@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block title %} Login: {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-6 col-md-offset3">
+		<form action="signup" method="post">
+			<div class="form-group">
+				<label>Username:</label><br>
+				<input type="text" id="username" name="username"><br>
+			</div>
+			<div class="form-group">
+				<label>Password:</label><br>
+				<input type="password" id="password" name="password">
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary">Login</button>
+			</div>
+
+			{% if feedback %}
+			<p class="text-danger float-right">{{ feedback }}</p>
+			{% endif %}
+		</form>
+	</div>
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<h2> Welcome! </h2>
+		{% if session['name'] %}
+		<h4> {{session['name']}}, explore your applications or create a new one. </h4>
+		<ol>
+			<li> App1 </li>
+			<li> App2 </li>
+		</ol>
+		{% else %}
+		<p>Log in, please</p>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}
