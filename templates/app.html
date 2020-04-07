@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block title %} Application: {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<p>Name: {{ app[0] }} </p>
+		<p>Description : {{ app[3] }} </p>
+		<p>app-key: {{ app[1] }} </p>
+
+		<p>Devices:</p>
+		{% if devs %}
+		<ol>
+			{% for dev in devs %}
+			<li><a href="/device?app_key={{ app[1] }}&dev={{ dev[1] }}"> {{ dev[0] }} </a></li>
+			{% endfor %}
+		</ol>
+		{% else %}
+		<p> No registed devices </p>
+		{% endif %}
+
+		<a href="/add-device"><button type="submit" class="btn btn-primary">Add Device</button></a>
+		<a href="/delete-app"><button type="submit" class="btn btn-danger" onclick="return conf();">Delete Application</button></a>
+	</div>
+</div>
+
+<script type="text/javascrypt">
+function conf() {
+	return confirm("Are you sure? It will remove all devices and data.")
+}
+</script>
+
+{% endblock %}
+
