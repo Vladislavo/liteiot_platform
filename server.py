@@ -35,16 +35,21 @@ def chk_user(name, password):
         conn = psycopg2.connect('dbname=gateway')
         cur  = conn.cursor()
         query = """
-        INSERT INTO
+        SELECT * FROM
             users
-        VALUES
-            (%s, %s)
+        WHERE 
+            name = %s
         """
-        cur.execute(query, (name, bcrypt.hashpw(password, bcrypt.gensalt())))
-        conn.commit()
-        print('User added')
+        cur.execute(query, (name,))
+        user = cur.fetchall()[0]
+        
+        if user[1].encode('utf-8') == bcrypt.hashpw(password, user[1].encode('utf-8')):
+            session['name'] = user[0]
+            print('User logged in')
+        else:
+            suc = (False, 'Password or username do not match')
     except (Exception, psycopg2.DatabaseError) as error:
-        print('Error adding a user: ', error)
+        print('Error querying a user: ', error)
         suc = (False, error)
     finally:
         if (conn):
@@ -52,7 +57,6 @@ def chk_user(name, password):
             conn.close()
         
     return suc
-
 
 
 @app.route('/')
@@ -65,7 +69,7 @@ def signup():
         return render_template('signup.html')
     else: 
         username = request.form['username']
-        password = request.form['password']
+        password = request.form['password'].encode('utf-8')
 
         if (username == '' or password == ''):
             feedback = 'Username or password fields cannot be empty'
@@ -74,18 +78,18 @@ def signup():
             res, msg = new_user(username, password)
             if (not res):
                 return render_template('signup.html', feedback=msg)
-
-            session['name'] = username
+            else:
+                session['name'] = username
         
-            return redirect(url_for('index'))
+                return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
-def signup():
+def login():
     if request.method == 'GET':
         return render_template('login.html')
     else: 
         username = request.form['username']
-        password = request.form['password']
+        password = request.form['password'].encode('utf-8')
 
         if (username == '' or password == ''):
             feedback = 'Username or password fields cannot be empty'
@@ -93,11 +97,17 @@ def signup():
         else:
             res, msg = chk_user(username, password)
             if (not res):
-                return render_template('signup.html', feedback=msg)
-
-            session['name'] = username
+                return render_template('login.html', feedback=msg)
+            else:
+                session['name'] = username
         
-            return redirect(url_for('index'))
+                return redirect(url_for('index'))
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
 
 @app.route('/apps')
