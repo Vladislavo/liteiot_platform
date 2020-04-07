@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import psycopg2
+import bcrypt
+
 
 app = Flask(__name__, template_folder='templates/')
 
@@ -14,7 +16,7 @@ def new_user(name, password):
         VALUES
             (%s, %s)
         """
-        cur.execute(query, (name, password))
+        cur.execute(query, (name, bcrypt.hashpw(password, bcrypt.gensalt())))
         conn.commit()
         print('User added')
     except (Exception, psycopg2.DatabaseError) as error:
@@ -26,6 +28,31 @@ def new_user(name, password):
             conn.close()
         
     return suc
+
+def chk_user(name, password):
+    suc = (True, 'Success')
+    try:
+        conn = psycopg2.connect('dbname=gateway')
+        cur  = conn.cursor()
+        query = """
+        INSERT INTO
+            users
+        VALUES
+            (%s, %s)
+        """
+        cur.execute(query, (name, bcrypt.hashpw(password, bcrypt.gensalt())))
+        conn.commit()
+        print('User added')
+    except (Exception, psycopg2.DatabaseError) as error:
+        print('Error adding a user: ', error)
+        suc = (False, error)
+    finally:
+        if (conn):
+            cur.close()
+            conn.close()
+        
+    return suc
+
 
 
 @app.route('/')
@@ -51,6 +78,27 @@ def signup():
             session['name'] = username
         
             return redirect(url_for('index'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'GET':
+        return render_template('login.html')
+    else: 
+        username = request.form['username']
+        password = request.form['password']
+
+        if (username == '' or password == ''):
+            feedback = 'Username or password fields cannot be empty'
+            return render_template('login.html', feedback=feedback)
+        else:
+            res, msg = chk_user(username, password)
+            if (not res):
+                return render_template('signup.html', feedback=msg)
+
+            session['name'] = username
+        
+            return redirect(url_for('index'))
+
 
 @app.route('/apps')
 def apps():
