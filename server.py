@@ -10,18 +10,21 @@ import dao.device.device as dd
 server = Flask(__name__, template_folder='templates/')
 
 
+def prep_ids(dev_list):
+    return "any"
+
 @server.route('/')
 def index():
     if 'name' in session and len(session['name']) > 0:
         ah = ad.ApplicationDao()
         apps = ah.get_list(session['name'].encode('utf-8'))
+
+        session.pop('appkey', None)
         print('apps: ', apps)
         if apps[0]:
             return render_template('index.html', apps=apps[1])
         else:
             return render_template('index.html', feedback=apps[1])
-
-    return render_template('index.html')
 
 
 
@@ -89,8 +92,16 @@ def app():
     ah = ad.ApplicationDao()
     if request.method == 'GET':
         dh = dd.DeviceDao()
-        app = ah.get(request.args.get('appkey'))
+        appkey = None
+        if 'appkey' in session:
+            appkey = session['appkey']
+        else:
+            appkey = request.args.get('appkey')
+            session['appkey'] = request.args.get('appkey')
+
+        app = ah.get(appkey)
         devs = dh.get_list(app[1][1])
+        
         print('devs : ', devs)
         return render_template('app.html', app=app[1], devs=devs[1])
     else:
@@ -112,6 +123,39 @@ def app():
             #    return render_template('new-app.html', feedback=str(res[1])+'|'+str(rer[1]))
             #else:
             return redirect(url_for('index'))
+
+
+@server.route('/add-dev')
+def new_dev():
+    free_ids = 'whatever'
+    
+    dh = dd.DeviceDao()
+    dev_list = dh.get_list(session['appkey'])
+    
+    print('dev list : ', dev_list)
+
+    if not dev_list[0]:
+        return render_template('add-dev.html', feedback=dev_list[1])
+    else:
+        return render_template('add-dev.html', free_ids=prep_ids(dev_list[1]))
+ 
+
+
+@server.route('/dev', methods=['GET', 'POST'])
+def dev():
+    dh = dd.DeviceDao()
+    if request.method == 'GET':
+        dev = dh.get(session['appkey'], request.args.get('dev_id'))
+        ltup = 'recently'
+
+        return render_template('dev.html', dev=dev[1], ltup=ltup)
+    else:
+        res = dh.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
+        
+        if not res[0]:
+            return render_template('add-dev.html', feedback=res[1])
+        else:
+            return redirect(url_for('app'))
 
 
 if __name__ == '__main__':

@@ -14,14 +14,14 @@
 		{% if devs %}
 		<ol>
 			{% for dev in devs %}
-			<li><a href="/device?app_key={{ app[1] }}&dev={{ dev[1] }}"> {{ dev[0] }} </a></li>
+			<li><a href="/dev?dev_id={{ dev[1] }}"> {{ dev[0] }} </a></li>
 			{% endfor %}
 		</ol>
 		{% else %}
 		<p> No registed devices </p>
 		{% endif %}
 
-		<a href="/add-device"><button type="submit" class="btn btn-primary">Add Device</button></a>
+		<a href="/add-dev"><button type="submit" class="btn btn-primary">Add Device</button></a>
 		<a href="/delete-app"><button type="submit" class="btn btn-danger" onclick="return conf();">Delete Application</button></a>
 	</div>
 </div>
