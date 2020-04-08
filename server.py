@@ -4,68 +4,10 @@ import bcrypt
 import misc
 import dao.user.user as ud
 import dao.application.application as ad
-
-
-APP_KEY_LEN = 8
+import dao.device.device as dd
 
 
 server = Flask(__name__, template_folder='templates/')
-
-
-
-def new_app_devs(appkey):
-    suc = (True, 'app_devs created')
-    try:
-        conn = psycopg2.connect('dbname=gateway')
-        cur  = conn.cursor()
-        query = """
-        CREATE TABLE devs_%s (
-            name VARCHAR(30) NOT NULL,
-            dev_id NUMERIC(3) PRIMARY KEY,
-            app_key VARCHAR(80),
-            description VARCHAR(200)
-            FOREIGN KEY (app_key) REFERENCES applications(app_key)
-        );
-        """
-        cur.execute(query, (appkey,))
-        conn.commit()
-        print('Devs table created')
-    except (Exception, psycopg2.DatabaseError) as error:
-        print('Error creating devs table: ', error)
-        suc = (False, error)
-    finally:
-        if (conn):
-            cur.close()
-            conn.close()
-        
-    return suc
-
-
-
-
-
-def get_devs(appkey):
-    res = []
-    try:
-        conn = psycopg2.connect('dbname=gateway')
-        cur  = conn.cursor()
-        query = """
-        SELECT * FROM
-            devs-%s
-        """
-        cur.execute(query, (appkey,))
-        res = cur.fetchall()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print('Error querying applications: ', error)
-    finally:
-        if (conn):
-            cur.close()
-            conn.close()
-        
-    return res
-
-
-
 
 
 @server.route('/')
@@ -74,7 +16,10 @@ def index():
         ah = ad.ApplicationDao()
         apps = ah.get_list(session['name'].encode('utf-8'))
         print('apps: ', apps)
-        return render_template('index.html', apps=apps[1])
+        if apps[0]:
+            return render_template('index.html', apps=apps[1])
+        else:
+            return render_template('index.html', feedback=apps[1])
 
     return render_template('index.html')
 
@@ -143,10 +88,11 @@ def new_application():
 def app():
     ah = ad.ApplicationDao()
     if request.method == 'GET':
+        dh = dd.DeviceDao()
         app = ah.get(request.args.get('appkey'))
-        devs = get_devs(app[1])
-        
-        return render_template('app.html', app=app[1], devs=devs)
+        devs = dh.get_list(app[1][1])
+        print('devs : ', devs)
+        return render_template('app.html', app=app[1], devs=devs[1])
     else:
         if request.form['appname'] == '':
             error = 'Application name cannot be empty.'
