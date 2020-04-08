@@ -2,70 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import psycopg2
 import bcrypt
 import misc
+import dao.user.user as ud
 
 
 APP_KEY_LEN = 8
 
 
 server = Flask(__name__, template_folder='templates/')
-
-
-
-def new_user(name, password):
-    suc = (True, 'User added')
-    try:
-        conn = psycopg2.connect('dbname=gateway')
-        cur  = conn.cursor()
-        query = """
-        INSERT INTO
-            users
-        VALUES
-            (%s, %s)
-        """
-        cur.execute(query, (name, bcrypt.hashpw(password, bcrypt.gensalt())))
-        conn.commit()
-        print('User added')
-    except (Exception, psycopg2.DatabaseError) as error:
-        print('Error adding a user: ', error)
-        suc = (False, error)
-    finally:
-        if (conn):
-            cur.close()
-            conn.close()
-        
-    return suc
-
-
-
-def chk_user(name, password):
-    suc = (True, 'Success')
-    try:
-        conn = psycopg2.connect('dbname=gateway')
-        cur  = conn.cursor()
-        query = """
-        SELECT * FROM
-            users
-        WHERE 
-            name = %s
-        """
-        cur.execute(query, (name,))
-        user = cur.fetchall()[0]
-        
-        if user[1].encode('utf-8') == bcrypt.hashpw(password, user[1].encode('utf-8')):
-            session['name'] = user[0]
-            print('User logged in')
-        else:
-            suc = (False, 'Password or username do not match')
-    except (Exception, psycopg2.DatabaseError) as error:
-        print('Error querying a user: ', error)
-        suc = (False, error)
-    finally:
-        if (conn):
-            cur.close()
-            conn.close()
-        
-    return suc
-
 
 
 def get_apps(username):
@@ -149,7 +92,7 @@ def new_app_devs(appkey):
         conn = psycopg2.connect('dbname=gateway')
         cur  = conn.cursor()
         query = """
-        CREATE TABLE dev_%s (
+        CREATE TABLE devs_%s (
             name VARCHAR(30) NOT NULL,
             dev_id NUMERIC(3) PRIMARY KEY,
             app_key VARCHAR(80),
@@ -159,9 +102,9 @@ def new_app_devs(appkey):
         """
         cur.execute(query, (appkey,))
         conn.commit()
-        print('Dev table created')
+        print('Devs table created')
     except (Exception, psycopg2.DatabaseError) as error:
-        print('Error creating app: ', error)
+        print('Error creating devs table: ', error)
         suc = (False, error)
     finally:
         if (conn):
@@ -200,9 +143,9 @@ def get_devs(appkey):
 
 @server.route('/')
 def index():
-    if len(session['name']) > 0:
+    if 'name' in session and len(session['name']) > 0:
         apps = get_apps(session['name'].encode('utf-8'))
-        print(apps)
+        print('apps: ', apps)
         return render_template('index.html', apps=apps)
 
     return render_template('index.html')
@@ -221,9 +164,10 @@ def signup():
             feedback = 'Username or password fields cannot be empty'
             return render_template('signup.html', feedback=feedback)
         else:
-            res, msg = new_user(username, password)
-            if (not res):
-                return render_template('signup.html', feedback=msg)
+            uh = ud.UserDao()
+            res = uh.create(username, password)
+            if (not res[0]):
+                return render_template('signup.html', feedback=res[1])
             else:
                 session['name'] = username
         
@@ -243,9 +187,10 @@ def login():
             feedback = 'Username or password fields cannot be empty'
             return render_template('login.html', feedback=feedback)
         else:
-            res, msg = chk_user(username, password)
-            if (not res):
-                return render_template('login.html', feedback=msg)
+            uh = ud.UserDao()
+            res = uh.get(username, password)
+            if (not res[0]):
+                return render_template('login.html', feedback=msg[1])
             else:
                 session['name'] = username
         
@@ -279,9 +224,16 @@ def app():
             return render_template('new-app.html', feedback=error)
         else:
             res = new_app(request.form['appname'], request.form['appdesc'])
-            rer = new_app_devs(request.form['appname'])
+            if not res[0]:
+                return render_template('new-app.html', feedback=res[1])
+
+            res = new_app_devs(request.form['appname'])
+            if not res[0]:
+                rm_app(request.form['appname'])
+                return render_template('new-app.html', feedback=res[1])
+            
             if not res[0] or not rer[0]:
-                return render_template('new-app.html', feedback=res[1]+'|'+rer[1])
+                return render_template('new-app.html', feedback=str(res[1])+'|'+str(rer[1]))
             else:
                 return redirect(url_for('index'))
 
