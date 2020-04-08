@@ -3,86 +3,13 @@ import psycopg2
 import bcrypt
 import misc
 import dao.user.user as ud
+import dao.application.application as ad
 
 
 APP_KEY_LEN = 8
 
 
 server = Flask(__name__, template_folder='templates/')
-
-
-def get_apps(username):
-    res = []
-    try:
-        conn = psycopg2.connect('dbname=gateway')
-        cur  = conn.cursor()
-        query = """
-        SELECT * FROM
-            applications
-        WHERE 
-            username = %s
-        """
-        cur.execute(query, (username,))
-        res = cur.fetchall()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print('Error querying applications: ', error)
-    finally:
-        if (conn):
-            cur.close()
-            conn.close()
-        
-    return res
-
-
-
-def get_app(appkey):
-    res = []
-    try:
-        conn = psycopg2.connect('dbname=gateway')
-        cur  = conn.cursor()
-        query = """
-        SELECT * FROM
-            applications
-        WHERE 
-            app_key = %s
-        """
-        cur.execute(query, (appkey,))
-        res = cur.fetchall()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print('Error querying applications: ', error)
-    finally:
-        if (conn):
-            cur.close()
-            conn.close()
-        
-    return res
-
-
-
-
-def new_app(name, desc):
-    suc = (True, 'App created')
-    try:
-        conn = psycopg2.connect('dbname=gateway')
-        cur  = conn.cursor()
-        query = """
-        INSERT INTO
-            applications
-        VALUES
-            (%s, %s, %s, %s)
-        """
-        cur.execute(query, (name, misc.rand_str(APP_KEY_LEN), session['name'], desc))
-        conn.commit()
-        print('App created')
-    except (Exception, psycopg2.DatabaseError) as error:
-        print('Error creating app: ', error)
-        suc = (False, error)
-    finally:
-        if (conn):
-            cur.close()
-            conn.close()
-        
-    return suc
 
 
 
@@ -144,9 +71,10 @@ def get_devs(appkey):
 @server.route('/')
 def index():
     if 'name' in session and len(session['name']) > 0:
-        apps = get_apps(session['name'].encode('utf-8'))
+        ah = ad.ApplicationDao()
+        apps = ah.get_list(session['name'].encode('utf-8'))
         print('apps: ', apps)
-        return render_template('index.html', apps=apps)
+        return render_template('index.html', apps=apps[1])
 
     return render_template('index.html')
 
@@ -213,8 +141,9 @@ def new_application():
 
 @server.route('/app', methods=['GET', 'POST'])
 def app():
+    ah = ad.ApplicationDao()
     if request.method == 'GET':
-        app = get_app(request.form['appkey'])
+        app = ah.get(request.form['appkey'])
         devs = get_devs(app[1])
         
         return render_template('app.html', app=app, devs=devs)
@@ -223,19 +152,20 @@ def app():
             error = 'Application name cannot be empty.'
             return render_template('new-app.html', feedback=error)
         else:
-            res = new_app(request.form['appname'], request.form['appdesc'])
+            res = ah.create(request.form['appname'], session['name'], request.form['appdesc'])
+            
             if not res[0]:
                 return render_template('new-app.html', feedback=res[1])
 
-            res = new_app_devs(request.form['appname'])
-            if not res[0]:
-                rm_app(request.form['appname'])
-                return render_template('new-app.html', feedback=res[1])
+            #res = new_app_devs(request.form['appname'])
+            #if not res[0]:
+            #    rm_app(request.form['appname'])
+            #    return render_template('new-app.html', feedback=res[1])
             
-            if not res[0] or not rer[0]:
-                return render_template('new-app.html', feedback=str(res[1])+'|'+str(rer[1]))
-            else:
-                return redirect(url_for('index'))
+            #if not res[0] or not rer[0]:
+            #    return render_template('new-app.html', feedback=str(res[1])+'|'+str(rer[1]))
+            #else:
+            return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
