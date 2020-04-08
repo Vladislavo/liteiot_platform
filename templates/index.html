@@ -11,7 +11,7 @@
 		<h4> Explore your applications or create a new one. </h4>
 		<ol>
 			{% for app in apps %}
-			<li><a href="/apps?appkey={{ app[1] }}"> {{ app[0] }} </a></li>
+			<li><a href="/app?appkey={{ app[1] }}"> {{ app[0] }} </a></li>
 			{% endfor %}
 		</ol>
 		<a href="/new-app"><button class="btn btn-primary" type="submit">New Application</button></a>

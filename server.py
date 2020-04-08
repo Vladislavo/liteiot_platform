@@ -143,10 +143,10 @@ def new_application():
 def app():
     ah = ad.ApplicationDao()
     if request.method == 'GET':
-        app = ah.get(request.form['appkey'])
+        app = ah.get(request.args.get('appkey'))
         devs = get_devs(app[1])
         
-        return render_template('app.html', app=app, devs=devs)
+        return render_template('app.html', app=app[1], devs=devs)
     else:
         if request.form['appname'] == '':
             error = 'Application name cannot be empty.'
