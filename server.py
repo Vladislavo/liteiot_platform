@@ -172,6 +172,15 @@ def dev():
                 return redirect(url_for('app'))
 
 
+@server.route('/delete-dev')
+def delete_dev():
+    dh = dd.DeviceDao()
+    dh.delete_datatable(session['appkey'], request.args.get('id'))
+    res = dh.delete(session['appkey'], request.args.get('id'))
+
+    return redirect(url_for('app', appkey=session['appkey']))
+
+
 if __name__ == '__main__':
     server.secret_key = 'sdjfklsjf^$654sd^#sPH'
     server.run(debug = True, host='0.0.0.0')
