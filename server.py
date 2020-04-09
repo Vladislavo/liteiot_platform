@@ -10,10 +10,6 @@ APP_KEY_LEN = 8
 
 server = Flask(__name__, template_folder='templates/')
 
-
-def prep_ids(dev_list):
-    return "any"
-
 @server.route('/')
 def index():
     if 'name' in session and len(session['name']) > 0:
@@ -145,8 +141,6 @@ def delete_app():
 
 @server.route('/add-dev')
 def new_dev():
-    free_ids = 'whatever'
-    
     dh = dd.DeviceDao()
     dev_list = dh.get_list(session['appkey'])
     
@@ -155,7 +149,7 @@ def new_dev():
     if not dev_list[0]:
         return render_template('add-dev.html', feedback=dev_list[1])
     else:
-        return render_template('add-dev.html', free_ids=prep_ids(dev_list[1]))
+        return render_template('add-dev.html', free_ids=misc.prep_id_range(dev_list[1]))
  
 
 
