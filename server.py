@@ -6,6 +6,7 @@ import dao.user.user as ud
 import dao.application.application as ad
 import dao.device.device as dd
 
+APP_KEY_LEN = 8
 
 server = Flask(__name__, template_folder='templates/')
 
@@ -109,21 +110,38 @@ def app():
             error = 'Application name cannot be empty.'
             return render_template('new-app.html', feedback=error)
         else:
-            res = ah.create(request.form['appname'], session['name'], request.form['appdesc'])
+            appkey = misc.rand_str(APP_KEY_LEN)
+            res = ah.create(request.form['appname'], appkey, session['name'], request.form['appdesc'])
             
             if not res[0]:
                 return render_template('new-app.html', feedback=res[1])
-
-            #res = new_app_devs(request.form['appname'])
-            #if not res[0]:
-            #    rm_app(request.form['appname'])
-            #    return render_template('new-app.html', feedback=res[1])
             
-            #if not res[0] or not rer[0]:
-            #    return render_template('new-app.html', feedback=str(res[1])+'|'+str(rer[1]))
-            #else:
+            dh = dd.DeviceDao()
+            res = dh.create_table(appkey)
+            
+            if not res[0]:
+                ah.delete(appkey)
+                return render_template('new-app.html', feedback=res[1])
+            
             return redirect(url_for('index'))
 
+@server.route('/delete-app')
+def delete_app():
+    dh = dd.DeviceDao()
+    devs = dh.get_list(session['appkey'])
+    
+    for dev in devs[1]:
+        dh.delete_datatable(session['appkey'], dev[1])
+    
+    dh.delete_table(session['appkey'])
+    
+    ah = ad.ApplicationDao()
+    res = ah.delete(session['appkey'])
+    
+    if not res[0]:
+        return redirect(url_for('app'))
+    else:
+        return redirect(url_for('index'))
 
 @server.route('/add-dev')
 def new_dev():
@@ -145,17 +163,23 @@ def new_dev():
 def dev():
     dh = dd.DeviceDao()
     if request.method == 'GET':
-        dev = dh.get(session['appkey'], request.args.get('dev_id'))
+        dev = dh.get(session['appkey'], request.args.get('id'))
         ltup = 'recently'
 
-        return render_template('dev.html', dev=dev[1], ltup=ltup)
+        return render_template('dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
     else:
         res = dh.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
-        
+
         if not res[0]:
             return render_template('add-dev.html', feedback=res[1])
         else:
-            return redirect(url_for('app'))
+            res = dh.create_datatable(session['appkey'], request.form['devid'])
+            
+            if not res[0]:
+                dh.delete(session['appkey'], request.form['devid'])
+                return render_template('add-dev.html', feedback=res[1])
+            else:
+                return redirect(url_for('app'))
 
 
 if __name__ == '__main__':

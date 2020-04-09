@@ -1,8 +1,6 @@
 import psycopg2
 import bcrypt
-from misc import rand_str
 
-APP_KEY_LEN = 8
 
 class ApplicationDao:
     
@@ -31,14 +29,14 @@ class ApplicationDao:
 
     @staticmethod
     @with_psql
-    def create(cur, name, username, desc):
+    def create(cur, name, appkey, username, desc):
         query = """
         INSERT INTO
             applications
         VALUES
             (%s, %s, %s, %s)
         """
-        cur.execute(query, (name, rand_str(APP_KEY_LEN), username, desc))
+        cur.execute(query, (name, appkey, username, desc))
         
         return (True,)
 
