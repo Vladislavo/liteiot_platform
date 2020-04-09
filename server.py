@@ -180,7 +180,23 @@ def dev_conf():
     if request.method == 'GET':
         return render_template('dev-conf.html', devname=session['devname'])
     else:
-        pass
+        argslen = len(request.form['arg']) + 1
+        args = bytearray(argslen + 2)
+        args[0] = int(request.form['confid'])
+        args[1] = argslen
+        
+        bstr = request.form['arg'].encode('utf-8')
+        i = 0
+        while i < argslen:
+            print(args[2+i])
+            args[2+i] = bstr[i]
+            i += 1
+
+        print('msg = ', args)
+        print(type(request.form['arg'].encode('utf-8')))
+        print(request.form['arg'].encode('utf-8'))
+        
+        return redirect(url_for('dev', id=session['devid']))
 
 @server.route('/delete-dev')
 def delete_dev():
