@@ -89,14 +89,10 @@ def app():
     ah = ad.ApplicationDao()
     if request.method == 'GET':
         dh = dd.DeviceDao()
-        appkey = None
-        if 'appkey' in session:
-            appkey = session['appkey']
-        else:
-            appkey = request.args.get('appkey')
-            session['appkey'] = request.args.get('appkey')
+            
+        session['appkey'] = request.args.get('appkey')
 
-        app = ah.get(appkey)
+        app = ah.get(session['appkey'])
         devs = dh.get_list(app[1][1])
         
         print('devs : ', devs)
