@@ -156,6 +156,9 @@ def dev():
         dev = dh.get(session['appkey'], request.args.get('id'))
         ltup = 'recently'
 
+        session['devid'] = dev[1][1]
+        session['devname'] = dev[1][0]
+
         return render_template('dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
     else:
         res = dh.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
@@ -171,6 +174,13 @@ def dev():
             else:
                 return redirect(url_for('app'))
 
+
+@server.route('/dev-conf', methods=['GET', 'POST'])
+def dev_conf():
+    if request.method == 'GET':
+        return render_template('dev-conf.html', devname=session['devname'])
+    else:
+        pass
 
 @server.route('/delete-dev')
 def delete_dev():
