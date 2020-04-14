@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 import psycopg2
 import bcrypt
 import misc
@@ -11,6 +11,7 @@ import binascii
 
 
 APP_KEY_LEN = 8
+DATA_DOWNLOAD_DIR = 'data'
 
 server = Flask(__name__, template_folder='templates/')
 
@@ -222,10 +223,31 @@ def dev_data():
     last = data.get_last_n(session['appkey'], session['devid'], 5)  
     count = data.get_count(session['appkey'], session['devid'])
 
-    print(last)
-    print(count)
+    #print(last)
+    #print(count)
 
     return render_template('dev-data.html', data=last[1], total=count[1][0])
+
+@server.route('/data-csv')
+def data_csv():
+    dumpd = data.get_all(session['appkey'], session['devid'])
+
+    fn = session['appkey']+ '_' +str(session['devid'])+ '.csv'
+
+    with open(DATA_DOWNLOAD_DIR+'/'+fn, 'w') as f: 
+        for d in dumpd[1][0][2]:
+            f.write(d)
+            f.write(',')
+        f.write('\n')
+        
+        for row in dumpd[1]:
+            for v in row[2]:
+                f.write(str(row[2][v]))
+                f.write(',')
+            f.write('\n')
+    
+    return send_from_directory(DATA_DOWNLOAD_DIR, fn, as_attachment=True)
+        
 
 if __name__ == '__main__':
     server.secret_key = 'sdjfklsjf^$654sd^#sPH'
