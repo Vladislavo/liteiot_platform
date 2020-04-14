@@ -23,8 +23,8 @@ def with_psql(f):
 
 
 @with_psql
-def create_table(cur, appkey, dev_id):
-    tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
+def create_table(cur, appkey, devid):
+    tn = 'dev_' +str(appkey)+ '_' +str(devid)
     cur.execute(
         sql.SQL(
             """CREATE TABLE {} (
@@ -37,8 +37,8 @@ def create_table(cur, appkey, dev_id):
 
     
 @with_psql
-def delete_table(cur, appkey, dev_id):
-    tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
+def delete_table(cur, appkey, devid):
+    tn = 'dev_' +str(appkey)+ '_' +str(devid)
     cur.execute(
         psycopg2.sql.SQL(
             "DROP TABLE {}"
@@ -47,8 +47,8 @@ def delete_table(cur, appkey, dev_id):
 
 
 @with_psql
-def get_last_n(cur, appkey, dev_id, n):
-    tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
+def get_last_n(cur, appkey, devid, n):
+    tn = 'dev_' +str(appkey)+ '_' +str(devid)
     query = """
         SELECT * FROM 
             {}
@@ -56,24 +56,36 @@ def get_last_n(cur, appkey, dev_id, n):
             utc DESC
         LIMIT %s
         """
-        cur.execute(
-            sql.SQL(query).format(sql.Identifier(tn)), [n])
-        data = cur.fetchall()
+    cur.execute(
+        sql.SQL(query).format(sql.Identifier(tn)), [n])
+    data = cur.fetchall()
         
-        if (data == []):
-            return (False, 'There is no data for the device.')
-        else:
-            return (True, data)
+    if (data == []):
+        return (False, 'There is no data for the device.')
+    else:
+        return (True, data)
 
 
 @with_psql
 def get_all(cur, appkey, devid):
-    tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
-        query = """
+    tn = 'dev_' +str(appkey)+ '_' +str(devid)
+    query = """
         SELECT * FROM
             {}
         """
-        cur.execute(
-            sql.SQL(query).format(sql.Identifier(tn)))
-        return (True, cur.fetchall())
+    cur.execute(
+        sql.SQL(query).format(sql.Identifier(tn)))
+    return (True, cur.fetchall())
+
+@with_psql
+def get_count(cur, appkey, devid):
+    tn = 'dev_' +str(appkey)+ '_' +str(devid)
+    query = """
+        SELECT COUNT(utc) FROM
+            {}
+        """
+    cur.execute(
+        sql.SQL(query).format(sql.Identifier(tn)))
+    return (True, cur.fetchone())
+
 

@@ -8,16 +8,22 @@
 	<div class="col-md-6 col-md-offset-3">
 		<p>Last 5 messages:</p>
 		
-		<table>
-			{% for data %}
+		<table class="table">
+			<thead>
+				<th>Time</th>
+				<th>Content</th>
+			</thead>
+			<tbody>
+			{% for d in data %}
 			<tr>
-				<th> {{ data[1] }} </th>
-				<th> {{ data[2] }} </th>
+				<th> {{ d[1] }} </th>
+				<th> {{ d[2] }} </th>
 			</tr>
 			{% endfor %}
+			</tbody>
 		</table>
 
-		<p>Total {{ total }} messages.</p>
+		<p>Total: {{ total }} messages.</p>
 
 		<a href="/data-csv"><button type="submit" class="btn btn-primary">Download CSV</button></a>
 	</div>

@@ -6,6 +6,7 @@ import dao.user.user as ud
 import dao.application.application as ad
 import dao.device.device as dd
 import dao.pend.pend as pend
+import dao.data.data as data
 import binascii
 
 
@@ -126,7 +127,7 @@ def delete_app():
     devs = dh.get_list(session['appkey'])
     
     for dev in devs[1]:
-        dh.delete_datatable(session['appkey'], dev[1])
+        data.delete_table(session['appkey'], dev[1])
     
     dh.delete_table(session['appkey'])
     
@@ -169,7 +170,7 @@ def dev():
         if not res[0]:
             return render_template('add-dev.html', feedback=res[1])
         else:
-            res = dh.create_datatable(session['appkey'], request.form['devid'])
+            res = data.create_table(session['appkey'], request.form['devid'])
             
             if not res[0]:
                 dh.delete(session['appkey'], request.form['devid'])
@@ -210,15 +211,21 @@ def dev_conf():
 @server.route('/delete-dev')
 def delete_dev():
     dh = dd.DeviceDao()
-    dh.delete_datatable(session['appkey'], request.args.get('id'))
-    res = dh.delete(session['appkey'], request.args.get('id'))
+    data.delete_table(session['appkey'], session['devid'])
+    res = dh.delete(session['appkey'], session['devid'])
 
     return redirect(url_for('app', appkey=session['appkey']))
 
 
 @server.route('/dev-data')
 def dev_data():
-    pass 
+    last = data.get_last_n(session['appkey'], session['devid'], 5)  
+    count = data.get_count(session['appkey'], session['devid'])
+
+    print(last)
+    print(count)
+
+    return render_template('dev-data.html', data=last[1], total=count[1][0])
 
 if __name__ == '__main__':
     server.secret_key = 'sdjfklsjf^$654sd^#sPH'
