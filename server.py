@@ -5,6 +5,9 @@ import misc
 import dao.user.user as ud
 import dao.application.application as ad
 import dao.device.device as dd
+import dao.pend.pend as pend
+import binascii
+
 
 APP_KEY_LEN = 8
 
@@ -180,21 +183,26 @@ def dev_conf():
     if request.method == 'GET':
         return render_template('dev-conf.html', devname=session['devname'])
     else:
+        
         argslen = len(request.form['arg']) + 1
         args = bytearray(argslen + 2)
         args[0] = int(request.form['confid'])
         args[1] = argslen
         
-        bstr = request.form['arg'].encode('utf-8')
+        bstr = bytes(request.form['arg'])
         i = 0
-        while i < argslen:
-            print(args[2+i])
+        while i < argslen - 1:
             args[2+i] = bstr[i]
             i += 1
 
-        print('msg = ', args)
-        print(type(request.form['arg'].encode('utf-8')))
-        print(request.form['arg'].encode('utf-8'))
+        base64_args = binascii.b2a_base64(args).decode('utf-8')
+
+        pend.create(session['appkey'], session['devid'], base64_args)
+
+        #print('msg = ', args)
+        #print('base64 = ', base64_args)
+        #print(type(request.form['arg'].encode('utf-8')))
+        #print(request.form['arg'].encode('utf-8'))
         
         return redirect(url_for('dev', id=session['devid']))
 
