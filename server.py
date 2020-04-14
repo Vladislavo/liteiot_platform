@@ -27,6 +27,8 @@ def index():
             return render_template('index.html', apps=apps[1])
         else:
             return render_template('index.html', feedback=apps[1])
+    else:
+        return render_template('index.html')
 
 
 
