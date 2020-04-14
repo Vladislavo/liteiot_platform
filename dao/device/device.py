@@ -36,6 +36,7 @@ class DeviceDao:
             sql.SQL(
                 """CREATE TABLE {} (
                     utc NUMERIC(10) NOT NULL,
+                    timedate VARCHAR(100) NOT NULL,
                     data json NOT NULL
                 )"""
             ).format(sql.Identifier(tn)))

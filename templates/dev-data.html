@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block title %} Device Data: {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<p>Last 5 messages:</p>
+		
+		<table>
+			{% for data %}
+			<tr>
+				<th> {{ data[1] }} </th>
+				<th> {{ data[2] }} </th>
+			</tr>
+			{% endfor %}
+		</table>
+
+		<p>Total {{ total }} messages.</p>
+
+		<a href="/data-csv"><button type="submit" class="btn btn-primary">Download CSV</button></a>
+	</div>
+</div>
+
+<script type="text/javascrypt">
+function conf() {
+	return confirm("Are you sure? It will remove all device data.")
+}
+</script>
+
+{% endblock %}
+

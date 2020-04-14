@@ -175,7 +175,7 @@ def dev():
                 dh.delete(session['appkey'], request.form['devid'])
                 return render_template('add-dev.html', feedback=res[1])
             else:
-                return redirect(url_for('app'))
+                return redirect(url_for('app', appkey=session['appkey']))
 
 
 @server.route('/dev-conf', methods=['GET', 'POST'])
@@ -206,6 +206,7 @@ def dev_conf():
         
         return redirect(url_for('dev', id=session['devid']))
 
+
 @server.route('/delete-dev')
 def delete_dev():
     dh = dd.DeviceDao()
@@ -214,6 +215,10 @@ def delete_dev():
 
     return redirect(url_for('app', appkey=session['appkey']))
 
+
+@server.route('/dev-data')
+def dev_data():
+    pass 
 
 if __name__ == '__main__':
     server.secret_key = 'sdjfklsjf^$654sd^#sPH'
