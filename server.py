@@ -222,7 +222,7 @@ def delete_dev():
 
 @server.route('/dev-data')
 def dev_data():
-    last = data.get_last_n(session['appkey'], session['devid'], 5)  
+    last = data.get_last_n(session['appkey'], session['devid'], 10)  
     count = data.get_count(session['appkey'], session['devid'])
 
     #print(last)
