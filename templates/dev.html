@@ -6,15 +6,39 @@
 
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
-		<p>Name: {{ dev[0] }} </p>
-		<p>dev_id: {{ dev[1] }} </p>
-		<p>app-key: {{ appkey }} </p>
-		<p>Description : {{ dev[2] }} </p>
-		<p>Last time up : {{ ltup }} </p>
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<center><h2> {{ dev[0] }} </h2></center>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover">
+					<tbody>
+						<tr>
+							<th> dev_id </th>
+							<th> {{ dev[1] }} </th>
+						</tr>
+						<tr>
+							<th> app-key </th>
+							<th> {{ appkey }} </th>
+						</tr>
+						<tr>
+							<th> Description </th>
+							<th> {{ dev[2] }} </th>
+						</tr>
+						<tr>
+							<th> Last time up </th> 
+							<th><strong> {{ ltup }} </strong></th>
+						</tr>
+					</tbody>
+				</table>
 
-		<a href="/dev-data"><button type="submit" class="btn btn-primary">Data</button></a>
-		<a href="/dev-conf"><button type="submit" class="btn btn-primary">Configure</button></a>
-		<a href="/delete-dev"><button type="submit" class="btn btn-danger" onclick="return conf();">Delete Device</button></a>
+				<center>
+				<a href="/dev-data"><button type="submit" class="btn btn-primary">Data</button></a>
+				<a href="/dev-conf"><button type="submit" class="btn btn-primary">Configure</button></a>
+				<a href="/delete-dev"><button type="submit" class="btn btn-danger" onclick="return conf();">Delete Device</button></a>
+				</center
+			</div>
+		</div>
 	</div>
 </div>
 
