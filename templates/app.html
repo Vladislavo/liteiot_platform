@@ -27,9 +27,9 @@
 
 			{% if devs %}
 			<h3><center>Devices:</center></h3>
-			<ol class="list-group" style="list-style: decimal inside;">
+			<ol class="list-group">
 				{% for dev in devs %}
-				<a href="/dev?id={{ dev[1] }}"><li class="list-group-item" style="display:list-item;"><strong> {{ dev[0] }} </strong></li></a>
+				<a href="/dev?id={{ dev[1] }}"><li class="list-group-item"><strong> {{ dev[0] }} </strong></li></a>
 				{% endfor %}
 			</ol>
 			{% else %}

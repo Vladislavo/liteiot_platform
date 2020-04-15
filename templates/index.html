@@ -8,12 +8,17 @@
 	<div class="col-md-6 col-md-offset-3">
 		<h2> Welcome, {{session['name']}}! </h2>
 		{% if session['name'] %}
+		<br>
 		<h4> Explore your applications or create a new one. </h4>
-		<ol>
+		{% if apps %}
+		<br>
+		<ol class="list-group">
 			{% for app in apps %}
-			<li><a href="/app?appkey={{ app[1] }}"> {{ app[0] }} </a></li>
+			<a href="/app?appkey={{ app[1] }}"><li class="list-group-item"><strong> {{ app[0] }} </strong></li></a>
 			{% endfor %}
 		</ol>
+		{% endif %}
+		<br>
 		<a href="/new-app"><button class="btn btn-primary" type="submit">New Application</button></a>
 		{% else %}
 		<p>Log in, please</p>
