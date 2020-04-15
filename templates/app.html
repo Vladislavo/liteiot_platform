@@ -27,13 +27,13 @@
 
 			{% if devs %}
 			<h3><center>Devices:</center></h3>
-			<ol class="list-group">
+			<ol class="list-group" style="list-style: decimal inside;">
 				{% for dev in devs %}
-				<a href="/dev?id={{ dev[1] }}"><li class="list-group-item"><strong> {{ dev[0] }} <strong></li></a>
+				<a href="/dev?id={{ dev[1] }}"><li class="list-group-item" style="display:list-item;"><strong> {{ dev[0] }} </strong></li></a>
 				{% endfor %}
 			</ol>
 			{% else %}
-			<h3> No registed devices </h3>
+			<h3><center> No registed devices </center></h3>
 			{% endif %}
 
 			<br><br>
