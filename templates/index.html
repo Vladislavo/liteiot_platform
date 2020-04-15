@@ -6,8 +6,8 @@
 
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
-		<h2> Welcome, {{session['name']}}! </h2>
 		{% if session['name'] %}
+		<h2> Welcome, {{session['name']}}! </h2>
 		<br>
 		<h4> Explore your applications or create a new one. </h4>
 		{% if apps %}
@@ -21,7 +21,9 @@
 		<br>
 		<a href="/new-app"><button class="btn btn-primary" type="submit">New Application</button></a>
 		{% else %}
-		<p>Log in, please</p>
+		<h2>Log in, please</h2>
+		<br>
+		<a href="/login"><button class="btn btn-primary btn-lg">Login</button></a>
 		{% endif %}
 		{% if feedback %}
 		<p class="text-danger float-right"> {{ feedback }} </p>	
