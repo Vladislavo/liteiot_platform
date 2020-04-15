@@ -6,16 +6,19 @@
 
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
-		<p> Device name : {{ devname }}
+		<h2> Configure Device: {{ devname }} </h2>
+		<br><br>
 		<form action="dev-conf" method="post">
 			<div class="form-group">
 				<label>Config ID:</label><br>
-				<input type="text" id="confid" name="confid"><br>
+				<input type="text" class="form-control" id="confid" name="confid" required></textarea>
 			</div>
+			<br>
 			<div class="form-group">
 				<label>Argument:</label><br>
-				<input type="text" id="arg" name="arg"><br>
+				<textarea type="text" class="form-control" id="arg" name="arg" rows="2" reqiured></textarea>
 			</div>
+			<br><br>
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">Configure</button>
 			</div>
