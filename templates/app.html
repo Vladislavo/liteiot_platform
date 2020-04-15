@@ -6,23 +6,44 @@
 
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
-		<p>Name: {{ app[0] }} </p>
-		<p>Description : {{ app[3] }} </p>
-		<p>app-key: {{ app[1] }} </p>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h2><center> {{ app[0] }} </center></h2>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover">
+					<tbody>
+						<tr>
+							<th>Description</th> 
+							<th> {{ app[3] }} </th>
+						</tr>
+						<tr>
+							<th>app-key</th>
+							<th> {{ app[1] }} </th>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-		<p>Devices:</p>
-		{% if devs %}
-		<ol>
-			{% for dev in devs %}
-			<li><a href="/dev?id={{ dev[1] }}"> {{ dev[0] }} </a></li>
-			{% endfor %}
-		</ol>
-		{% else %}
-		<p> No registed devices </p>
-		{% endif %}
+			{% if devs %}
+			<h3><center>Devices:</center></h3>
+			<ol class="list-group">
+				{% for dev in devs %}
+				<a href="/dev?id={{ dev[1] }}"><li class="list-group-item"><strong> {{ dev[0] }} <strong></li></a>
+				{% endfor %}
+			</ol>
+			{% else %}
+			<h3> No registed devices </h3>
+			{% endif %}
 
-		<a href="/add-dev"><button type="submit" class="btn btn-primary">Add Device</button></a>
-		<a href="/delete-app"><button type="submit" class="btn btn-danger" onclick="return conf();">Delete Application</button></a>
+			<br><br>
+			
+			<center>	
+			<a href="/add-dev"><button type="submit" class="btn btn-primary">Add Device</button></a>
+			<a href="/delete-app"><button type="submit" class="btn btn-danger" onclick="return conf();">Delete Application</button></a>
+			</center>
+			<br>
+		</div>	
 	</div>
 </div>
 
