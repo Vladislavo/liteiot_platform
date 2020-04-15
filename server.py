@@ -88,188 +88,215 @@ def logout():
 
 @server.route('/new-app')
 def new_application():
-    return render_template('new-app.html')
+    if 'name' in session:
+        return render_template('new-app.html')
+    else:
+        return redirect(url_for('index'))
 
 
 
 @server.route('/app', methods=['GET', 'POST'])
 def app():
-    ah = ad.ApplicationDao()
-    if request.method == 'GET':
-        dh = dd.DeviceDao()
-            
-        session['appkey'] = request.args.get('appkey')
-
-        app = ah.get(session['appkey'])
-        devs = dh.get_list(app[1][1])
-        
-        try:
-            filelist = [f for f in os.listdir(DATA_DOWNLOAD_DIR) if f.startswith(session['appkey'])]
-            print(filelist)
-            for f in filelist:
-                os.remove(DATA_DOWNLOAD_DIR+'/'+f)
-        except OSError:
-            pass
-
-        # print('devs : ', devs)
-        return render_template('app.html', app=app[1], devs=devs[1])
-    else:
-        if request.form['appname'] == '':
-            error = 'Application name cannot be empty.'
-            return render_template('new-app.html', feedback=error)
-        else:
-            appkey = misc.rand_str(APP_KEY_LEN)
-            res = ah.create(request.form['appname'], appkey, session['name'], request.form['appdesc'])
-            
-            if not res[0]:
-                return render_template('new-app.html', feedback=res[1])
-            
+    if 'name' in session:
+        ah = ad.ApplicationDao()
+        if request.method == 'GET':
             dh = dd.DeviceDao()
-            res = dh.create_table(appkey)
             
-            if not res[0]:
-                ah.delete(appkey)
-                return render_template('new-app.html', feedback=res[1])
-            
-            return redirect(url_for('index'))
+            session['appkey'] = request.args.get('appkey')
 
-@server.route('/delete-app')
-def delete_app():
-    dh = dd.DeviceDao()
-    devs = dh.get_list(session['appkey'])
-    
-    for dev in devs[1]:
-        data.delete_table(session['appkey'], dev[1])
-    
-    dh.delete_table(session['appkey'])
-    
-    ah = ad.ApplicationDao()
-    res = ah.delete(session['appkey'])
-    
-    if not res[0]:
-        return redirect(url_for('app'))
+            app = ah.get(session['appkey'])
+            devs = dh.get_list(app[1][1])
+        
+            try:
+                filelist = [f for f in os.listdir(DATA_DOWNLOAD_DIR) if f.startswith(session['appkey'])]
+                for f in filelist:
+                    os.remove(DATA_DOWNLOAD_DIR+'/'+f)
+            except OSError:
+                pass
+
+           # print('devs : ', devs)
+            return render_template('app.html', app=app[1], devs=devs[1])
+        else:
+            if request.form['appname'] == '':
+                error = 'Application name cannot be empty.'
+                return render_template('new-app.html', feedback=error)
+            else:
+                appkey = misc.rand_str(APP_KEY_LEN)
+                res = ah.create(request.form['appname'], appkey, session['name'], request.form['appdesc'])
+            
+                if not res[0]:
+                    return render_template('new-app.html', feedback=res[1])
+            
+                dh = dd.DeviceDao()
+                res = dh.create_table(appkey)
+            
+                if not res[0]:
+                    ah.delete(appkey)
+                    return render_template('new-app.html', feedback=res[1])
+            
+                return redirect(url_for('index'))
     else:
         return redirect(url_for('index'))
 
+@server.route('/delete-app')
+def delete_app():
+    if 'name' in session:
+        dh = dd.DeviceDao()
+        devs = dh.get_list(session['appkey'])
+    
+        for dev in devs[1]:
+            data.delete_table(session['appkey'], dev[1])
+    
+        dh.delete_table(session['appkey'])
+    
+        ah = ad.ApplicationDao()
+        res = ah.delete(session['appkey'])
+    
+        if not res[0]:
+            return redirect(url_for('app'))
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
+
+
 @server.route('/add-dev')
 def new_dev():
-    dh = dd.DeviceDao()
-    dev_list = dh.get_list(session['appkey'])
+    if 'name' in session:
+        dh = dd.DeviceDao()
+        dev_list = dh.get_list(session['appkey'])
     
     #print('dev list : ', dev_list)
 
-    if not dev_list[0]:
-        return render_template('add-dev.html', feedback=dev_list[1])
+        if not dev_list[0]:
+            return render_template('add-dev.html', feedback=dev_list[1])
+        else:
+            return render_template('add-dev.html', free_ids=misc.prep_id_range(dev_list[1]))
     else:
-        return render_template('add-dev.html', free_ids=misc.prep_id_range(dev_list[1]))
+        return redirect(url_for('index'))
  
 
 
 @server.route('/dev', methods=['GET', 'POST'])
 def dev():
-    dh = dd.DeviceDao()
-    if request.method == 'GET':
-        dev = dh.get(session['appkey'], request.args.get('id'))
+    if 'name' in session:
+        dh = dd.DeviceDao()
+        if request.method == 'GET':
+            dev = dh.get(session['appkey'], request.args.get('id'))
 
-        session['devid'] = dev[1][1]
-        session['devname'] = dev[1][0]
+            session['devid'] = dev[1][1]
+            session['devname'] = dev[1][0]
         
-        last = data.get_last_n(session['appkey'], session['devid'], 1)
+            last = data.get_last_n(session['appkey'], session['devid'], 1)
         
-        ltup = 'Device have not sent data yet'
+            ltup = 'Device have not sent data yet'
 
-        if last[0]:
-            ltup = last[1][0][1]
+            if last[0]:
+                ltup = last[1][0][1]
 
-        return render_template('dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
-    else:
-        res = dh.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
-
-        if not res[0]:
-            return render_template('add-dev.html', feedback=res[1])
+            return render_template('dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
         else:
-            res = data.create_table(session['appkey'], request.form['devid'])
-            
+            res = dh.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
+
             if not res[0]:
-                dh.delete(session['appkey'], request.form['devid'])
                 return render_template('add-dev.html', feedback=res[1])
             else:
-                return redirect(url_for('app', appkey=session['appkey']))
+                res = data.create_table(session['appkey'], request.form['devid'])
+            
+                if not res[0]:
+                    dh.delete(session['appkey'], request.form['devid'])
+                    return render_template('add-dev.html', feedback=res[1])
+                else:
+                    return redirect(url_for('app', appkey=session['appkey']))
+    else:
+        return redirect(url_for('index'))
 
 
 @server.route('/dev-conf', methods=['GET', 'POST'])
 def dev_conf():
-    if request.method == 'GET':
-        return render_template('dev-conf.html', devname=session['devname'])
-    else:
+    if 'name' in session and 'devid' in session:
+        if request.method == 'GET':
+            return render_template('dev-conf.html', devname=session['devname'])
+        else:
         
-        argslen = len(request.form['arg']) + 1
-        args = bytearray(argslen + 2)
-        args[0] = int(request.form['confid'])
-        args[1] = argslen
+            argslen = len(request.form['arg']) + 1
+            args = bytearray(argslen + 2)
+            args[0] = int(request.form['confid'])
+            args[1] = argslen
         
-        bstr = bytes(request.form['arg'])
-        i = 0
-        while i < argslen - 1:
-            args[2+i] = bstr[i]
-            i += 1
+            bstr = bytes(request.form['arg'])
+            i = 0
+            while i < argslen - 1:
+                args[2+i] = bstr[i]
+                i += 1
 
-        base64_args = binascii.b2a_base64(args).decode('utf-8')
+            base64_args = binascii.b2a_base64(args).decode('utf-8')
 
-        pend.create(session['appkey'], session['devid'], base64_args)
+            pend.create(session['appkey'], session['devid'], base64_args)
 
         #print('msg = ', args)
         #print('base64 = ', base64_args)
         #print(type(request.form['arg'].encode('utf-8')))
         #print(request.form['arg'].encode('utf-8'))
         
-        return redirect(url_for('dev', id=session['devid']))
+            return redirect(url_for('dev', id=session['devid']))
+    else:
+        return redirect(url_for('index'))
 
 
 @server.route('/delete-dev')
 def delete_dev():
-    dh = dd.DeviceDao()
-    data.delete_table(session['appkey'], session['devid'])
-    res = dh.delete(session['appkey'], session['devid'])
+    if 'name' in session and 'devid' in session:
+        dh = dd.DeviceDao()
+        data.delete_table(session['appkey'], session['devid'])
+        res = dh.delete(session['appkey'], session['devid'])
 
-    return redirect(url_for('app', appkey=session['appkey']))
+        return redirect(url_for('app', appkey=session['appkey']))
+    else:
+        return redirect(utl_for('index'))
 
 
 @server.route('/dev-data')
 def dev_data():
-    last = data.get_last_n(session['appkey'], session['devid'], 10)  
-    count = data.get_count(session['appkey'], session['devid'])
+    if 'name' in session and 'devid' in session:
+        last = data.get_last_n(session['appkey'], session['devid'], 10)  
+        count = data.get_count(session['appkey'], session['devid'])
 
-    last_ctr = 10
-    if count[1][0] < 10:
-        last_ctr = count[1][0]
+        last_ctr = 10
+        if count[1][0] < 10:
+            last_ctr = count[1][0]
 
-    #print(last)
-    #print(count)
-    if count[1][0] > 0:
-        return render_template('dev-data.html', data=last[1], total=count[1][0], lastctr=last_ctr, devname=session['devname'])
+        #print(last)
+        #print(count)
+        if count[1][0] > 0:
+            return render_template('dev-data.html', data=last[1], total=count[1][0], lastctr=last_ctr, devname=session['devname'])
+        else:
+            return render_template('dev-data.html', devname=session['devname'])
     else:
-        return render_template('dev-data.html', devname=session['devname'])
+        return redirect(utl_for('index'))
 
 @server.route('/data-csv')
 def data_csv():
-    dumpd = data.get_all(session['appkey'], session['devid'])
+    if 'name' in session and 'devid' in session:
+        dumpd = data.get_all(session['appkey'], session['devid'])
 
-    fn = session['appkey']+ '_' +str(session['devid'])+ '.csv'
+        fn = session['appkey']+ '_' +str(session['devid'])+ '.csv'
 
-    with open(DATA_DOWNLOAD_DIR+'/'+fn, 'w') as f: 
-        for d in dumpd[1][0][2]:
-            f.write(d)
-            f.write(',')
-        f.write('\n')
-        
-        for row in dumpd[1]:
-            for v in row[2]:
-                f.write(str(row[2][v]))
+        with open(DATA_DOWNLOAD_DIR+'/'+fn, 'w') as f: 
+            for d in dumpd[1][0][2]:
+                f.write(d)
                 f.write(',')
             f.write('\n')
+        
+            for row in dumpd[1]:
+                for v in row[2]:
+                    f.write(str(row[2][v]))
+                    f.write(',')
+                f.write('\n')
     
-    return send_from_directory(DATA_DOWNLOAD_DIR, fn, as_attachment=True)
+        return send_from_directory(DATA_DOWNLOAD_DIR, fn, as_attachment=True)
+    else:
+        return redirect(utl_for('index'))
         
 
 if __name__ == '__main__':
