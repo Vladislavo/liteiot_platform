@@ -161,10 +161,16 @@ def dev():
     dh = dd.DeviceDao()
     if request.method == 'GET':
         dev = dh.get(session['appkey'], request.args.get('id'))
-        ltup = 'recently'
 
         session['devid'] = dev[1][1]
         session['devname'] = dev[1][0]
+        
+        last = data.get_last_n(session['appkey'], session['devid'], 1)
+        
+        ltup = 'Device have not sent data yet'
+
+        if last[0]:
+            ltup = last[1][0][1]
 
         return render_template('dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
     else:
