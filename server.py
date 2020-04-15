@@ -22,7 +22,7 @@ def index():
         apps = ah.get_list(session['name'].encode('utf-8'))
 
         session.pop('appkey', None)
-        print('apps: ', apps)
+        # print('apps: ', apps)
         if apps[0]:
             return render_template('index.html', apps=apps[1])
         else:
@@ -102,7 +102,7 @@ def app():
         app = ah.get(session['appkey'])
         devs = dh.get_list(app[1][1])
         
-        print('devs : ', devs)
+        # print('devs : ', devs)
         return render_template('app.html', app=app[1], devs=devs[1])
     else:
         if request.form['appname'] == '':
@@ -147,7 +147,7 @@ def new_dev():
     dh = dd.DeviceDao()
     dev_list = dh.get_list(session['appkey'])
     
-    print('dev list : ', dev_list)
+    #print('dev list : ', dev_list)
 
     if not dev_list[0]:
         return render_template('add-dev.html', feedback=dev_list[1])
@@ -227,8 +227,10 @@ def dev_data():
 
     #print(last)
     #print(count)
-
-    return render_template('dev-data.html', data=last[1], total=count[1][0])
+    if count[1][0] > 0:
+        return render_template('dev-data.html', data=last[1], total=count[1][0])
+    else:
+        return render_template('dev-data.html')
 
 @server.route('/data-csv')
 def data_csv():
