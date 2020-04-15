@@ -6,30 +6,37 @@
 
 <div class="row">
 	<div class="col-md-6 col-md-offset-3">
-		{% if data %}
-		<p>Last messages:</p>
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<h2><center> {{ devname }} data </center></h2>
+			</div>
+			<div class="panel-body">
+				{% if data %}
+				<p>Last {{ lastctr }} messages:</p>
 		
-		<table class="table">
-			<thead>
-				<th>Time</th>
-				<th>Content</th>
-			</thead>
-			<tbody>
-			{% for d in data %}
-			<tr>
-				<th> {{ d[1] }} </th>
-				<th> {{ d[2] }} </th>
-			</tr>
-			{% endfor %}
-			</tbody>
-		</table>
+				<table class="table">
+					<thead>
+						<th>Time</th>
+						<th>Content</th>
+					</thead>
+					<tbody>
+					{% for d in data %}
+						<tr>
+							<th> {{ d[1] }} </th>
+							<th> {{ d[2] }} </th>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
 
-		<p>Total: {{ total }} messages.</p>
+				<p>Total: <strong>{{ total }}</strong> messages.</p>
 
-		<a href="/data-csv"><button type="submit" class="btn btn-primary">Download CSV</button></a>
-		{% else %}
-		<p>Device have not sent any data yet.</p>
-		{% endif %}
+				<center>
+				<a href="/data-csv"><button type="submit" class="btn btn-primary">Download CSV</button></a>
+				</center>
+				{% else %}
+				<h3>Device have not sent any data yet.</h3>
+				{% endif %}
 	</div>
 </div>
 

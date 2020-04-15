@@ -231,10 +231,14 @@ def dev_data():
     last = data.get_last_n(session['appkey'], session['devid'], 10)  
     count = data.get_count(session['appkey'], session['devid'])
 
+    last_ctr = 10
+    if count[1][0] < 10:
+        last_ctr = count[1][0]
+
     #print(last)
     #print(count)
     if count[1][0] > 0:
-        return render_template('dev-data.html', data=last[1], total=count[1][0])
+        return render_template('dev-data.html', data=last[1], total=count[1][0], lastctr=last_ctr, devname=session['devname'])
     else:
         return render_template('dev-data.html')
 
