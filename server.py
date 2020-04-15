@@ -8,6 +8,7 @@ import dao.device.device as dd
 import dao.pend.pend as pend
 import dao.data.data as data
 import binascii
+import os
 
 
 APP_KEY_LEN = 8
@@ -102,6 +103,14 @@ def app():
         app = ah.get(session['appkey'])
         devs = dh.get_list(app[1][1])
         
+        try:
+            filelist = [f for f in os.listdir(DATA_DOWNLOAD_DIR) if f.startswith(session['appkey'])]
+            print(filelist)
+            for f in filelist:
+                os.remove(DATA_DOWNLOAD_DIR+'/'+f)
+        except OSError:
+            pass
+
         # print('devs : ', devs)
         return render_template('app.html', app=app[1], devs=devs[1])
     else:
@@ -240,7 +249,7 @@ def dev_data():
     if count[1][0] > 0:
         return render_template('dev-data.html', data=last[1], total=count[1][0], lastctr=last_ctr, devname=session['devname'])
     else:
-        return render_template('dev-data.html')
+        return render_template('dev-data.html', devname=session['devname'])
 
 @server.route('/data-csv')
 def data_csv():
