@@ -11,16 +11,16 @@
 		<form action="dev" method="post">
 			<div class="form-group">
 				<label>Name:</label><br>
-				<input type="text" class="form-control" id="devname" name="devname" required><br>
+				<input type="text" class="form-control" id="devname" maxlength="30" name="devname" required><br>
 			</div>
 			<div class="form-group">
 				<label>Description:</label><br>
-				<textarea id="devdesc" class="form-control" name="devdesc" cols="40" rows="5"></textarea>
+				<textarea id="devdesc" class="form-control" name="devdesc" maxlength="200" cols="40" rows="5"></textarea>
 			</div>
 			<br>
 			<div class="form-group">
 				<label>dev_id: {{ free_ids }}</label><br>
-				<input type="text" class="form-control" id="devid" name="devid" required><br>
+				<input type="number" size="3" min="1" max="255" class="form-control" id="devid" name="devid" required><br>
 			</div>
 			<br>
 			<div class="form-group">

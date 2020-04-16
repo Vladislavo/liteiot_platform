@@ -11,12 +11,12 @@
 		<form action="dev-conf" method="post">
 			<div class="form-group">
 				<label>Config ID:</label><br>
-				<input type="text" class="form-control" id="confid" name="confid" required></textarea>
+				<input type="number" size="3" min="0" max="255" class="form-control" id="confid" name="confid" required></textarea>
 			</div>
 			<br>
 			<div class="form-group">
 				<label>Argument:</label><br>
-				<textarea type="text" class="form-control" id="arg" name="arg" rows="2" reqiured></textarea>
+				<textarea type="text" maxlength="50" class="form-control" id="arg" name="arg" rows="2" reqiured></textarea>
 			</div>
 			<br><br>
 			<div class="form-group">
