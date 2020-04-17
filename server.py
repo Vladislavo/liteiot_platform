@@ -98,12 +98,11 @@ def new_application():
 def app():
     if 'name' in session:
         if request.method == 'GET':
-            dh = dd.DeviceDao()
             
             session['appkey'] = request.args.get('appkey')
 
             app = ad.get(session['appkey'])
-            devs = dh.get_list(app[1][1])
+            devs = dd.get_list(app[1][1])
         
             try:
                 filelist = [f for f in os.listdir(DATA_DOWNLOAD_DIR) if f.startswith(session['appkey'])]
@@ -125,8 +124,7 @@ def app():
                 if not res[0]:
                     return render_template('new-app.html', feedback=res[1])
             
-                dh = dd.DeviceDao()
-                res = dh.create_table(appkey)
+                res = dd.create_table(appkey)
             
                 if not res[0]:
                     ad.delete(appkey)
@@ -139,13 +137,12 @@ def app():
 @server.route('/delete-app')
 def delete_app():
     if 'name' in session:
-        dh = dd.DeviceDao()
-        devs = dh.get_list(session['appkey'])
+        devs = dd.get_list(session['appkey'])
     
         for dev in devs[1]:
             data.delete_table(session['appkey'], dev[1])
     
-        dh.delete_table(session['appkey'])
+        dd.delete_table(session['appkey'])
     
         res = ad.delete(session['appkey'])
     
@@ -160,8 +157,7 @@ def delete_app():
 @server.route('/add-dev')
 def new_dev():
     if 'name' in session:
-        dh = dd.DeviceDao()
-        dev_list = dh.get_list(session['appkey'])
+        dev_list = dd.get_list(session['appkey'])
     
     #print('dev list : ', dev_list)
 
@@ -177,9 +173,8 @@ def new_dev():
 @server.route('/dev', methods=['GET', 'POST'])
 def dev():
     if 'name' in session:
-        dh = dd.DeviceDao()
         if request.method == 'GET':
-            dev = dh.get(session['appkey'], request.args.get('id'))
+            dev = dd.get(session['appkey'], request.args.get('id'))
 
             session['devid'] = dev[1][1]
             session['devname'] = dev[1][0]
@@ -193,7 +188,7 @@ def dev():
 
             return render_template('dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
         else:
-            res = dh.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
+            res = dd.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
 
             if not res[0]:
                 return render_template('add-dev.html', feedback=res[1])
@@ -201,7 +196,7 @@ def dev():
                 res = data.create_table(session['appkey'], request.form['devid'])
             
                 if not res[0]:
-                    dh.delete(session['appkey'], request.form['devid'])
+                    dd.delete(session['appkey'], request.form['devid'])
                     return render_template('add-dev.html', feedback=res[1])
                 else:
                     return redirect(url_for('app', appkey=session['appkey']))
@@ -244,9 +239,8 @@ def dev_conf():
 @server.route('/delete-dev')
 def delete_dev():
     if 'name' in session and 'devid' in session:
-        dh = dd.DeviceDao()
         data.delete_table(session['appkey'], session['devid'])
-        res = dh.delete(session['appkey'], session['devid'])
+        res = dd.delete(session['appkey'], session['devid'])
 
         return redirect(url_for('app', appkey=session['appkey']))
     else:
