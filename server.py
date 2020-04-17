@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 import psycopg2
-import bcrypt
-import misc
+
 import dao.user.user as ud
 import dao.application.application as ad
 import dao.device.device as dd
 import dao.pend.pend as pend
 import dao.data.data as data
-import binascii
+
+import misc
+
 import os
 
 
@@ -44,8 +45,7 @@ def signup():
             feedback = 'Username or password fields cannot be empty'
             return render_template('signup.html', feedback=feedback)
         else:
-            uh = ud.UserDao()
-            res = uh.create(username, password)
+            res = ud.create(username, password)
             if (not res[0]):
                 return render_template('signup.html', feedback=res[1])
             else:
@@ -67,8 +67,7 @@ def login():
             feedback = 'Username or password fields cannot be empty'
             return render_template('login.html', feedback=feedback)
         else:
-            uh = ud.UserDao()
-            res = uh.get(username, password)
+            res = ud.get(username, password)
             if (not res[0]):
                 return render_template('login.html', feedback=msg[1])
             else:
