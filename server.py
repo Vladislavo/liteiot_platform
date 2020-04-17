@@ -19,8 +19,7 @@ server = Flask(__name__, template_folder='templates/')
 @server.route('/')
 def index():
     if 'name' in session and len(session['name']) > 0:
-        ah = ad.ApplicationDao()
-        apps = ah.get_list(session['name'].encode('utf-8'))
+        apps = ad.get_list(session['name'].encode('utf-8'))
 
         session.pop('appkey', None)
         # print('apps: ', apps)
@@ -98,13 +97,12 @@ def new_application():
 @server.route('/app', methods=['GET', 'POST'])
 def app():
     if 'name' in session:
-        ah = ad.ApplicationDao()
         if request.method == 'GET':
             dh = dd.DeviceDao()
             
             session['appkey'] = request.args.get('appkey')
 
-            app = ah.get(session['appkey'])
+            app = ad.get(session['appkey'])
             devs = dh.get_list(app[1][1])
         
             try:
@@ -122,7 +120,7 @@ def app():
                 return render_template('new-app.html', feedback=error)
             else:
                 appkey = misc.rand_str(APP_KEY_LEN)
-                res = ah.create(request.form['appname'], appkey, session['name'], request.form['appdesc'])
+                res = ad.create(request.form['appname'], appkey, session['name'], request.form['appdesc'])
             
                 if not res[0]:
                     return render_template('new-app.html', feedback=res[1])
@@ -131,7 +129,7 @@ def app():
                 res = dh.create_table(appkey)
             
                 if not res[0]:
-                    ah.delete(appkey)
+                    ad.delete(appkey)
                     return render_template('new-app.html', feedback=res[1])
             
                 return redirect(url_for('index'))
@@ -149,8 +147,7 @@ def delete_app():
     
         dh.delete_table(session['appkey'])
     
-        ah = ad.ApplicationDao()
-        res = ah.delete(session['appkey'])
+        res = ad.delete(session['appkey'])
     
         if not res[0]:
             return redirect(url_for('app'))
