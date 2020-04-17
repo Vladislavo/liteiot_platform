@@ -1,5 +1,7 @@
 from binascii import hexlify
 import os
+import psycopg2
+import json
 
 def rand_str(length):
     if length % 2 == 0:
@@ -39,12 +41,18 @@ def prep_id_range(devlist):
             s += str(r[-1])+']'
 
     return s
-import psycopg2
 
 # decorator implementation
 def with_psql(f):
     def _with_psql(*args, **kwargs):
-        conn = psycopg2.connect('dbname=gateway')
+        db_conf = read_json_file('db.conf')
+        conn = psycopg2.connect(
+                database = db_conf['name'], 
+                user = db_conf['user'], 
+                password = db_conf['password'],
+                host = db_conf['host'],
+                port = db_conf['port']
+            )
         cur = conn.cursor()
 
         try:
@@ -61,3 +69,12 @@ def with_psql(f):
         return res
     return _with_psql
 
+def read_json_file(path):
+    json_dict = None
+    try:
+        with open(path) as json_file:
+            json_dict = json.load(json_file)
+    except Exception, e:
+        print("{} : {}".format(path, e))
+
+    return json_dict
