@@ -11,6 +11,7 @@ class Config(object):
     DB_PORT = 5432
 
     SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_SECURE = True
 
     APPKEY_LENGTH = 8
     DATA_DOWNLOAD_DIR = 'data'
@@ -22,9 +23,11 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
     SESSION_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = False
     
 
 class TestingConfig(Config):
     TESTING = True
     
     SESSION_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = False

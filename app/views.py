@@ -1,6 +1,6 @@
 from app import app
 
-from flask import render_template, request, redirect, url_for, session, send_from_directory
+from flask import render_template, request, redirect, url_for, session, send_from_directory, flash
 import psycopg2
 
 import app.dao.user.user as ud
@@ -41,13 +41,18 @@ def signup():
         if (username == '' or password == ''):
             feedback = 'Username or password fields cannot be empty'
             return render_template('public/signup.html', feedback=feedback)
+        elif (len(password) < 8):
+            flash('Password length must be at least 8 characters.', 'danger')
+            return redirect(request.url)
         else:
             res = ud.create(username, password)
             if (not res[0]):
-                return render_template('public/signup.html', feedback=res[1])
+                flash('Error: {}'.format(res[1]), 'danger')
+                return redirect(request.url)
             else:
                 session['name'] = username
-        
+                
+                flash('User successfully created.', 'success')
                 return redirect(url_for('index'))
 
 
@@ -61,12 +66,13 @@ def login():
         password = request.form['password'].encode('utf-8')
 
         if (username == '' or password == ''):
-            feedback = 'Username or password fields cannot be empty'
-            return render_template('public/login.html', feedback=feedback)
+            flash('Username or password fields cannot be empty', 'danger')
+            return redirect(request.url)
         else:
             res = ud.get(username, password)
             if (not res[0]):
-                return render_template('public/login.html', feedback=msg[1])
+                flash('Error: {}'.format(res[1]), 'danger')
+                return redirect(request.url)
             else:
                 session['name'] = username
         
