@@ -2,7 +2,6 @@ from app import app
 from binascii import hexlify
 import os
 import psycopg2
-import json
 
 def rand_str(length):
     if length % 2 == 0:
@@ -11,7 +10,7 @@ def rand_str(length):
         return hexlify(os.urandom(length//2 + 1))
 
 def prep_id_range(devlist):
-    r = range(1,255)
+    r = list(range(1,255))
 
     for dev in devlist:
         del r[r.index(dev[1])]
@@ -43,16 +42,14 @@ def prep_id_range(devlist):
 
     return s
 
-# decorator implementation
 def with_psql(f):
     def _with_psql(*args, **kwargs):
-        #db_conf = read_json_file('db.conf')
         conn = psycopg2.connect(
-                database = app.config['DB_NAME'],#db_conf['name'], 
-                user = app.config['DB_USERNAME'],#db_conf['user'], 
-                password = app.config['DB_PASSWORD'],#db_conf['password'],
-                host = app.config['DB_HOST'],#db_conf['host'],
-                port = app.config['DB_PORT']#db_conf['port']
+                database = app.config['DB_NAME'], 
+                user = app.config['DB_USERNAME'],
+                password = app.config['DB_PASSWORD'],
+                host = app.config['DB_HOST'],
+                port = app.config['DB_PORT']
             )
         cur = conn.cursor()
 
@@ -69,13 +66,3 @@ def with_psql(f):
     
         return res
     return _with_psql
-
-def read_json_file(path):
-    json_dict = None
-    try:
-        with open(path) as json_file:
-            json_dict = json.load(json_file)
-    except Exception as e:
-        print("{} : {}".format(path, e))
-
-    return json_dict

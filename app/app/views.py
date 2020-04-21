@@ -11,6 +11,7 @@ import app.dao.data.data as data
 
 import app.helpers.misc as misc
 
+import binascii
 import os
 
 
@@ -201,7 +202,7 @@ def dev():
                     dd.delete(session['appkey'], request.form['devid'])
                     return render_template('public/add-dev.html', feedback=res[1])
                 else:
-                    return redirect(url_for('app', appkey=session['appkey']))
+                    return redirect(url_for('app_', appkey=session['appkey']))
     else:
         return redirect(url_for('index'))
 
@@ -210,15 +211,28 @@ def dev():
 def dev_conf():
     if 'name' in session and 'devid' in session:
         if request.method == 'GET':
-            return render_template('public/dev-conf.html', devname=session['devname'])
+            pend_msgs = pend.get_list(session['appkey'], session['devid'])
+            
+            if pend_msgs[0]:
+                config_list = []
+
+                for pm in pend_msgs[1]:
+                    cntt = binascii.a2b_base64(pm[2])
+                    config_id = int(cntt[0])
+                    config_args = cntt[2:(len(cntt)-1)].decode('utf-8')
+                    ack = pm[3]
+                    config_list.append((config_id, config_args, ack, pm[2]))
+
+                return render_template('public/dev-conf.html', devname=session['devname'], config_list=config_list)
+            else:
+                return render_template('public/dev-conf.html', devname=session['devname'])
         else:
-        
             argslen = len(request.form['arg']) + 1
             args = bytearray(argslen + 2)
             args[0] = int(request.form['confid'])
             args[1] = argslen
         
-            bstr = bytes(request.form['arg'])
+            bstr = bytes(request.form['arg'].encode('utf-8'))
             i = 0
             while i < argslen - 1:
                 args[2+i] = bstr[i]
@@ -237,6 +251,19 @@ def dev_conf():
     else:
         return redirect(url_for('index'))
 
+@app.route('/dev-conf-rm')
+def dev_conf_rm():
+    if 'name' in session and 'appkey' in session and 'devid' in session:
+        res = pend.delete(session['appkey'], session['devid'], request.args.get('conf')+'_')
+
+        if res[0]:
+            flash('Configuration message successfully removed.','success')
+            return redirect(url_for('dev_conf'))
+        else:
+            flash('Error removing configuration message: {}'.format(res[1]), 'danger')
+            return redirect(url_for('dev_conf'))
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/delete-dev')
 def delete_dev():

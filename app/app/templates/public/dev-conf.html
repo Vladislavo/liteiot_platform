@@ -27,6 +27,35 @@
 			<p class="text-danger float-right">{{ feedback }}</p>
 			{% endif %}
 		</form>
+		<br>
+		{% if config_list %}
+		<div>
+			<table class="table">
+				<thead>
+					<th> Config ID </th>
+					<th> Arguments </th>
+					<th> Acknowledged </th>
+					<th> </th>
+				</thead>
+				<tbody>
+					{% for c in config_list %}
+					{% if c[2] %}
+					<tr class="success">
+					{% else %}
+					<tr class="warning">
+					{% endif %}
+						<th> {{ c[0] }} </th>
+						<th> {{ c[1] }} </th>
+						<th> {{ c[2] }} </th>
+						<th> <a href="/dev-conf-rm?conf={{ c[3] }}"> <span class="glyphicon glyphicon-remove"</span> </a> </th>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		{% else %}
+		<center> No configuration messages. </center>
+		{% endif %}
 	</div>
 </div>
 
