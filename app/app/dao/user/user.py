@@ -3,14 +3,14 @@ import bcrypt
 
 
 @with_psql
-def create(cur, name, password):
+def create(cur, name, password, role):
     query = """
     INSERT INTO
         users
     VALUES
-        (%s, %s)
+        (%s, %s, %s)
     """
-    cur.execute(query, (name, bcrypt.hashpw(password, bcrypt.gensalt())))
+    cur.execute(query, (name, bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8'), role))
     return (True,)
 
 @with_psql 

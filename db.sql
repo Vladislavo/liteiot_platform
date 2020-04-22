@@ -68,7 +68,8 @@ CREATE TABLE public.pend_msgs (
 
 CREATE TABLE public.users (
     name character varying(30) NOT NULL,
-    password character varying(100) NOT NULL
+    password character varying(100) NOT NULL,
+    role character varying(10) NOT NULL
 );
 
 
@@ -105,6 +106,7 @@ ALTER TABLE ONLY public.applications
     ADD CONSTRAINT applications_username_fkey FOREIGN KEY (username) REFERENCES public.users(name);
 
 
+INSERT INTO public.users VALUES('admin', '$2b$12$chdF4ji1maIRLd4ms4s4yugFv.2BTvOAwiaWi6iRlTJzlGKjpTcA.', 'admin')
 --
 -- PostgreSQL database dump complete
 --
