@@ -42,9 +42,9 @@ def signup():
         if (username == '' or password == ''):
             feedback = 'Username or password fields cannot be empty'
             return render_template('public/signup.html', feedback=feedback)
-        #elif (len(password) < 8):
-        #    flash('Password length must be at least 8 characters.', 'danger')
-        #    return redirect(request.url)
+        elif (len(password) < 8):
+            flash('Password length must be at least 8 characters.', 'danger')
+            return redirect(request.url)
         else:
             res = ud.create(username, password, 'user')
             if (not res[0]):
