@@ -38,3 +38,15 @@ def delete(cur, appkey, devid, msg):
     """
     cur.execute(query, (appkey, devid, msg))
     return (True,)
+
+@with_psql
+def delete_all_ack(cur):
+    query = """
+    DELETE FROM
+        pend_msgs
+    WHERE
+        ack = True
+    """
+    cur.execute(query, ())
+    return (True,)
+

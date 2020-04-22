@@ -108,9 +108,9 @@ def app_():
             devs = dd.get_list(ap[1][1])
         
             try:
-                filelist = [f for f in os.listdir(app.config['DATA_DOWNLOAD_DIR']) if f.startswith(session['appkey'])]
+                filelist = [f for f in os.listdir(app.config['DATA_DOWNLOAD_DIR_OS'])]
                 for f in filelist:
-                    os.remove(app.config['DATA_DOWNLOAD_DIR']+'/'+f)
+                    os.remove(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+f)
             except OSError:
                 pass
 
@@ -303,7 +303,7 @@ def data_csv():
 
         fn = session['appkey']+ '_' +str(session['devid'])+ '.csv'
 
-        with open('app/'+app.config['DATA_DOWNLOAD_DIR']+'/'+fn, 'w+') as f: 
+        with open(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+fn, 'w+') as f: 
             f.write('utc,timestamp,')
             for d in dumpd[1][0][2]:
                 f.write(d)
@@ -320,3 +320,7 @@ def data_csv():
         return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
     else:
         return redirect(utl_for('index'))
+
+
+def pend_delete_all_ack():
+    pend.delete_all_ack()

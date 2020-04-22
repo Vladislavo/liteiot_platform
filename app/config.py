@@ -15,6 +15,10 @@ class Config(object):
 
     APPKEY_LENGTH = 8
     DATA_DOWNLOAD_DIR = 'data'
+    DATA_DOWNLOAD_DIR_OS = 'app/data'
+
+    # in minutes - 24 hours by default
+    MAINTAINER_INTERVAL = 1440
 
 class ProductionConfig(Config):
     pass

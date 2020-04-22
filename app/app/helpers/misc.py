@@ -66,3 +66,11 @@ def with_psql(f):
     
         return res
     return _with_psql
+
+def clean_data_folder():
+    try:
+        filelist = [f for f in os.listdir(app.config['DATA_DOWNLOAD_DIR_OS'])]
+        for f in filelist:
+            os.remove(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+f)
+    except OSError:
+        pass
