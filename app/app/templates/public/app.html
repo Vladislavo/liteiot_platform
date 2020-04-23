@@ -5,7 +5,14 @@
 {% block content %}
 
 <div class="row">
-	<div class="col-md-6 col-md-offset-3">
+	<div class="col-md-3">
+		<div class="clickback">
+			<span class="glyphicon glyphicon-arrow-left"></span>	
+			<p><a class="backlink" onclick="history.back(-1)"></a></p>
+		</div>
+	</div>
+
+	<div class="col-md-6">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 				<h2><center> {{ app[0] }} </center></h2>
