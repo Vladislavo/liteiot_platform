@@ -15,6 +15,11 @@ import binascii
 import os
 
 
+MAX_PG = 5
+MAX_PG_ENTRIES_USERS = 10
+MAX_PG_ENTRIES_DATA = 10
+
+
 @app.route('/')
 def index():
     if 'name' in session and len(session['name']) > 0:
@@ -242,11 +247,6 @@ def dev_conf():
 
             pend.create(session['appkey'], session['devid'], base64_args)
 
-        #print('msg = ', args)
-        #print('base64 = ', base64_args)
-        #print(type(request.form['arg'].encode('utf-8')))
-        #print(request.form['arg'].encode('utf-8'))
-        
             return redirect(url_for('dev', id=session['devid']))
     else:
         return redirect(url_for('index'))
@@ -286,15 +286,61 @@ def dev_data():
         if count[1][0] < 10:
             last_ctr = count[1][0]
 
-        #print(last[1][2][2])
-        #print(type(last[1][2][2]))
-        #print(count)
         if count[1][0] > 0:
             return render_template('public/dev-data.html', data=last[1], total=count[1][0], lastctr=last_ctr, devname=session['devname'])
         else:
             return render_template('public/dev-data.html', devname=session['devname'])
     else:
         return redirect(utl_for('index'))
+
+@app.route('/dev-data-pg')
+def dev_data_pg():
+    if 'name' in session and 'devid' in session:
+        cur_pg = 1
+        if request.args.get('p'):
+            cur_pg = int(request.args.get('p'))
+            if cur_pg < 1:
+                cur_pg = 1
+        
+        ent_cnt = data.get_count(session['appkey'], session['devid'])
+        npg = int(ent_cnt[1][0]/MAX_PG_ENTRIES_DATA)+1
+        ps = int(MAX_PG/2)
+
+        last = data.get_last_range(session['appkey'], session['devid'], [MAX_PG_ENTRIES_DATA, (cur_pg-1)*MAX_PG_ENTRIES_DATA])
+        
+        # next and previous pages
+        np = False
+        pp = False
+        pr = None # current pages range
+
+        if npg < MAX_PG:
+            # 1, ... , npg
+            pr = [1, npg+1]
+        else:
+            if cur_pg - ps <= 1:
+                # 1, 2, ..., MAX_PG >>
+                pr = [1, MAX_PG+1]
+                np = cur_pg + MAX_PG + ps
+            else:
+                if cur_pg + ps >= npg:
+                    # << npg-MAX_PG-1, ..., npg
+                    pp = cur_pg - MAX_PG
+                    pr = [npg-MAX_PG-1, npg+1]
+                else:
+                    # << cur_pg-ps, ... , cur_pg + ps >>
+                    pp = cur_pg - MAX_PG
+                    np = cur_pg + MAX_PG
+                    pr = [cur_pg-ps, cur_pg+ps+1]
+
+
+        if ent_cnt[1][0] > 0:
+            return render_template('public/dev-data-pg.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=np, pp=pp, pr=pr, devname=session['devname'])
+        else:
+            return render_template('public/dev-data-pg.html', devname=session['devname'])
+    else:
+        return redirect(utl_for('index'))
+
+
 
 @app.route('/data-csv')
 def data_csv():
