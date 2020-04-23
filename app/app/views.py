@@ -81,6 +81,7 @@ def login():
                 return redirect(request.url)
             else:
                 session['name'] = username
+                session['role'] = res[1][2]
         
                 return redirect(url_for('index'))
 

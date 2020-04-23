@@ -32,6 +32,14 @@
 				<ul class="nav navbar-nav navbar-right">
 	            			<li><a href="/logout">Logout</a></li>
 				</ul>
+				<ul class="nav navbar-nav navbar-right">
+	            			<li><a href="/settings">Settings</a></li>
+				</ul>
+				{% endif %}
+				{% if session['role'] == 'admin' %}
+				<ul class="nav navbar-nav navbar-right">
+	            			<li><a href="/dashboard">Dashboard</a></li>
+				</ul>
 				{% endif %}
         		</div><!--/.nav-collapse -->
       		</div>
