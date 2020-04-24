@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block title %} {{ username }} {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		{% if username %}
+		<h2> {{ username }} </h2>
+		<br>
+		<h4> Applications: </h4>
+		{% if apps %}
+		<br>
+		<ol class="list-group">
+			{% for app in apps %}
+			<a href="/app?appkey={{ app[1] }}"><li class="list-group-item"><strong> {{ app[0] }} </strong></li></a>
+			{% endfor %}
+		</ol>
+		{% else %}
+		<p> User does not have registered applications. </p>
+		{% endif %}
+		<br>
+
+		<a href="/user-delete?name={{ username }}"><button class="btn btn-danger" onclick="return confirm('Make sure you know what you are doing! This action will permanently remove the user with all devices and data.')">Delete User</button></a>
+		{% else %}
+		<h2>Log in, please</h2>
+		<br>
+		<a href="/login"><button class="btn btn-primary btn-lg">Login</button></a>
+		{% endif %}
+		{% if feedback %}
+		<p class="text-danger float-right"> {{ feedback }} </p>	
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}

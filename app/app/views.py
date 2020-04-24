@@ -118,21 +118,15 @@ def new_application():
 def app_():
     if 'name' in session:
         if request.method == 'GET':
-            
             session['appkey'] = request.args.get('appkey')
 
             ap = ad.get(session['appkey'])
             devs = dd.get_list(ap[1][1])
-        
-            try:
-                filelist = [f for f in os.listdir(app.config['DATA_DOWNLOAD_DIR_OS'])]
-                for f in filelist:
-                    os.remove(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+f)
-            except OSError:
-                pass
-
-           # print('devs : ', devs)
-            return render_template('public/app.html', app=ap[1], devs=devs[1])
+            
+            if session['role'] == 'admin' or session['name'] == ap[1][2]:
+                return render_template('public/app.html', app=ap[1], devs=devs[1])
+            else:
+                return redirect(url_for('index'))
         else:
             if request.form['appname'] == '':
                 error = 'Application name cannot be empty.'
@@ -194,6 +188,14 @@ def new_dev():
 def dev():
     if 'name' in session:
         if request.method == 'GET':
+           
+            # possible security improvement
+            #ap = ad.get(session['appkey'])
+            #if session['role'] == 'admin' or session['name'] == ap[1][2]:
+            #    return render_template(...)
+            #else:
+            #    return redirect(url_for('index'))
+
             dev = dd.get(session['appkey'], request.args.get('id'))
 
             session['devid'] = int(dev[1][1])
@@ -395,6 +397,30 @@ def dashboard_clean_search():
     if 'users_filter' in session:
         session.pop('users_filter', None)
     return redirect(url_for('dashboard'))
+
+
+@app.route('/user')
+def user():
+    if 'role' in session and session['role'] == 'admin':
+        name = request.args.get('name')
+        apps = ad.get_list(name)
+        
+        session.pop('appkey', None)
+        # print('apps: ', apps)
+        if apps[0]:
+            return render_template('admin/user.html', apps=apps[1], username=name)
+        else:
+            return render_template('admin/user.html', feedback=apps[1], username=name)
+    else:
+        return render_template('public/index.html')
+
+
+@app.route('/user-delete')
+def user_delete():
+    user = ud.get(request.args.get('name'))
+    if user[2] != 'admin' and session['role'] and session['role'] == 'admin':
+        pass
+        
 
 def pend_delete_all_ack():
     pend.delete_all_ack()
