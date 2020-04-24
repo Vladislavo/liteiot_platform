@@ -39,11 +39,14 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
-        return render_template('public/signup.html')
+        if session['role'] and session['role'] == 'admin':
+            return render_template('admin/signup.html')
+        else:
+            return render_template('public/signup.html')
     else: 
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
-
+        
         if (username == '' or password == ''):
             feedback = 'Username or password fields cannot be empty'
             return render_template('public/signup.html', feedback=feedback)
@@ -51,7 +54,11 @@ def signup():
             flash('Password length must be at least 8 characters.', 'danger')
             return redirect(request.url)
         else:
-            res = ud.create(username, password, 'user')
+            role = 'user'
+            if request.form['role'] and request.form['role'] == 'administrator':
+                role = 'admin'
+
+            res = ud.create(username, password, role)
             if (not res[0]):
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
@@ -59,7 +66,11 @@ def signup():
                 session['name'] = username
                 
                 flash('User successfully created.', 'success')
-                return redirect(url_for('index'))
+
+                if session['role'] and session['role'] == 'admin':
+                    return redirect(url_for('dashboard'))
+                else:
+                    return redirect(url_for('index'))
 
 
 
