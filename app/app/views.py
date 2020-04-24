@@ -303,40 +303,19 @@ def dev_data_pg():
             if cur_pg < 1:
                 cur_pg = 1
         
-        ent_cnt = data.get_count(session['appkey'], session['devid'])
-        npg = int(ent_cnt[1][0]/MAX_PG_ENTRIES_DATA)+1
-        ps = int(MAX_PG/2)
-
         last = data.get_last_range(session['appkey'], session['devid'], [MAX_PG_ENTRIES_DATA, (cur_pg-1)*MAX_PG_ENTRIES_DATA])
         
-        # next and previous pages
-        np = False
-        pp = False
-        pr = None # current pages range
+        ent_cnt = data.get_count(session['appkey'], session['devid'])
+        if ent_cnt[0]:
+            # range data
+            rd = misc.paging(cur_pg, ent_cnt[1][0], MAX_PG_ENTRIES_DATA, MAX_PG)
 
-        if npg < MAX_PG:
-            # 1, ... , npg
-            pr = [1, npg+1]
-        else:
-            if cur_pg - ps <= 1:
-                # 1, 2, ..., MAX_PG >>
-                pr = [1, MAX_PG+1]
-                np = cur_pg + MAX_PG + ps
+            if ent_cnt[1][0] > 0:
+                return render_template('public/dev-data-pg.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=rd[2], pp=rd[0], pr=rd[1], devname=session['devname'])
             else:
-                if cur_pg + ps >= npg:
-                    # << npg-MAX_PG-1, ..., npg
-                    pp = cur_pg - MAX_PG
-                    pr = [npg-MAX_PG-1, npg+1]
-                else:
-                    # << cur_pg-ps, ... , cur_pg + ps >>
-                    pp = cur_pg - MAX_PG
-                    np = cur_pg + MAX_PG
-                    pr = [cur_pg-ps, cur_pg+ps+1]
-
-
-        if ent_cnt[1][0] > 0:
-            return render_template('public/dev-data-pg.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=np, pp=pp, pr=pr, devname=session['devname'])
+                return render_template('public/dev-data-pg.html', devname=session['devname'])
         else:
+            flash('Error: {}'.format(ent_cnt[1]), 'danger')
             return render_template('public/dev-data-pg.html', devname=session['devname'])
     else:
         return redirect(utl_for('index'))
@@ -368,6 +347,33 @@ def data_csv():
     else:
         return redirect(utl_for('index'))
 
+
+@app.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    if 'role' in session and session['role'] == 'admin':
+        user_cnt = ud.get_count()
+        apps_cnt = ad.get_count()
+        devs_cnt = dd.get_count_all()
+        print(devs_cnt)
+
+        cur_pg = 1
+        if request.args.get('p'):
+            cur_pg = int(request.args.get('p'))
+            if cur_pg < 1:
+                cur_pg = 1
+
+        users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
+        
+        if request.method == 'GET':
+            users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
+            
+            rd = misc.paging(cur_pg, user_cnt[1][0], MAX_PG_ENTRIES_USERS, MAX_PG)
+
+            return render_template('admin/dashboard.html', users_cnt=user_cnt[1][0], apps_cnt=apps_cnt[1][0], dev_cnt=devs_cnt, users=users[1], pp=rd[0], pr=rd[1], np=rd[2], cp=cur_pg, usn=(cur_pg-1)*MAX_PG_ENTRIES_USERS+1)
+        else:
+            pass
+    else:
+        return redirect(url_for('index'))
 
 def pend_delete_all_ack():
     pend.delete_all_ack()

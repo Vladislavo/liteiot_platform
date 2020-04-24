@@ -74,3 +74,33 @@ def clean_data_folder():
             os.remove(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+f)
     except OSError:
         pass
+
+def paging(cur_pg, ent_cnt, max_ent, max_pg):
+    npg = int(ent_cnt/max_ent)+1
+    ps = int(max_pg/2)
+
+    # next and previous pages
+    pp = False
+    np = False
+    pr = None # current pages range
+
+    if npg < max_pg:
+        # 1, ... , npg
+        pr = [1, npg+1]
+    else:
+        if cur_pg - ps <= 1:
+            # 1, 2, ..., MAX_PG >>
+            pr = [1, max_pg+1]
+            np = cur_pg + max_pg + ps
+        else:
+            if cur_pg + ps >= npg:
+                # << npg-MAX_PG-1, ..., npg
+                pp = cur_pg - max_pg
+                pr = [npg-max_pg-1, npg+1]
+            else:
+                # << cur_pg-ps, ... , cur_pg + ps >>
+                pp = cur_pg - max_pg
+                np = cur_pg + max_pg
+                pr = [cur_pg-ps, cur_pg+ps+1]
+
+    return [pp, pr, np]

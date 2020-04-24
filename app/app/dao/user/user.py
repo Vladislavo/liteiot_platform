@@ -62,3 +62,24 @@ def get(cur, name, password):
     else:
         return (False, 'Password or username do not match')
 
+@with_psql
+def get_count(cur):
+    query = """
+    SELECT COUNT(*) FROM
+        users
+    """
+    cur.execute(query, ())
+    return (True, cur.fetchone())
+
+
+@with_psql
+def get_range(cur, rng):
+    query = """
+    SELECT * FROM
+        users
+    ORDER BY
+        name ASC
+    LIMIT %s OFFSET %s
+    """
+    cur.execute(query, (rng[0],rng[1]))
+    return (True, cur.fetchall())

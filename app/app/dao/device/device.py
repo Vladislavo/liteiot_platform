@@ -105,3 +105,42 @@ def get_list(cur, appkey):
         sql.SQL(query).format(sql.Identifier(tn)))
     return (True, cur.fetchall())
 
+
+@with_psql
+def get_count(cur, appkey):
+    tn = 'devices_' +str(appkey)
+    query = """
+    SELECT COUNT(*) FROM 
+        {}
+    """
+    cur.execute(
+        sql.SQL(query).format(sql.Identifier(tn)), [appkey])
+        
+    return (True, cur.fetchone())
+
+@with_psql
+def get_device_table_names(cur):
+    query = """
+        SELECT table_name FROM
+            information_schema.tables
+        WHERE
+            table_name ~ '^devices'
+        """
+    cur.execute(query, ())
+    return(True, cur.fetchall())
+
+
+def get_count_all():
+    count = 0
+    tns = get_device_table_names()
+    print(tns)
+    if tns[0] and len(tns[1]) > 0:
+        for tn in tns[1]:
+           sp = tn[0].split('_')
+           print(sp)
+           r = get_count(sp[1])
+           print(r)
+           if r[0]:
+               count += r[1][0]
+
+    return count

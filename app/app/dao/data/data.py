@@ -82,7 +82,7 @@ def get_all(cur, appkey, devid):
 def get_count(cur, appkey, devid):
     tn = 'dev_' +str(appkey)+ '_' +str(devid)
     query = """
-        SELECT COUNT(utc) FROM
+        SELECT COUNT(*) FROM
             {}
         """
     cur.execute(

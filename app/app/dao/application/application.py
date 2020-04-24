@@ -68,4 +68,12 @@ def update(cur, appkey, name, desc):
 
     return (True,)
 
+@with_psql
+def get_count(cur):
+    query = """
+    SELECT COUNT(*) FROM
+        applications
+    """
+    cur.execute(query, ())
 
+    return (True, cur.fetchone())
