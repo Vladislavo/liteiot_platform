@@ -354,7 +354,6 @@ def dashboard():
         user_cnt = ud.get_count()
         apps_cnt = ad.get_count()
         devs_cnt = dd.get_count_all()
-        print(devs_cnt)
 
         cur_pg = 1
         if request.args.get('p'):
@@ -362,18 +361,29 @@ def dashboard():
             if cur_pg < 1:
                 cur_pg = 1
 
-        users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
+        users = None
         
-        if request.method == 'GET':
-            users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
+        if request.method == 'POST':
+            session['users_filter'] = request.form['username']
             
-            rd = misc.paging(cur_pg, user_cnt[1][0], MAX_PG_ENTRIES_USERS, MAX_PG)
-
-            return render_template('admin/dashboard.html', users_cnt=user_cnt[1][0], apps_cnt=apps_cnt[1][0], dev_cnt=devs_cnt, users=users[1], pp=rd[0], pr=rd[1], np=rd[2], cp=cur_pg, usn=(cur_pg-1)*MAX_PG_ENTRIES_USERS+1)
+        if 'users_filter' in session:
+            users = ud.get_range_name(session['users_filter'], [MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
+            print(users)
+            rd = misc.paging(cur_pg, len(users[1]), MAX_PG_ENTRIES_USERS, MAX_PG)
         else:
-            pass
+            users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
+            rd = misc.paging(cur_pg, user_cnt[1][0], MAX_PG_ENTRIES_USERS, MAX_PG)
+        
+        return render_template('admin/dashboard.html', users_cnt=user_cnt[1][0], apps_cnt=apps_cnt[1][0], dev_cnt=devs_cnt, users=users[1], pp=rd[0], pr=rd[1], np=rd[2], cp=cur_pg, usn=(cur_pg-1)*MAX_PG_ENTRIES_USERS+1)
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/dashboard-clean-search')
+def dashboard_clean_search():
+    if 'users_filter' in session:
+        session.pop('users_filter', None)
+    return redirect(url_for('dashboard'))
 
 def pend_delete_all_ack():
     pend.delete_all_ack()

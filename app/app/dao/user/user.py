@@ -83,3 +83,20 @@ def get_range(cur, rng):
     """
     cur.execute(query, (rng[0],rng[1]))
     return (True, cur.fetchall())
+
+
+@with_psql
+def get_range_name(cur, name, rng):
+    name += '%'
+    query = """
+    SELECT * FROM
+        users
+    WHERE name LIKE %s
+    ORDER BY
+        name ASC
+    LIMIT %s OFFSET %s
+    """
+    cur.execute(query, (name, rng[0],rng[1]))
+    return (True, cur.fetchall())
+
+
