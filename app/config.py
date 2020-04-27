@@ -20,6 +20,9 @@ class Config(object):
     # in minutes - 24 hours by default
     MAINTAINER_INTERVAL = 1440
 
+    # manual user signup by default
+    USERS_SIGNUP = False
+
 class ProductionConfig(Config):
     pass
 

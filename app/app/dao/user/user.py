@@ -32,7 +32,7 @@ def update_name(cur, old_name, new_name):
     WHERE
         name = %s
     """
-    cur.execute(query, (new_name,))
+    cur.execute(query, (new_name,old_name))
     return (True,)
 
 @with_psql
@@ -43,7 +43,7 @@ def update_password(cur, name, password):
     WHERE
         name = %s
     """
-    cur.execute(query, (password, name))
+    cur.execute(query, (bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8'), name))
     return (True,)
 
 @with_psql

@@ -42,36 +42,41 @@ def signup():
         if session['role'] and session['role'] == 'admin':
             return render_template('admin/signup.html')
         else:
-            return render_template('public/signup.html')
-    else: 
-        username = request.form['username']
-        password = request.form['password'].encode('utf-8')
-        
-        if (username == '' or password == ''):
-            feedback = 'Username or password fields cannot be empty'
-            return render_template('public/signup.html', feedback=feedback)
-        elif (len(password) < 8):
-            flash('Password length must be at least 8 characters.', 'danger')
-            return redirect(request.url)
-        else:
-            role = 'user'
-            if request.form['role'] and request.form['role'] == 'administrator':
-                role = 'admin'
-
-            res = ud.create(username, password, role)
-            if (not res[0]):
-                flash('Error: {}'.format(res[1]), 'danger')
+            if app.config['USERS_SIGNUP']:
+                return render_template('public/signup.html')
+            else:
+                return redirect(url_for('index'))
+    else:
+        if app.config['USERS_SIGNUP'] or session['role'] == 'admin':
+            username = request.form['username']
+            password = request.form['password'].encode('utf-8')
+            
+            if (username == '' or password == ''):
+                feedback = 'Username or password fields cannot be empty'
+                return render_template('public/signup.html', feedback=feedback)
+            elif (len(password) < 8):
+                flash('Password length must be at least 8 characters.', 'danger')
                 return redirect(request.url)
             else:
-                session['name'] = username
-                
-                flash('User successfully created.', 'success')
+                role = 'user'
+                if request.form['role'] and request.form['role'] == 'administrator':
+                    role = 'admin'
 
-                if session['role'] and session['role'] == 'admin':
-                    return redirect(url_for('dashboard'))
+                res = ud.create(username, password, role)
+                if (not res[0]):
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return redirect(request.url)
                 else:
-                    return redirect(url_for('index'))
+                    session['name'] = username
+                    
+                    flash('User successfully created.', 'success')
 
+                    if session['role'] and session['role'] == 'admin':
+                        return redirect(url_for('dashboard'))
+                    else:
+                        return redirect(url_for('index'))
+        else:
+            return redirect(url_for('index'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -434,6 +439,31 @@ def user_delete():
     else:
         flash('Warning: the user is admin or does not exist.' ,'warning')
         return redirect(url_for('index'))
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if request.method == 'GET':
+        if session['role'] == 'admin':
+            return render_template('public/settings.html', username=session['name'])
+        else:
+            return render_template('public/settings.html', username=session['name'])
+    else:
+        if request.form['name'] != session['name']:
+            res = ud.update_name(session['name'], request.form['name'])
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return redirect(request.url);
+            else:
+                session['name'] = request.form['name']
+        if request.form['password'] != '':
+            res = ud.update_password(session['name'], request.form['password'].encode('utf-8'))
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return redirect(request.url);
+
+
+        return redirect(url_for('index'))
+
 
 def pend_delete_all_ack():
     pend.delete_all_ack()

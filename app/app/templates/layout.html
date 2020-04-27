@@ -25,7 +25,9 @@
 					<li><a href="/">Home</a></li>
 					{% if not session['name'] %}
 					<li><a href="/login">Login</a></li>
+						{% if users_signup %}
         	    			<li><a href="/signup">Signup</a></li>
+						{% endif %}
 					{% endif %}
 	         		</ul>
 				{% if session['name'] %}
