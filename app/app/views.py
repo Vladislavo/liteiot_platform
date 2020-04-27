@@ -28,11 +28,11 @@ def index():
         session.pop('appkey', None)
         # print('apps: ', apps)
         if apps[0]:
-            return render_template('public/index.html', apps=apps[1])
+            return render_template('public/index.html', apps=apps[1], users_signup=app.config['USERS_SIGNUP'])
         else:
-            return render_template('public/index.html', feedback=apps[1])
+            return render_template('public/index.html', feedback=apps[1], users_signup=app.config['USERS_SIGNUP'])
     else:
-        return render_template('public/index.html')
+        return render_template('public/index.html', users_signup=app.config['USERS_SIGNUP'])
 
 
 
@@ -40,12 +40,12 @@ def index():
 def signup():
     if request.method == 'GET':
         if session['role'] and session['role'] == 'admin':
-            return render_template('admin/signup.html')
+            return render_template('admin/signup.html', users_signup=app.config['USERS_SIGNUP'])
         else:
             if app.config['USERS_SIGNUP']:
-                return render_template('public/signup.html')
+                return render_template('public/signup.html', users_signup=app.config['USERS_SIGNUP'])
             else:
-                return redirect(url_for('index'))
+                return redirect(url_for('index', users_signup=app.config['USERS_SIGNUP']))
     else:
         if app.config['USERS_SIGNUP'] or session['role'] == 'admin':
             username = request.form['username']
@@ -53,10 +53,10 @@ def signup():
             
             if (username == '' or password == ''):
                 feedback = 'Username or password fields cannot be empty'
-                return render_template('public/signup.html', feedback=feedback)
+                return render_template('public/signup.html', feedback=feedback, users_signup=app.config['USERS_SIGNUP'])
             elif (len(password) < 8):
                 flash('Password length must be at least 8 characters.', 'danger')
-                return redirect(request.url)
+                return redirect(request.url, users_signup=app.config['USERS_SIGNUP'])
             else:
                 role = 'user'
                 if request.form['role'] and request.form['role'] == 'administrator':
@@ -444,7 +444,7 @@ def user_delete():
 def settings():
     if request.method == 'GET':
         if session['role'] == 'admin':
-            return render_template('public/settings.html', username=session['name'])
+            return render_template('admin/settings.html', username=session['name'], users_signup=app.config['USERS_SIGNUP'])
         else:
             return render_template('public/settings.html', username=session['name'])
     else:
@@ -459,10 +459,15 @@ def settings():
             res = ud.update_password(session['name'], request.form['password'].encode('utf-8'))
             if not res[0]:
                 flash('Error: {}'.format(res[1]), 'danger')
-                return redirect(request.url);
+                return redirect(request.url)
+        if session['role'] == 'admin':
+            if request.form.getlist('users_signup') and request.form.getlist('users_signup')[0] == 'us':
+                app.config['USERS_SIGNUP'] = True
+            else:
+                app.config['USERS_SIGNUP'] = False
 
 
-        return redirect(url_for('index'))
+        return redirect(request.url)
 
 
 def pend_delete_all_ack():
