@@ -188,27 +188,23 @@ def new_dev():
 def dev():
     if 'name' in session:
         if request.method == 'GET':
-           
-            # possible security improvement
-            #ap = ad.get(session['appkey'])
-            #if session['role'] == 'admin' or session['name'] == ap[1][2]:
-            #    return render_template(...)
-            #else:
-            #    return redirect(url_for('index'))
+            ap = ad.get(session['appkey'])
+            if session['role'] == 'admin' or session['name'] == ap[1][2]:
+                dev = dd.get(session['appkey'], request.args.get('id'))
 
-            dev = dd.get(session['appkey'], request.args.get('id'))
-
-            session['devid'] = int(dev[1][1])
-            session['devname'] = dev[1][0]
+                session['devid'] = int(dev[1][1])
+                session['devname'] = dev[1][0]
         
-            last = data.get_last_n(session['appkey'], session['devid'], 1)
+                last = data.get_last_n(session['appkey'], session['devid'], 1)
         
-            ltup = 'Device have not sent data yet'
+                ltup = 'Device have not sent data yet'
 
-            if last[0]:
-                ltup = last[1][0][1]
+                if last[0]:
+                    ltup = last[1][0][1]
 
-            return render_template('public/dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
+                return render_template('public/dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
+            else:
+                return redirect(url_for('index'))
         else:
             res = dd.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
 
@@ -291,23 +287,6 @@ def delete_dev():
 
 
 @app.route('/dev-data')
-def dev_data():
-    if 'name' in session and 'devid' in session:
-        last = data.get_last_n(session['appkey'], session['devid'], 10)  
-        count = data.get_count(session['appkey'], session['devid'])
-
-        last_ctr = 10
-        if count[1][0] < 10:
-            last_ctr = count[1][0]
-
-        if count[1][0] > 0:
-            return render_template('public/dev-data.html', data=last[1], total=count[1][0], lastctr=last_ctr, devname=session['devname'])
-        else:
-            return render_template('public/dev-data.html', devname=session['devname'])
-    else:
-        return redirect(utl_for('index'))
-
-@app.route('/dev-data-pg')
 def dev_data_pg():
     if 'name' in session and 'devid' in session:
         cur_pg = 1
@@ -324,12 +303,12 @@ def dev_data_pg():
             rd = misc.paging(cur_pg, ent_cnt[1][0], MAX_PG_ENTRIES_DATA, MAX_PG)
 
             if ent_cnt[1][0] > 0:
-                return render_template('public/dev-data-pg.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=rd[2], pp=rd[0], pr=rd[1], devname=session['devname'])
+                return render_template('public/dev-data.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=rd[2], pp=rd[0], pr=rd[1], devname=session['devname'])
             else:
-                return render_template('public/dev-data-pg.html', devname=session['devname'])
+                return render_template('public/dev-data.html', devname=session['devname'])
         else:
             flash('Error: {}'.format(ent_cnt[1]), 'danger')
-            return render_template('public/dev-data-pg.html', devname=session['devname'])
+            return render_template('public/dev-data.html', devname=session['devname'])
     else:
         return redirect(utl_for('index'))
 
@@ -418,8 +397,7 @@ def user():
 @app.route('/user-delete')
 def user_delete():
     user = ud.get(request.args.get('name'))
-    if user[2] != 'admin' and session['role'] and session['role'] == 'admin':
-        pass
+    if user[1][2] != 'admin' and session['role'] and session['role'] == 'admin':
         
 
 def pend_delete_all_ack():
