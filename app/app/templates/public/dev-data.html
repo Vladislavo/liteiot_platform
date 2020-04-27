@@ -2,6 +2,36 @@
 
 {% block title %} Device Data: {% endblock %}
 
+{% block head %}
+	{% if data %}
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript">
+	google.charts.load('current', {'packages':['corechart']});
+      	google.charts.setOnLoadCallback(drawChart);
+
+      	function drawChart() {
+        	var data = google.visualization.arrayToDataTable([
+          		['Timestamp', 'Data'],
+			{% for d in data %}
+			['{{ d[1] }}', {{ d[2]['hih8121_h_mkr'] }}],
+			{% endfor %}
+		]);
+
+        	var options = {
+			title: 'ESP32 Data',
+          		curveType: 'function',
+			hAxis: { format: 'long' },
+			legend: { position: 'none' }
+        	};
+
+        	var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        	chart.draw(data, options);
+      	}
+	</script>
+	{% endif %}
+{% endblock %}
+
 {% block content %}
 
 <div class="row">
@@ -18,7 +48,9 @@
 			</div>
 			<div class="panel-body">
 				{% if data %}
-		
+
+				<div id="curve_chart" style="height: 600px;"></div>
+
 				<table class="table">
 					<thead>
 						<th>Time</th>
@@ -47,21 +79,21 @@
 						{% else %}
 						<li class="disabled">
 						{% endif %}
-							<a href="/dev-data-pg?p={{ pp }}" aria-label="Previous">
+							<a href="/dev-data?p={{ pp }}" aria-label="Previous">
 								<span aria-hidden="true">&laquo;</span>
 							</a>
 						</li>
 						{% for i in range(pr[0],pr[1]) %}
 							{% if i == cp %}
 							<li class="active">
-								<a href="/dev-data-pg?p={{ i }}"> 
+								<a href="/dev-data?p={{ i }}"> 
 									{{ i }} 
 									<span class="sr-only">(current)</span>
 								</a>
 							</li>
 							{% else %}
 							<li>
-								<a href="/dev-data-pg?p={{ i }}"> {{ i }} </a>
+								<a href="/dev-data?p={{ i }}"> {{ i }} </a>
 							</li>
 							{% endif %}
 						{% endfor %}
@@ -71,7 +103,7 @@
 						{% else %}
 						<li class="disabled">
 						{% endif %}
-							<a href="/dev-data-pg?p={{ np }}" aria-label="Next">
+							<a href="/dev-data?p={{ np }}" aria-label="Next">
 								<span aria-hidden="true">&raquo;</span>
 							</a>
 						</li>
@@ -87,12 +119,6 @@
 				{% endif %}
 	</div>
 </div>
-
-<script type="text/javascrypt">
-function conf() {
-	return confirm("Are you sure? It will remove all device data.")
-}
-</script>
 
 {% endblock %}
 
