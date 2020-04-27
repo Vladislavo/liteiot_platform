@@ -19,7 +19,7 @@ def create_datatable(cur, appkey, dev_id):
 def delete_datatable(cur, appkey, dev_id):
     tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
     cur.execute(
-        psycopg2.sql.SQL(
+        sql.SQL(
             "DROP TABLE {}"
         ).format(sql.Identifier(tn)))
     return (True,)
@@ -42,7 +42,7 @@ def create_table(cur, appkey):
 def delete_table(cur, appkey):
     tn = 'devices_' +str(appkey)
     cur.execute(
-        psycopg2.sql.SQL(
+        sql.SQL(
             "DROP TABLE {}"
         ).format(sql.Identifier(tn)))
     return (True,)

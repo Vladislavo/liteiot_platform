@@ -20,7 +20,7 @@ def create_table(cur, appkey, devid):
 def delete_table(cur, appkey, devid):
     tn = 'dev_' +str(appkey)+ '_' +str(devid)
     cur.execute(
-        psycopg2.sql.SQL(
+        sql.SQL(
             "DROP TABLE {}"
         ).format(sql.Identifier(tn)))
     return (True,)

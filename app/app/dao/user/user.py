@@ -47,7 +47,18 @@ def update_password(cur, name, password):
     return (True,)
 
 @with_psql
-def get(cur, name, password):
+def get(cur, name):
+    query = """
+    SELECT * FROM
+        users
+    WHERE 
+        name = %s
+    """
+    cur.execute(query, (name,))
+    return (True, cur.fetchone())
+
+@with_psql
+def check(cur, name, password):
     query = """
     SELECT * FROM
         users

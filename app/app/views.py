@@ -86,7 +86,7 @@ def login():
             flash('Username or password fields cannot be empty', 'danger')
             return redirect(request.url)
         else:
-            res = ud.get(username, password)
+            res = ud.check(username, password)
             if (not res[0]):
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
@@ -132,7 +132,7 @@ def app_():
                 error = 'Application name cannot be empty.'
                 return render_template('public/new-app.html', feedback=error)
             else:
-                appkey = misc.rand_str(app.config['APPKEY_LENGTH'])
+                appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
                 res = ad.create(request.form['appname'], appkey, session['name'], request.form['appdesc'])
             
                 if not res[0]:
@@ -397,8 +397,43 @@ def user():
 @app.route('/user-delete')
 def user_delete():
     user = ud.get(request.args.get('name'))
-    if user[1][2] != 'admin' and session['role'] and session['role'] == 'admin':
-        
+    if user[0] and user[1][2] != 'admin' and session['role'] == 'admin':
+        app_list = ad.get_list(user[1][0])
+
+        res = (True,)
+        if app_list[0]:
+            for app in app_list[1]:
+                devs = dd.get_list(app[1])
+                print('devs: {}'.format(devs))
+                for dev in devs[1]:
+                    res = data.delete_table(app[1], dev[1])
+                    print ('data del {}'.format(res))
+                    if not res[0]:
+                        break
+    
+                if res[0]:
+                    res = dd.delete_table(app[1])
+                    print ('devices del {}'.format(res))
+                    
+                if res[0]:
+                    res = ad.delete(app[1])
+                    print ('app del {}'.format(res))
+
+                if not res[0]:
+                    break
+
+        if res[0]:
+            res = ud.delete(user[1][0])
+            print ('user del {}'.format(res))
+
+        if not res[0]:
+            flash('Error: {}'.format(res[1]), 'danger')
+            return render_template('admin/user.html', username=user[1][0])
+        else:
+                return redirect(url_for('dashboard'))
+    else:
+        flash('Warning: the user is admin or does not exist.' ,'warning')
+        return redirect(url_for('index'))
 
 def pend_delete_all_ack():
     pend.delete_all_ack()
