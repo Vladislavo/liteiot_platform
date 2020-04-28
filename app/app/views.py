@@ -308,12 +308,12 @@ def dev_data_pg():
             rd = misc.paging(cur_pg, ent_cnt[1][0], MAX_PG_ENTRIES_DATA, MAX_PG)
 
             if ent_cnt[1][0] > 0:
-                return render_template('public/dev-data.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=rd[2], pp=rd[0], pr=rd[1], devname=session['devname'])
+                return render_template('public/dev-data-t.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=rd[2], pp=rd[0], pr=rd[1], devname=session['devname'])
             else:
-                return render_template('public/dev-data.html', devname=session['devname'])
+                return render_template('public/dev-data-t.html', devname=session['devname'])
         else:
             flash('Error: {}'.format(ent_cnt[1]), 'danger')
-            return render_template('public/dev-data.html', devname=session['devname'])
+            return render_template('public/dev-data-t.html', devname=session['devname'])
     else:
         return redirect(utl_for('index'))
 

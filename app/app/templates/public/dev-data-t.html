@@ -1,0 +1,168 @@
+{% extends 'layout.html' %}
+
+{% block title %} Device Data: {% endblock %}
+
+{% block head %}
+	{% if data %}
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatabs.css') }}"/>
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript">
+	google.charts.load('current', {'packages':['corechart']});
+      	google.charts.setOnLoadCallback(drawChart);
+
+	
+      	function drawChart() {
+		{% for k in data[0][2] %}
+		var data_{{ k }} = google.visualization.arrayToDataTable([
+			['Time', '{{ k }}'],
+			{% for d in data %}
+			['{{ d[1] }}', {{ d[2][k] }}],
+			{% endfor %}
+		]);
+
+		var options_{{ k }} = {
+			title: '{{ devname}} > {{ k }}',
+          		curveType: 'function',
+			hAxis: { 
+				format: 'dd/MM/yy hh:mm:ss'
+			},
+			vAxis: {
+				format: 'decimal',
+				scaleType: 'linear'
+			},
+			legend: { position: 'none' },
+			height: 600,
+			width: 900,
+        	};
+	
+		var container_{{ k }} = document.getElementById('curve_chart_{{ k }}');	
+		var chart_{{ k }} = new google.visualization.LineChart(container_{{ k }});
+		//google.visualization.events.addListener(chart_{{ k }}, 'ready', function () { container_{{ k }}.className = ''; });
+		chart_{{ k }}.draw(data_{{ k }}, options_{{ k }});
+		{% endfor %}
+      	}
+	</script>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-1">
+		<div class="clickback">
+			<span class="glyphicon glyphicon-arrow-left"></span>	
+			<p><a class="backlink" onclick="history.back(-1)"></a></p>
+		</div>
+	</div>
+	<div class="col-md-10">
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<h2><center> {{ devname }} data </center></h2>
+			</div>
+			<div class="panel-body">
+				{% if data %}
+				<div class="tab">
+				{% for k in data[0][2] %}
+				<button class="tablinks" onclick="display_data(event, '{{ k }}')" id="tab_{{ k }}"> {{ k }} </button>
+				{% endfor %}
+				</div>
+				
+				{% for k in data[0][2] %}
+				<div id="{{ k }}" class="tabcontent">
+					<div id="curve_chart_{{ k }}"></div>
+
+					<table class="table">
+						<thead>
+							<th>Time</th>
+							<th>{{ k }}</th>
+						</thead>
+						<tbody>
+						{% for d in data %}
+							<tr>
+								<th> {{ d[1] }} </th>
+								<th>{{ d[2][k] }}</th>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% endfor %}
+				<p>Total: <strong>{{ total }}</strong> messages.</p>
+				<center>	
+				<nav aria-label="Page navigation">
+					<ul class="pagination">
+						{% if pp %}
+						<li>
+						{% else %}
+						<li class="disabled">
+						{% endif %}
+							<a href="/dev-data?p={{ pp }}" aria-label="Previous">
+								<span aria-hidden="true">&laquo;</span>
+							</a>
+						</li>
+						{% for i in range(pr[0],pr[1]) %}
+							{% if i == cp %}
+							<li class="active">
+								<a href="/dev-data?p={{ i }}"> 
+									{{ i }} 
+									<span class="sr-only">(current)</span>
+								</a>
+							</li>
+							{% else %}
+							<li>
+								<a href="/dev-data?p={{ i }}"> {{ i }} </a>
+							</li>
+							{% endif %}
+						{% endfor %}
+
+						{% if np %}
+						<li>
+						{% else %}
+						<li class="disabled">
+						{% endif %}
+							<a href="/dev-data?p={{ np }}" aria-label="Next">
+								<span aria-hidden="true">&raquo;</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+				</center>
+				<br>
+				<center>
+				<a href="/data-csv"><button type="submit" class="btn btn-primary">Download CSV</button></a>
+				</center>
+				{% else %}
+				<h3><center>Device have not sent any data yet.</center></h3>
+				{% endif %}
+	</div>
+</div>
+
+{% if data %}
+<script type="text/javascript">
+	function display_data(evt, dname) {
+  		// Declare all variables
+  		var i, tabcontent, tablinks;
+
+  		// Get all elements with class="tabcontent" and hide them
+  		tabcontent = document.getElementsByClassName("tabcontent");
+  		for (i = 0; i < tabcontent.length; i++) {
+    			tabcontent[i].style.display = "none";
+  		}
+
+  		// Get all elements with class="tablinks" and remove the class "active"
+  		tablinks = document.getElementsByClassName("tablinks");
+  		for (i = 0; i < tablinks.length; i++) {
+    			tablinks[i].className = tablinks[i].className.replace(" active", "");
+  		}
+
+  		// Show the current tab, and add an "active" class to the button that opened the tab
+  		document.getElementById(dname).style.display = "block";
+  		evt.currentTarget.className += " active";
+	}
+	document.getElementById("tab_{{ data[0][2] | first }}").click();
+</script>
+{% endif %}
+
+{% endblock %}
+
