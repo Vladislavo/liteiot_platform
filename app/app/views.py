@@ -17,7 +17,7 @@ import os
 
 MAX_PG = 5
 MAX_PG_ENTRIES_USERS = 10
-MAX_PG_ENTRIES_DATA = 10
+MAX_PG_ENTRIES_DATA = 30
 
 
 @app.route('/')

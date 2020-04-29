@@ -5,44 +5,7 @@
 {% block head %}
 	{% if data %}
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatabs.css') }}"/>
-
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-	<script type="text/javascript">
-	google.charts.load('current', {'packages':['corechart']});
-      	google.charts.setOnLoadCallback(drawChart);
-
-	
-      	function drawChart() {
-		{% for k in data[0][2] %}
-		var data_{{ k }} = google.visualization.arrayToDataTable([
-			['Time', '{{ k }}'],
-			{% for d in data %}
-			['{{ d[1] }}', {{ d[2][k] }}],
-			{% endfor %}
-		]);
-
-		var options_{{ k }} = {
-			title: '{{ devname}} > {{ k }}',
-          		curveType: 'function',
-			hAxis: { 
-				format: 'dd/MM/yy hh:mm:ss'
-			},
-			vAxis: {
-				format: 'decimal',
-				scaleType: 'linear'
-			},
-			legend: { position: 'none' },
-			height: 600,
-			width: 900,
-        	};
-	
-		var container_{{ k }} = document.getElementById('curve_chart_{{ k }}');	
-		var chart_{{ k }} = new google.visualization.LineChart(container_{{ k }});
-		//google.visualization.events.addListener(chart_{{ k }}, 'ready', function () { container_{{ k }}.className = ''; });
-		chart_{{ k }}.draw(data_{{ k }}, options_{{ k }});
-		{% endfor %}
-      	}
-	</script>
 	{% endif %}
 {% endblock %}
 
@@ -140,6 +103,43 @@
 
 {% if data %}
 <script type="text/javascript">
+	google.charts.load('current', {'packages':['corechart']});
+      	google.charts.setOnLoadCallback(drawChart);
+      
+	{% for k in data[0][2] %}
+	function drawChart_{{ k }} () {
+		var data_{{ k }} = google.visualization.arrayToDataTable([
+			['Time', '{{ k }}'],
+			{% for d in data %}
+			['{{ d[1] }}', {{ d[2][k] }}],
+			{% endfor %}
+		]);
+
+		var options_{{ k }} = {
+			title: '{{ devname}} > {{ k }}',
+          		curveType: 'function',
+			hAxis: { 
+				format: 'dd/MM/yy hh:mm:ss'
+			},
+			vAxis: {
+				format: 'decimal',
+				scaleType: 'linear',
+				textPosition: 'in'
+			},
+			legend: { position: 'none' },
+			height: 600,
+			width: 900,
+			// interpolateNulls: true,
+			chartArea: { left: 0, top: 10, width: '100%' }
+        	};
+
+		var container_{{ k }} = document.getElementById('curve_chart_{{ k }}');
+		var chart_{{ k }} = new google.visualization.LineChart(container_{{ k }});
+		//google.visualization.events.addListener(chart_{{ k }}, 'ready', function () { container_{{ k }}.className = ''; });
+		chart_{{ k }}.draw(data_{{ k }}, options_{{ k }});
+	}
+	{% endfor %}
+
 	function display_data(evt, dname) {
   		// Declare all variables
   		var i, tabcontent, tablinks;
@@ -159,7 +159,10 @@
   		// Show the current tab, and add an "active" class to the button that opened the tab
   		document.getElementById(dname).style.display = "block";
   		evt.currentTarget.className += " active";
+		
+		eval('drawChart_'+dname+'()');
 	}
+
 	document.getElementById("tab_{{ data[0][2] | first }}").click();
 </script>
 {% endif %}
