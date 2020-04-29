@@ -110,7 +110,7 @@
 	function drawChart_{{ k }} () {
 		var data_{{ k }} = google.visualization.arrayToDataTable([
 			['Time', '{{ k }}'],
-			{% for d in data %}
+			{% for d in data|reverse %}
 			['{{ d[1] }}', {{ d[2][k] }}],
 			{% endfor %}
 		]);
