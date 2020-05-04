@@ -470,5 +470,21 @@ def settings():
         return redirect(request.url)
 
 
+@app.route('/dev-data/<var>/<dest>/<cnt>/<page>')
+def dev_data(var, dest, cnt, page):
+    if dest == 'graph':
+        # for graph <cnt> is in hours
+        last = data.get_last_range(session['appkey'], session['devid'], [int(cnt), (int(page)-1)*int(cnt)])
+        arr = '[["Time", "{}"],'.format(var)
+        if last[0]:
+            for d in last[1]:
+                arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
+            arr += ']'
+        return arr
+    elif dest == 'table':
+        # for table <cnt> is in items
+        pass
+
+
 def pend_delete_all_ack():
     pend.delete_all_ack()

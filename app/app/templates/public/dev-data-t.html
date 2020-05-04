@@ -104,19 +104,12 @@
 {% if data %}
 <script type="text/javascript">
 	google.charts.load('current', {'packages':['corechart']});
-      	google.charts.setOnLoadCallback(drawChart);
-      
-	{% for k in data[0][2] %}
-	function drawChart_{{ k }} () {
-		var data_{{ k }} = google.visualization.arrayToDataTable([
-			['Time', '{{ k }}'],
-			{% for d in data|reverse %}
-			[new Date({{ d[0] }}*1000), {{ d[2][k] }}],
-			{% endfor %}
-		]);
+     
+	function drawChart(dname, ddata) {
+		var data = google.visualization.arrayToDataTable(ddata);
 
-		var options_{{ k }} = {
-			title: '{{ devname}} > {{ k }}',
+		var options = {
+			title: '{{ devname }} > '+dname,
           		curveType: 'function',
 			hAxis: { 
 				format: 'dd/MM/yy hh:mm:ss',
@@ -133,12 +126,10 @@
 			chartArea: { left: 0, top: 10, width: '100%' }
         	};
 
-		var container_{{ k }} = document.getElementById('curve_chart_{{ k }}');
-		var chart_{{ k }} = new google.visualization.LineChart(container_{{ k }});
-		//google.visualization.events.addListener(chart_{{ k }}, 'ready', function () { container_{{ k }}.className = ''; });
-		chart_{{ k }}.draw(data_{{ k }}, options_{{ k }});
+		var container = document.getElementById('curve_chart_'+dname);
+		var chart = new google.visualization.LineChart(container);
+		chart.draw(data, options);
 	}
-	{% endfor %}
 
 	function display_data(evt, dname) {
   		// Declare all variables
@@ -159,8 +150,9 @@
   		// Show the current tab, and add an "active" class to the button that opened the tab
   		document.getElementById(dname).style.display = "block";
   		evt.currentTarget.className += " active";
+
 		
-		eval('drawChart_'+dname+'()');
+		fetch(window.origin+'/dev-data/'+dname+'/graph/200/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
 	}
 
 	document.getElementById("tab_{{ data[0][2] | first }}").click();
