@@ -35,19 +35,7 @@
 				<div id="{{ k }}" class="tabcontent">
 					<div id="curve_chart_{{ k }}"></div>
 
-					<table class="table">
-						<thead>
-							<th>Time</th>
-							<th>{{ k }}</th>
-						</thead>
-						<tbody>
-						{% for d in data %}
-							<tr>
-								<th> {{ d[1] }} </th>
-								<th>{{ d[2][k] }}</th>
-							</tr>
-						{% endfor %}
-						</tbody>
+					<table class="table" id="table_{{ k }}">
 					</table>
 				</div>
 				{% endfor %}
@@ -102,6 +90,7 @@
 </div>
 
 {% if data %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 <script type="text/javascript">
 	google.charts.load('current', {'packages':['corechart']});
      
@@ -151,8 +140,8 @@
   		document.getElementById(dname).style.display = "block";
   		evt.currentTarget.className += " active";
 
-		
-		fetch(window.origin+'/dev-data/'+dname+'/graph/200/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
+		fetch(window.origin+'/dev-data/'+dname+'/graph/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
+		fetch(window.origin+'/dev-data/'+dname+'/table/1').then(res => res.text()).then(data => $('#table_'+dname).html(data));
 	}
 
 	document.getElementById("tab_{{ data[0][2] | first }}").click();

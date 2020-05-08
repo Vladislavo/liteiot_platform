@@ -1,5 +1,6 @@
 from psycopg2 import sql
 from app.helpers.misc import with_psql
+from datetime import datetime
 
 
 @with_psql
@@ -65,6 +66,31 @@ def get_last_range(cur, appkey, devid, r):
     else:
         return (True, data)
 
+
+@with_psql
+def get_last_hours(cur, appkey, devid, hours, p):
+    tn = 'dev_' +str(appkey)+ '_' +str(devid)
+    last = get_last_n(appkey, devid, 1)
+    utcb = last[1][0][0] - hours*3600*p
+    utcu = utcb + hours*3600
+    print(utcb, utcu)
+    query = """
+        SELECT * FROM 
+            {}
+        WHERE 
+            utc > %s
+        AND
+            utc <= %s
+        ORDER BY utc DESC
+        """
+    cur.execute(
+        sql.SQL(query).format(sql.Identifier(tn)), [utcb, utcu])
+    data = cur.fetchall()
+        
+    if (data == []):
+        return (False, 'There is no data for the device.')
+    else:
+        return (True, data)
 
 
 @with_psql

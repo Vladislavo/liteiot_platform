@@ -4,7 +4,7 @@ class Config(object):
 
     SECRET_KEY = b'ksj^*(s90*Dklds;osdj'
 
-    DB_NAME = 'gateway'
+    DB_NAME = 'iotserver'
     DB_USERNAME = 'pi'
     DB_PASSWORD = 'dev'
     DB_HOST = 'localhost'

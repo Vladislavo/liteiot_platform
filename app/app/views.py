@@ -17,7 +17,8 @@ import os
 
 MAX_PG = 5
 MAX_PG_ENTRIES_USERS = 10
-MAX_PG_ENTRIES_DATA = 30
+MAX_PG_ENTRIES_DATA = 10
+MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
 
 @app.route('/')
@@ -470,11 +471,10 @@ def settings():
         return redirect(request.url)
 
 
-@app.route('/dev-data/<var>/<dest>/<cnt>/<page>')
-def dev_data(var, dest, cnt, page):
+@app.route('/dev-data/<var>/<dest>/<page>')
+def dev_data(var, dest, page):
     if dest == 'graph':
-        # for graph <cnt> is in hours
-        last = data.get_last_range(session['appkey'], session['devid'], [int(cnt), (int(page)-1)*int(cnt)])
+        last = data.get_last_hours(session['appkey'], session['devid'], MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
         arr = '[["Time", "{}"],'.format(var)
         if last[0]:
             for d in last[1]:
@@ -483,7 +483,18 @@ def dev_data(var, dest, cnt, page):
         return arr
     elif dest == 'table':
         # for table <cnt> is in items
-        pass
+        last = data.get_last_range(session['appkey'], session['devid'], [MAX_PG_ENTRIES_DATA, (int(page)-1)*MAX_PG_ENTRIES_DATA])
+        t = """ <thead>
+                    <th>Time</th>
+                    <th>{}</th>
+                </thead>
+                <tbody>
+        """.format(var)
+        if last[0]:
+            for d in last[1]:
+                t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
+        t += '</tbody>'
+        return t
 
 
 def pend_delete_all_ack():
