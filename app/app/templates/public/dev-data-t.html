@@ -72,6 +72,7 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 <script type="text/javascript">
 	google.charts.load('current', {'packages':['corechart']});
+	google.charts.setOnLoadCallback(show_first_page);	
 
 	function init_scroll() {
 		var ts = {
@@ -143,8 +144,10 @@
 			}
 		};
 	}
-
-	document.getElementById("tab_{{ data[0][2] | first }}").click();
+	
+	function show_first_page() {
+		document.getElementById("tab_{{ data[0][2] | first }}").click();
+	}
 </script>
 {% endif %}
 
