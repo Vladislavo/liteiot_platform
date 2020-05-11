@@ -22,7 +22,7 @@
 		<div class="panel panel-success">
 			<div class="panel-heading">
 				<h2><center> {{ devname }} data </center></h2>
-			</div>
+			</div>	
 			<div class="panel-body">
 				{% if data %}
 				<div class="tab">
@@ -33,7 +33,13 @@
 				
 				{% for k in data[0][2] %}
 				<div id="{{ k }}" class="tabcontent">
-					<div id="curve_chart_{{ k }}"></div>
+					<center><div id="curve_chart_{{ k }}"></div></center>
+				
+					<br>
+					<p>Total: <strong>{{ total }}</strong> messages.
+					<a href="/data-csv"><button type="submit" class="btn btn-primary">Download CSV</button></a>
+					</p>
+					<br>
 
 					<table class="table" id="table_{{ k }}">
 						<thead>
@@ -45,50 +51,6 @@
 					</table>
 				</div>
 				{% endfor %}
-				<p>Total: <strong>{{ total }}</strong> messages.</p>
-				<center>	
-				<nav aria-label="Page navigation">
-					<ul class="pagination">
-						{% if pp %}
-						<li>
-						{% else %}
-						<li class="disabled">
-						{% endif %}
-							<a href="/dev-data?p={{ pp }}" aria-label="Previous">
-								<span aria-hidden="true">&laquo;</span>
-							</a>
-						</li>
-						{% for i in range(pr[0],pr[1]) %}
-							{% if i == cp %}
-							<li class="active">
-								<a href="/dev-data?p={{ i }}"> 
-									{{ i }} 
-									<span class="sr-only">(current)</span>
-								</a>
-							</li>
-							{% else %}
-							<li>
-								<a href="/dev-data?p={{ i }}"> {{ i }} </a>
-							</li>
-							{% endif %}
-						{% endfor %}
-
-						{% if np %}
-						<li>
-						{% else %}
-						<li class="disabled">
-						{% endif %}
-							<a href="/dev-data?p={{ np }}" aria-label="Next">
-								<span aria-hidden="true">&raquo;</span>
-							</a>
-						</li>
-					</ul>
-				</nav>
-				</center>
-				<br>
-				<center>
-				<a href="/data-csv"><button type="submit" class="btn btn-primary">Download CSV</button></a>
-				</center>
 				{% else %}
 				<h3><center>Device have not sent any data yet.</center></h3>
 				{% endif %}
@@ -117,18 +79,19 @@
 			title: '{{ devname }} > '+dname,
           		curveType: 'function',
 			hAxis: { 
-				format: 'dd/MM/yy hh:mm:ss',
+				format: 'dd/MM hh:mm',
+				
 			},
 			vAxis: {
 				format: 'decimal',
 				scaleType: 'linear',
-				textPosition: 'in'
+				textPosition: 'out'
 			},
 			legend: { position: 'none' },
 			height: 600,
 			width: 900,
 			// interpolateNulls: true,
-			chartArea: { left: 0, top: 10, width: '100%' }
+			chartArea: { left: '5%', width: '90%', height: '80%' }
         	};
 
 		var container = document.getElementById('curve_chart_'+dname);
@@ -164,7 +127,6 @@
 			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
 				tscroll[dname] += 1;
 				fetch(window.origin+'/dev-data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').append(data));
-				console.log(tscroll[dname]);
 			}
 		};
 	}
