@@ -40,6 +40,11 @@
    	/*workaround to make clickable in IE */
 }
 
-.glyphicon.glyphicon-arrow-left {
+.glyphicon-pagenav {
 	font-size: 50px;
+}
+
+
+.glyphicon-graphnav {
+	font-size: 40px;
 }
