@@ -484,16 +484,17 @@ def dev_data(var, dest, page):
     elif dest == 'table':
         # for table <cnt> is in items
         last = data.get_last_range(session['appkey'], session['devid'], [MAX_PG_ENTRIES_DATA, (int(page)-1)*MAX_PG_ENTRIES_DATA])
-        t = """ <thead>
-                    <th>Time</th>
-                    <th>{}</th>
-                </thead>
-                <tbody>
-        """.format(var)
+        #t = """ <thead>
+        #            <th>Time</th>
+        #            <th>{}</th>
+        #        </thead>
+        #        <tbody>
+        #""".format(var)
+        t = ''
         if last[0]:
             for d in last[1]:
                 t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
-        t += '</tbody>'
+        #t += '</tbody>'
         return t
 
 

@@ -36,6 +36,12 @@
 					<div id="curve_chart_{{ k }}"></div>
 
 					<table class="table" id="table_{{ k }}">
+						<thead>
+							<th> Time </th>
+							<th> {{ k }} </th>
+						</thead>
+						<tbody id="table_{{ k }}_body">
+						</tbody>
 					</table>
 				</div>
 				{% endfor %}
@@ -92,6 +98,16 @@
 {% if data %}
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 <script type="text/javascript">
+	function init_scroll() {
+		var ts = {
+			{% for k in data[0][2] %}
+			{{ k }} : 1,
+			{% endfor %}
+		};
+		return ts;
+	}
+
+	var tscroll = init_scroll();
 	google.charts.load('current', {'packages':['corechart']});
      
 	function drawChart(dname, ddata) {
@@ -140,8 +156,17 @@
   		document.getElementById(dname).style.display = "block";
   		evt.currentTarget.className += " active";
 
-		fetch(window.origin+'/dev-data/'+dname+'/graph/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
-		fetch(window.origin+'/dev-data/'+dname+'/table/1').then(res => res.text()).then(data => $('#table_'+dname).html(data));
+		fetch(window.origin+'/dev-data/'+dname+'/graph/'+tscroll[dname]).then(res => res.text()).then(data => drawChart(dname, eval(data)));
+		fetch(window.origin+'/dev-data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').html(data));
+	
+		
+		window.onscroll = function (ev) {
+			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+				tscroll[dname] += 1;
+				fetch(window.origin+'/dev-data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').append(data));
+				console.log(tscroll[dname]);
+			}
+		};
 	}
 
 	document.getElementById("tab_{{ data[0][2] | first }}").click();
