@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block title %} Application Alarms: {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-3">
+		<div class="clickback">
+			<span class="glyphicon glyphicon-arrow-left"></span>	
+			<p><a class="backlink" onclick="history.back(-1)"></a></p>
+		</div>
+	</div>
+	<div class="col-md-6">
+		{% if alarm_list %}
+		<div>
+			<table class="table">
+				<thead>
+					<th> Name </th>
+					<th> Description </th>
+					<th> </th>
+				</thead>
+				<tbody>
+					{% for a in alarm_list %}
+					<tr>
+						<th> {{ a[3] }} </th>
+						<th> {{ a[4] }} </th>
+						<th> <a href="/alarm-rm?id={{ c[0] }}"> <span class="glyphicon glyphicon-remove"</span> </a> </th>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<a href="/new-alarm"><button class="btn btn-primary" type="submit">Create New Alarm</button></a>
+		</div>
+		{% else %}
+		<center> There are no alarms for given application. </center>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}
+

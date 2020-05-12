@@ -498,5 +498,13 @@ def dev_data(var, dest, page):
         return t
 
 
+@app.route('/alarms')
+def alarms():
+    if name in session:
+        
+        return render_template('public/alarms.html')
+    else:
+        return redirect(url_for('index'))
+
 def pend_delete_all_ack():
     pend.delete_all_ack()

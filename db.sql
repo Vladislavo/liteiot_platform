@@ -41,7 +41,7 @@ SET default_with_oids = false;
 CREATE TABLE public.applications (
     name character varying(30) NOT NULL,
     app_key character varying(30) NOT NULL,
-    username character varying(30),
+    username character varying(30) NOT NULL,
     description character varying(200)
 );
 
