@@ -1,14 +1,14 @@
 from app.helpers.misc import with_psql
 
 @with_psql
-def create(cur, nid, appkey, devid, name, desc, action_type, action):
+def create(cur, nid, appkey, devid):
     query = """
     INSERT INTO
-        notifications
+        notifications_queue
     VALUES
-        (%s, %s, %s, %s, %s, %s, %s)
+        (%s, %s, %s)
     """
-    cur.execute(query, (nid, appkey, devid, name, desc, action_type, action))
+    cur.execute(query, (nid, appkey, devid))
        
     return (True,)
 
@@ -16,9 +16,9 @@ def create(cur, nid, appkey, devid, name, desc, action_type, action):
 def delete(cur, appkey, nid):
     query = """
     DELETE FROM
-        notifications
+        notifications_queue
     WHERE
-        id = %s
+         nf_id = %s
     AND
         app_key = %s
     """
@@ -30,9 +30,9 @@ def delete(cur, appkey, nid):
 def get(cur, appkey, nid):
     query = """
     SELECT * FROM
-        notifications
+        notifications_queue
     WHERE
-        id = %s
+        nf_id = %s
     AND
         app_key = %s
     """
@@ -40,20 +40,18 @@ def get(cur, appkey, nid):
     nf = cur.fetchone()
 
     if nf is None:
-        return (False, 'Notification with appkey {} and id {} does not exist'.format(appkey, nid))
+        return (False, 'Queued notification with appkey {} and id {} does not exist'.format(appkey, nid))
     else:
         return (True, nf)
 
     
 @with_psql
-def get_list(cur, appkey):
+def get_all(cur):
     query = """
     SELECT * FROM
-        notifications
-    WHERE
-        app_key = %s
+        notificationis_queue
     """
-    cur.execute(query, (appkey,))
+    cur.execute(query)
 
     return (True, cur.fetchall())
 
@@ -62,7 +60,7 @@ def get_list(cur, appkey):
 def get_count(cur):
     query = """
     SELECT COUNT(*) FROM
-        notifications
+        notifications_queue
     """
     cur.execute(query, ())
 
