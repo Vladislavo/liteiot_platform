@@ -8,6 +8,8 @@ import app.dao.application.application as ad
 import app.dao.device.device as dd
 import app.dao.pend.pend as pend
 import app.dao.data.data as data
+import app.dao.notification.notification as nfs
+import app.dao.trigger.trigger as tr
 
 import app.helpers.misc as misc
 
@@ -281,6 +283,7 @@ def dev_conf_rm():
     else:
         return redirect(url_for('index'))
 
+
 @app.route('/delete-dev')
 def delete_dev():
     if 'name' in session and 'devid' in session:
@@ -318,6 +321,20 @@ def dev_data_pg():
     else:
         return redirect(utl_for('index'))
 
+
+@app.route('/dev-vars')
+def dev_vars():
+    if 'name' in session:
+        last = data.get_last_n(session['appkey'], request.args.get('id'), 1)
+        if last[0]:
+            select = '<select class="form-control" id="varname" name="varname" onchange="onvar(event)" required>'
+            select += '<option value="-">Select Variable</option>'
+            for k in last[1][0][2]:
+                select += '<option>'+k+'</option>'
+            select += '</select>'
+            return select
+    else:
+        return redirect(url_for('index'))
 
 
 @app.route('/data-csv')
@@ -441,6 +458,7 @@ def user_delete():
         flash('Warning: the user is admin or does not exist.' ,'warning')
         return redirect(url_for('index'))
 
+
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'GET':
@@ -498,11 +516,38 @@ def dev_data(var, dest, page):
         return t
 
 
-@app.route('/alarms')
-def alarms():
-    if name in session:
-        
-        return render_template('public/alarms.html')
+@app.route('/alerts')
+def alerts():
+    if 'name' in session:
+        alerts = nfs.get_list(session['appkey'])
+        return render_template('public/alerts.html', alert_list=alerts[1])
+    else:
+        return redirect(url_for('index'))
+
+@app.route('/new-alert')
+def new_alert():
+    if 'name' in session:
+        devs = dd.get_list(session['appkey'])
+        return render_template('public/new-alert.html', devs=devs[1])
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/alert', methods=['POST'])
+def alert():
+    pass
+
+@app.route('/alert-rm')
+def alarm_rm():
+    if 'name' in session:
+        res = nfs.delete(session['appkey'], request.args.get('id'))
+
+        if res[0]:
+            flash('Alarm removed', 'success')
+            return redirect(url_for('alerts'))
+        else:
+            flash('Alarm cannot be removed : {}'.format(res[1]), 'danger')
+            return redirect(url_for('alerts'))
     else:
         return redirect(url_for('index'))
 

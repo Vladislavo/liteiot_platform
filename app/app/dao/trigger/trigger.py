@@ -63,7 +63,7 @@ def create_function(cur, appkey, devid, nfid, expr):
                 VALUES
                     ({},{},{});
             END IF;
-        """.format( expr[0], get_type(expr[2]), expr[1], expr[2]
+        """.format( expr[0], get_type(expr[2]), expr[1], expr[2],
                     ndif, appkey, devid)
     
     query += """

@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+
+{% block title %} New Alert {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-3">
+		<div class="clickback">
+			<span class="glyphicon glyphicon-arrow-left"></span>	
+			<p><a class="backlink" onclick="history.back(-1)"></a></p>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<h2> Create New Alert </h2>
+		<br><br>
+		<form id="alertform" action="alert" method="post">
+			<div class="form-group">
+				<label>Name:</label><br>
+				<input type="text" maxlength="30" class="form-control" id="alertname" name="alertname" required><br>
+			</div>
+			<div class="form-group">
+				<label>Description:</label><br>
+				<textarea id="alertdesc" maxlength="300" class="form-control" name="alertdesc" rows="5"></textarea>
+			</div>
+			<h3> Condition: </h3>
+			<h4> IF </h4>
+			<select class="form-control" id="devid" name="devid" onchange="ondev()" required>
+				<option default value="-">Select Device</option>
+				{% for d in devs %}
+				<option value="{{ d[1] }}">{{ d[0] }}</option>
+				{% endfor %}
+			</select>
+
+			<br>
+
+			{% if feedback %}
+			<p class="text-danger float-right">{{ feedback }}</p>
+			{% endif %}
+		</form>
+		<br>
+		<h4> THEN </h4>
+		<h5> Send email to </h5>
+
+		<input form="alertform" class="form-control" type="email" id="email" name="email" placeholder="Type email...">
+		<br>
+		<div class="form-group">
+			<button form="alertform" type="submit" class="btn btn-primary">Create Alert</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function ondev() {
+		var dev_sel = document.getElementById("devid");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
+		if (!document.getElementById("varname")) {
+			if (sel_op != "-") {
+				fetch(window.origin+'/dev-vars?id='+sel_op).then(res => res.text()).then(data => $("#alertform").append(data));
+			}
+		} else {
+			if (sel_op == "-") {
+				$("#varname").remove();
+			}
+		}
+	}
+	function onvar() {
+		if (!document.getElementById("operation")) {
+			$("#alertform").append("<br><select class='form-control' name='operaton' id='operation' onchange='onop()' required><option default>CHANGES</option><option>></option><option>>=</option><option><</option><option><=</option><option>==</option></select>");
+		} else {
+			var var_sel = document.getElementById("varname");
+			var sel_var = var_sel.options[var_sel.selectedIndex].value;
+			if (sel_var == "-") {
+				$("#operation").remove();
+			}
+		}
+	}
+	function onop() {
+		if (!document.getElementById("value")) {
+			var op_sel = document.getElementById("operation");
+			var sel_op = op_sel.options[op_sel.selectedIndex].text;
+			if (sel_op != "CHANGES" && !document.getElementById("avalue")) {
+				$("#alertform").append("<br><input type='numeric' class='form-control' name='avalue' id='avalue' placeholder='Value' required>");
+			} else {
+				if (document.getElementById("avalue")) {
+					$("#avalue").remove();
+				}
+			}
+		}
+	}
+</script>
+
+{% endblock %}
+
