@@ -1,6 +1,8 @@
 from app import app
+from flask_mail import Mail, Message
 
 from flask import render_template, request, redirect, url_for, session, send_from_directory, flash
+from flask_mail import Message
 import psycopg2
 
 import app.dao.user.user as ud
@@ -23,6 +25,7 @@ MAX_PG_ENTRIES_USERS = 10
 MAX_PG_ENTRIES_DATA = 10
 MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
+mail = Mail(app)
 
 @app.route('/')
 def index():
@@ -583,5 +586,22 @@ def alarm_rm():
     else:
         return redirect(url_for('index'))
 
+@app.route('/mail')
+def send_mail():
+    print (1)
+    msg = Message('test message',
+        sender = 'hpcaiotserver@gmail.com',
+        recipients = ['al373630@uji.es'])
+    print (2)
+    msg.body = 'Hello vlad, alert is here!'
+    print (3)
+    res = mail.send(msg)
+    print (res)
+    return res
+
+
+
+
 def pend_delete_all_ack():
     pend.delete_all_ack()
+

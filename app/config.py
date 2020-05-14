@@ -24,6 +24,13 @@ class Config(object):
     # manual user signup by default
     USERS_SIGNUP = False
 
+    # mail server config
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = 'hpcaiotserver@gmail.com'
+    MAIL_PASSWORD = 'HPC&A10T.'
+
 class ProductionConfig(Config):
     pass
 
