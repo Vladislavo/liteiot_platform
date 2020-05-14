@@ -17,7 +17,8 @@
 			<table class="table">
 				<thead>
 					<th> Name </th>
-					<th> Description </th>
+					<th> Condition </th>
+					<th> Email </th>
 					<th> </th>
 				</thead>
 				<tbody>
@@ -25,6 +26,7 @@
 					<tr>
 						<th> {{ a[3] }} </th>
 						<th> {{ a[4] }} </th>
+						<th> {{ a[6] }} </th>
 						<th> <a href="/alert-rm?id={{ a[0] }}&devid={{ a[2] }}"> <span class="glyphicon glyphicon-remove"</span> </a> </th>
 					</tr>
 					{% endfor %}
@@ -32,7 +34,7 @@
 			</table>
 		</div>
 		{% else %}
-		<center> There are no alarms for given application. </center>
+		<center> There are no alerts for given application. </center>
 		{% endif %}
 		<br>
 		<center><a href="/new-alert"><button class="btn btn-primary" type="submit">Create New Alert</button></a></center>

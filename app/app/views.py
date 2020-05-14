@@ -526,6 +526,7 @@ def dev_data(var, dest, page):
 def alerts():
     if 'name' in session:
         alerts = nfs.get_list(session['appkey'])
+        print(alerts)
         return render_template('public/alerts.html', alert_list=alerts[1])
     else:
         return redirect(url_for('index'))
@@ -548,13 +549,9 @@ def alert():
             dev = dd.get(session['appkey'], request.form['devid'])
             avalue = ''
 
-            desc_ext = request.form['alertdesc'] + ' (Application '+session['appname']+' => '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']
-            if request.form['operation'] == 'CHANGES':
-                desc_ext += ')'
-            else:
-                desc_ext += ' '+request.form['avalue']+')'
+            desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
 
-            res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['alertname'], desc_ext, 'alert', request.form['alertemail'])
+            res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
             if res[0]:
                 # create new function and trigger
                 tr.create_function(session['appkey'], request.form['devid'], nid, [request.form['varname'],request.form['operation'],avalue])
