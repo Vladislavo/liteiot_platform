@@ -72,23 +72,14 @@
 	}
 	function onvar() {
 		if (!document.getElementById("operation")) {
-			$("#alertform").append("<select class='form-control notifelem' name='operation' id='operation' onchange='onop()' required><option default>CHANGES</option><option>></option><option>>=</option><option><</option><option><=</option><option>==</option></select>");
+			$("#alertform").append("<select class='form-control notifelem' name='operation' id='operation' required><option default>></option><option>>=</option><option><</option><option><=</option><option>=</option></select>");
+			$("#alertform").append("<input type='numeric' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' required>");
 		} else {
 			var var_sel = document.getElementById("varname");
 			var sel_var = var_sel.options[var_sel.selectedIndex].value;
 			if (sel_var == "-") {
-				$("#operation").remove();
-			}
-		}
-	}
-	function onop() {
-		var op_sel = document.getElementById("operation");
-		var sel_op = op_sel.options[op_sel.selectedIndex].text;
-		if (sel_op != "CHANGES" && !document.getElementById("avalue")) {
-			$("#alertform").append("<input type='numeric' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' required>");
-		} else {
-			if (document.getElementById("avalue")) {
 				$("#avalue").remove();
+				$("#operation").remove();
 			}
 		}
 	}

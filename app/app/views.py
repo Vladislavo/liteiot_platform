@@ -10,6 +10,7 @@ import app.dao.pend.pend as pend
 import app.dao.data.data as data
 import app.dao.notification.notification as nfs
 import app.dao.trigger.trigger as tr
+import app.dao.notification_queue.notification_queue as nq
 
 import app.helpers.misc as misc
 
@@ -542,22 +543,24 @@ def alert():
             # create new notification
             nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
             dev = dd.get(session['appkey'], request.form['devid'])
-            
-            try:
-                desc_ext = request.form['alertdesc'] + ' (Application '+session['appname']+' => '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']+')'
-            except:
-                desc_ext = request.form['alertdesc'] + ' (Application '+session['appname']+' => '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+')'
+            avalue = ''
 
+            desc_ext = request.form['alertdesc'] + ' (Application '+session['appname']+' => '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']
+            if request.form['operation'] == 'CHANGES':
+                desc_ext += ')'
+            else:
+                desc_ext += ' '+request.form['avalue']+')'
 
             res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['alertname'], desc_ext, 'alert', request.form['alertemail'])
             if res[0]:
-                print('notification created')
+                # create new function and trigger
+                tr.create_function(session['appkey'], request.form['devid'], nid, [request.form['varname'],request.form['operation'],avalue])
+                tr.create(session['appkey'], request.form['devid'], nid)
                 
                 return redirect(url_for('alerts'))
             else:
                 flash('Error creating new notification: {}'.format(res[1]), 'danger')
                 return redirect(url_for('alerts'))
-            # create new function and trigger
         else:
             return redirect(url_for('index'))
     else:
@@ -566,7 +569,10 @@ def alert():
 @app.route('/alert-rm')
 def alarm_rm():
     if 'name' in session:
-        res = nfs.delete(session['appkey'], request.args.get('id'))
+        nq.delete_list(session['appkey'])
+        tr.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
+        tr.delete_function(session['appkey'], request.args.get('devid'), request.args.get('id'))
+        res = nfs.delete(session['appkey'], request.args.get('id'), request.args.get('devid'))
 
         if res[0]:
             flash('Alert removed', 'success')

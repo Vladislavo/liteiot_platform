@@ -13,7 +13,7 @@ def create(cur, nid, appkey, devid, name, desc, action_type, action):
     return (True,)
 
 @with_psql
-def delete(cur, appkey, nid):
+def delete(cur, appkey, nid, devid):
     query = """
     DELETE FROM
         notifications
@@ -21,8 +21,10 @@ def delete(cur, appkey, nid):
         id = %s
     AND
         app_key = %s
+    AND
+        dev_id = %s
     """
-    cur.execute(query, (nid, appkey))
+    cur.execute(query, (nid, appkey, devid))
         
     return (True,)
 

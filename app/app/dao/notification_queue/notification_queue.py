@@ -44,6 +44,17 @@ def get(cur, appkey, nid):
     else:
         return (True, nf)
 
+@with_psql
+def delete_list(cur, appkey):
+    query = """
+    DELETE FROM
+        notifications_queue
+    WHERE
+        app_key = %s
+    """
+    cur.execute(query, (appkey,))
+    
+    return (True,)
     
 @with_psql
 def get_all(cur):
