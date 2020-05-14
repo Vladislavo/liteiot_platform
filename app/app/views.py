@@ -130,6 +130,8 @@ def app_():
 
             ap = ad.get(session['appkey'])
             devs = dd.get_list(ap[1][1])
+
+            session['appname'] = ap[1][0]
             
             if session['role'] == 'admin' or session['name'] == ap[1][2]:
                 return render_template('public/app.html', app=ap[1], devs=devs[1])
@@ -535,7 +537,31 @@ def new_alert():
 
 @app.route('/alert', methods=['POST'])
 def alert():
-    pass
+    if 'name' in session:
+        if request.method == 'POST':
+            # create new notification
+            nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
+            dev = dd.get(session['appkey'], request.form['devid'])
+            
+            try:
+                desc_ext = request.form['alertdesc'] + ' (Application '+session['appname']+' => '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']+')'
+            except:
+                desc_ext = request.form['alertdesc'] + ' (Application '+session['appname']+' => '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+')'
+
+
+            res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['alertname'], desc_ext, 'alert', request.form['alertemail'])
+            if res[0]:
+                print('notification created')
+                
+                return redirect(url_for('alerts'))
+            else:
+                flash('Error creating new notification: {}'.format(res[1]), 'danger')
+                return redirect(url_for('alerts'))
+            # create new function and trigger
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/alert-rm')
 def alarm_rm():
@@ -543,10 +569,10 @@ def alarm_rm():
         res = nfs.delete(session['appkey'], request.args.get('id'))
 
         if res[0]:
-            flash('Alarm removed', 'success')
+            flash('Alert removed', 'success')
             return redirect(url_for('alerts'))
         else:
-            flash('Alarm cannot be removed : {}'.format(res[1]), 'danger')
+            flash('Alert cannot be removed : {}'.format(res[1]), 'danger')
             return redirect(url_for('alerts'))
     else:
         return redirect(url_for('index'))

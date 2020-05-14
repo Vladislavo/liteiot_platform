@@ -14,6 +14,7 @@ class Config(object):
     REMEMBER_COOKIE_SECURE = True
 
     APPKEY_LENGTH = 8
+    NID_LENGTH = 5
     DATA_DOWNLOAD_DIR = 'data'
     DATA_DOWNLOAD_DIR_OS = 'app/data'
 
