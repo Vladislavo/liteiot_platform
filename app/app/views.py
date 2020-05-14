@@ -327,7 +327,7 @@ def dev_vars():
     if 'name' in session:
         last = data.get_last_n(session['appkey'], request.args.get('id'), 1)
         if last[0]:
-            select = '<select class="form-control" id="varname" name="varname" onchange="onvar(event)" required>'
+            select = '<select class="form-control notifelem" id="varname" name="varname" onchange="onvar(event)" required>'
             select += '<option value="-">Select Variable</option>'
             for k in last[1][0][2]:
                 select += '<option>'+k+'</option>'

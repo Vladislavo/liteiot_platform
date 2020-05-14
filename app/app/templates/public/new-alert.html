@@ -31,13 +31,12 @@
 				<option value="{{ d[1] }}">{{ d[0] }}</option>
 				{% endfor %}
 			</select>
-
-			<br>
-
-			{% if feedback %}
-			<p class="text-danger float-right">{{ feedback }}</p>
-			{% endif %}
 		</form>
+		
+		{% if feedback %}
+		<p class="text-danger float-right">{{ feedback }}</p>
+		{% endif %}
+		
 		<br>
 		<h4> THEN </h4>
 		<h5> Send email to </h5>
@@ -61,12 +60,19 @@
 		} else {
 			if (sel_op == "-") {
 				$("#varname").remove();
+				if (document.getElementById("operation")) {
+					$("#operation").remove();
+				}
+				if (document.getElementById("avalue")) {
+					$("#avalue").remove();
+				}
+
 			}
 		}
 	}
 	function onvar() {
 		if (!document.getElementById("operation")) {
-			$("#alertform").append("<br><select class='form-control' name='operaton' id='operation' onchange='onop()' required><option default>CHANGES</option><option>></option><option>>=</option><option><</option><option><=</option><option>==</option></select>");
+			$("#alertform").append("<select class='form-control notifelem' name='operaton' id='operation' onchange='onop()' required><option default>CHANGES</option><option>></option><option>>=</option><option><</option><option><=</option><option>==</option></select>");
 		} else {
 			var var_sel = document.getElementById("varname");
 			var sel_var = var_sel.options[var_sel.selectedIndex].value;
@@ -76,15 +82,13 @@
 		}
 	}
 	function onop() {
-		if (!document.getElementById("value")) {
-			var op_sel = document.getElementById("operation");
-			var sel_op = op_sel.options[op_sel.selectedIndex].text;
-			if (sel_op != "CHANGES" && !document.getElementById("avalue")) {
-				$("#alertform").append("<br><input type='numeric' class='form-control' name='avalue' id='avalue' placeholder='Value' required>");
-			} else {
-				if (document.getElementById("avalue")) {
-					$("#avalue").remove();
-				}
+		var op_sel = document.getElementById("operation");
+		var sel_op = op_sel.options[op_sel.selectedIndex].text;
+		if (sel_op != "CHANGES" && !document.getElementById("avalue")) {
+			$("#alertform").append("<input type='numeric' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' required>");
+		} else {
+			if (document.getElementById("avalue")) {
+				$("#avalue").remove();
 			}
 		}
 	}
