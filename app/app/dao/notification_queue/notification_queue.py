@@ -13,7 +13,7 @@ def create(cur, nid, appkey, devid):
     return (True,)
 
 @with_psql
-def delete(cur, appkey, nid):
+def delete(cur, appkey, devid, nid):
     query = """
     DELETE FROM
         notifications_queue
@@ -21,13 +21,15 @@ def delete(cur, appkey, nid):
          nf_id = %s
     AND
         app_key = %s
+    AND
+        dev_id = %s
     """
-    cur.execute(query, (nid, appkey))
+    cur.execute(query, (nid, appkey, devid))
         
     return (True,)
 
 @with_psql
-def get(cur, appkey, nid):
+def get(cur, appkey, devid, nid):
     query = """
     SELECT * FROM
         notifications_queue
@@ -35,8 +37,10 @@ def get(cur, appkey, nid):
         nf_id = %s
     AND
         app_key = %s
+    AND
+        dev_id = %s
     """
-    cur.execute(query, (nid, appkey))
+    cur.execute(query, (nid, appkey, devid))
     nf = cur.fetchone()
 
     if nf is None:
@@ -60,7 +64,7 @@ def delete_list(cur, appkey):
 def get_all(cur):
     query = """
     SELECT * FROM
-        notificationis_queue
+        notifications_queue
     """
     cur.execute(query)
 

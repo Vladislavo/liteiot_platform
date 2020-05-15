@@ -13,7 +13,7 @@ def create(cur, nid, appkey, devid, name, desc, action_type, action):
     return (True,)
 
 @with_psql
-def delete(cur, appkey, nid, devid):
+def delete(cur, appkey, devid, nid):
     query = """
     DELETE FROM
         notifications
@@ -29,7 +29,7 @@ def delete(cur, appkey, nid, devid):
     return (True,)
 
 @with_psql
-def get(cur, appkey, nid):
+def get(cur, appkey, devid, nid):
     query = """
     SELECT * FROM
         notifications
@@ -37,8 +37,10 @@ def get(cur, appkey, nid):
         id = %s
     AND
         app_key = %s
+    AND
+        dev_id = %s
     """
-    cur.execute(query, (nid, appkey))
+    cur.execute(query, (nid, appkey, devid))
     nf = cur.fetchone()
 
     if nf is None:

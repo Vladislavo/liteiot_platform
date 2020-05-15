@@ -1,8 +1,7 @@
-from app import app
-from flask_mail import Mail, Message
+from app import app, mail
+from flask_mail import Message
 
 from flask import render_template, request, redirect, url_for, session, send_from_directory, flash
-from flask_mail import Message
 import psycopg2
 
 import app.dao.user.user as ud
@@ -15,6 +14,7 @@ import app.dao.trigger.trigger as tr
 import app.dao.notification_queue.notification_queue as nq
 
 import app.helpers.misc as misc
+import app.helpers.mailer as mailer
 
 import binascii
 import os
@@ -24,8 +24,6 @@ MAX_PG = 5
 MAX_PG_ENTRIES_USERS = 10
 MAX_PG_ENTRIES_DATA = 10
 MAX_PG_ENTRIES_GRAPH_HOURS = 24
-
-mail = Mail(app)
 
 @app.route('/')
 def index():
@@ -526,7 +524,6 @@ def dev_data(var, dest, page):
 def alerts():
     if 'name' in session:
         alerts = nfs.get_list(session['appkey'])
-        print(alerts)
         return render_template('public/alerts.html', alert_list=alerts[1])
     else:
         return redirect(url_for('index'))
@@ -547,16 +544,16 @@ def alert():
             # create new notification
             nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
             dev = dd.get(session['appkey'], request.form['devid'])
-            avalue = ''
 
             desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
 
             res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
             if res[0]:
                 # create new function and trigger
-                tr.create_function(session['appkey'], request.form['devid'], nid, [request.form['varname'],request.form['operation'],avalue])
-                tr.create(session['appkey'], request.form['devid'], nid)
-                
+                r = tr.create_function(session['appkey'], request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                print ('tr.create_function', r)
+                r = tr.create(session['appkey'], request.form['devid'], nid)
+                print('tr.create', r)
                 return redirect(url_for('alerts'))
             else:
                 flash('Error creating new notification: {}'.format(res[1]), 'danger')
@@ -572,7 +569,7 @@ def alarm_rm():
         nq.delete_list(session['appkey'])
         tr.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
         tr.delete_function(session['appkey'], request.args.get('devid'), request.args.get('id'))
-        res = nfs.delete(session['appkey'], request.args.get('id'), request.args.get('devid'))
+        res = nfs.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
 
         if res[0]:
             flash('Alert removed', 'success')
@@ -583,22 +580,22 @@ def alarm_rm():
     else:
         return redirect(url_for('index'))
 
-@app.route('/mail')
-def send_mail():
-    print (1)
-    msg = Message('test message',
-        sender = 'hpcaiotserver@gmail.com',
-        recipients = ['al373630@uji.es'])
-    print (2)
-    msg.body = 'Hello vlad, alert is here!'
-    print (3)
-    res = mail.send(msg)
-    print (res)
-    return res
-
-
-
-
 def pend_delete_all_ack():
     pend.delete_all_ack()
+
+def fire_notifications(app):
+    fnfs = nq.get_all()
+    print ('nq.get_all ', fnfs)
+    if fnfs[0]:
+        for fnf in fnfs[1]:
+            nf = nfs.get(fnf[1], fnf[2], fnf[0])
+            print('nfs.get ', nf)
+            if nf[1][5] == 'alert':
+                # send mail
+                mailer.send_mail(app, nf[1], fnf)
+                nq.delete(fnf[1], fnf[2], fnf[0])
+                print('send alert mail')
+            elif nf[1][5] == 'automation':
+                # enqueue conf id
+                print('automation')
 

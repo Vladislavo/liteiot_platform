@@ -14,6 +14,10 @@ def maintainer():
     views.pend_delete_all_ack()
     clean_data_folder()
 
+def fire_notifications():
+    views.fire_notifications(app)
+
 scheduler = BackgroundScheduler()
-job = scheduler.add_job(maintainer, 'interval', minutes=app.config['MAINTAINER_INTERVAL'])
+scheduler.add_job(maintainer, 'interval', minutes=app.config['MAINTAINER_INTERVAL'])
+scheduler.add_job(fire_notifications, 'interval', minutes=app.config['FIRE_NOTIFICATIONS_INTERVAL'])
 scheduler.start()

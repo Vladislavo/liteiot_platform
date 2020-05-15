@@ -30,6 +30,10 @@ class Config(object):
     MAIL_USE_SSL = True
     MAIL_USERNAME = 'hpcaiotserver@gmail.com'
     MAIL_PASSWORD = 'HPC&A10T.'
+    MAIL_DEFAULT_SENDER = 'hpcaiotserver@gmail.com'
+
+    # in minutes
+    FIRE_NOTIFICATIONS_INTERVAL = 1
 
 class ProductionConfig(Config):
     pass
