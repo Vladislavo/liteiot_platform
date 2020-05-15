@@ -523,7 +523,7 @@ def dev_data(var, dest, page):
 @app.route('/alerts')
 def alerts():
     if 'name' in session:
-        alerts = nfs.get_list(session['appkey'])
+        alerts = nfs.get_alerts_list(session['appkey'])
         return render_template('public/alerts.html', alert_list=alerts[1])
     else:
         return redirect(url_for('index'))
@@ -579,6 +579,26 @@ def alarm_rm():
             return redirect(url_for('alerts'))
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/automation', methods=['GET','POST'])
+def automation():
+    if 'name' in session:
+        if request.method == 'GET':
+            auto = nfs.get_automation_list(session['appkey'])
+            return render_template('public/automation.html', auto_list=auto[1])
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/new-automation')
+def new_automation():
+    if 'name' in session:
+        devs = dd.get_list(session['appkey'])
+        return render_template('public/new-automation.html', devs=devs[1])
+    else:
+        return redirect(url_for('index'))
+
 
 def pend_delete_all_ack():
     pend.delete_all_ack()

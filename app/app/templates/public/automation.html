@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block title %} Application Automation: {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-3">
+		<div class="clickback">
+			<span class="glyphicon glyphicon-arrow-left"></span>	
+			<p><a class="backlink" onclick="history.back(-1)"></a></p>
+		</div>
+	</div>
+	<div class="col-md-6">
+		{% if auto_list %}
+		<div>
+			<table class="table">
+				<thead>
+					<th> Name </th>
+					<th> Condition </th>
+					<th> Action </th>
+					<th> </th>
+				</thead>
+				<tbody>
+					{% for a in auto_list %}
+					<tr>
+						<th> {{ a[3] }} </th>
+						<th> {{ a[4] }} </th>
+						<th> {{ a[6] }} </th>
+						<th> <a href="/automation-rm?id={{ a[0] }}&devid={{ a[2] }}"> <span class="glyphicon glyphicon-remove"</span> </a> </th>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		{% else %}
+		<center> There is no automation for a given application. </center>
+		{% endif %}
+		<br>
+		<center><a href="/new-automation"><button class="btn btn-primary" type="submit">Add New Automation</button></a></center>
+	</div>
+</div>
+
+{% endblock %}
+

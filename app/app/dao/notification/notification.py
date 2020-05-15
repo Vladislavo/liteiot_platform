@@ -63,6 +63,36 @@ def get_list(cur, appkey):
 
 
 @with_psql
+def get_alerts_list(cur, appkey):
+    query = """
+    SELECT * FROM
+        notifications
+    WHERE
+        app_key = %s
+    AND
+        action_type = 'alert'
+    """
+    cur.execute(query, (appkey,))
+
+    return (True, cur.fetchall())
+
+
+@with_psql
+def get_automation_list(cur, appkey):
+    query = """
+    SELECT * FROM
+        notifications
+    WHERE
+        app_key = %s
+    AND
+        action_type = 'automation'
+    """
+    cur.execute(query, (appkey,))
+
+    return (True, cur.fetchall())
+
+
+@with_psql
 def get_count(cur):
     query = """
     SELECT COUNT(*) FROM

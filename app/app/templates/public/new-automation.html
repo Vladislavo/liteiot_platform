@@ -1,0 +1,105 @@
+{% extends 'layout.html' %}
+
+{% block title %} New Automation {% endblock %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-3">
+		<div class="clickback">
+			<span class="glyphicon glyphicon-arrow-left"></span>	
+			<p><a class="backlink" onclick="history.back(-1)"></a></p>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<h2> Add New Automation </h2>
+		<br><br>
+		<form id="automationform" action="alert" method="post">
+			<div class="form-group">
+				<label>Name:</label><br>
+				<input type="text" maxlength="30" class="form-control" id="automationname" name="automationname" required><br>
+			</div>
+			<h3> Condition: </h3>
+			<h4> IF </h4>
+			<select class="form-control" id="devid" name="devid" onchange="ondev()" required>
+				<option default value="-">Select Device</option>
+				{% for d in devs %}
+				<option value="{{ d[1] }}">{{ d[0] }}</option>
+				{% endfor %}
+			</select>
+		</form>
+		
+		{% if feedback %}
+		<p class="text-danger float-right">{{ feedback }}</p>
+		{% endif %}
+		
+		<br>
+		<h4> THEN </h4>
+		<h5> Set config on </h5>
+		
+		<div id="THEN">
+			<select class="form-control" id="adevid" name="adevid" onchange="onadev()" required>
+				<option default value="-">Select Device</option>
+				{% for d in devs %}
+				<option value="{{ d[1] }}">{{ d[0] }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		
+
+		<br>
+		<div class="form-group">
+			<button form="automationform" type="submit" class="btn btn-primary">Create Alert</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function ondev() {
+		var dev_sel = document.getElementById("devid");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
+		if (!document.getElementById("varname")) {
+			if (sel_op != "-") {
+				fetch(window.origin+'/dev-vars?id='+sel_op).then(res => res.text()).then(data => $("#automationform").append(data));
+			}
+		} else {
+			if (sel_op == "-") {
+				$("#varname").remove();
+				if (document.getElementById("operation")) {
+					$("#operation").remove();
+				}
+				if (document.getElementById("avalue")) {
+					$("#avalue").remove();
+				}
+
+			}
+		}
+	}
+	function onvar() {
+		if (!document.getElementById("operation")) {
+			$("#automationform").append("<select class='form-control notifelem' name='operation' id='operation' required><option default>></option><option>>=</option><option><</option><option><=</option><option>=</option></select>");
+			$("#automationform").append("<input type='numeric' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' required>");
+		} else {
+			var var_sel = document.getElementById("varname");
+			var sel_var = var_sel.options[var_sel.selectedIndex].value;
+			if (sel_var == "-") {
+				$("#avalue").remove();
+				$("#operation").remove();
+			}
+		}
+	}
+	function onadev() {
+		var dev_sel = document.getElementById("adevid");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
+		if (sel_op != "-") {
+			$("#THEN").append("<input type='number' size='3' min='0' max='255' class='form-control notifelem' id='confid' name='confid' placeholder='Conf ID' required>");
+			$("#THEN").append("<textarea type='text' maxlength='50' class='form-control notifelem' id='arg' name='arg' rows='2' placeholder='Args' reqiured></textarea>");
+		} else {
+			$("#confid").remove();
+			$("#arg").remove();
+		}
+	}
+</script>
+
+{% endblock %}
+
