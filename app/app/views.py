@@ -587,6 +587,9 @@ def automation():
         if request.method == 'GET':
             auto = nfs.get_automation_list(session['appkey'])
             return render_template('public/automation.html', auto_list=auto[1])
+        elif request.method == 'POST':
+            # new automation
+            return redirect(url_for('autmation'))
     else:
         return redirect(url_for('index'))
 
