@@ -604,7 +604,7 @@ def new_automation():
 
 
 @app.route('/automation-rm')
-def alarm_rm():
+def automation_rm():
     if 'name' in session:
         nq.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
         tr.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
