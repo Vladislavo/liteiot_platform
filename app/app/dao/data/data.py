@@ -73,7 +73,6 @@ def get_last_hours(cur, appkey, devid, hours, p):
     last = get_last_n(appkey, devid, 1)
     utcb = last[1][0][0] - hours*3600*p
     utcu = utcb + hours*3600
-    print(utcb, utcu)
     query = """
         SELECT * FROM 
             {}

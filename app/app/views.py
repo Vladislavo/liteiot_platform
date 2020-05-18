@@ -603,6 +603,26 @@ def new_automation():
         return redirect(url_for('index'))
 
 
+@app.route('/automation-rm')
+def alarm_rm():
+    if 'name' in session:
+        nq.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
+        tr.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
+        tr.delete_function(session['appkey'], request.args.get('devid'), request.args.get('id'))
+        res = nfs.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
+
+        if res[0]:
+            flash('Automation removed', 'success')
+            return redirect(url_for('alerts'))
+        else:
+            flash('Automation cannot be removed : {}'.format(res[1]), 'danger')
+            return redirect(url_for('alerts'))
+    else:
+        return redirect(url_for('index'))
+
+
+
+
 def pend_delete_all_ack():
     pend.delete_all_ack()
 
