@@ -14,7 +14,7 @@
 	<div class="col-md-6">
 		<h2> Add New Automation </h2>
 		<br><br>
-		<form id="automationform" action="alert" method="post">
+		<form id="automationform" action="automation" method="post">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="automationname" name="automationname" required><br>
@@ -38,7 +38,7 @@
 		<h5> Set config on </h5>
 		
 		<div id="THEN">
-			<select class="form-control" id="adevid" name="adevid" onchange="onadev()" required>
+			<select form="automationform" class="form-control" id="adevid" name="adevid" onchange="onadev()" required>
 				<option default value="-">Select Device</option>
 				{% for d in devs %}
 				<option value="{{ d[1] }}">{{ d[0] }}</option>
@@ -78,7 +78,7 @@
 	function onvar() {
 		if (!document.getElementById("operation")) {
 			$("#automationform").append("<select class='form-control notifelem' name='operation' id='operation' required><option default>></option><option>>=</option><option><</option><option><=</option><option>=</option></select>");
-			$("#automationform").append("<input type='numeric' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' required>");
+			$("#automationform").append("<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>");
 		} else {
 			var var_sel = document.getElementById("varname");
 			var sel_var = var_sel.options[var_sel.selectedIndex].value;
@@ -92,8 +92,8 @@
 		var dev_sel = document.getElementById("adevid");
 		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
 		if (sel_op != "-") {
-			$("#THEN").append("<input type='number' size='3' min='0' max='255' class='form-control notifelem' id='confid' name='confid' placeholder='Conf ID' required>");
-			$("#THEN").append("<textarea type='text' maxlength='50' class='form-control notifelem' id='arg' name='arg' rows='2' placeholder='Args' reqiured></textarea>");
+			$("#THEN").append("<input type='number' form='automationform' size='3' min='0' max='255' class='form-control notifelem' id='confid' name='confid' placeholder='Conf ID' required>");
+			$("#THEN").append("<textarea type='text' form='automationform' maxlength='50' class='form-control notifelem' id='arg' name='arg' rows='2' placeholder='Args' reqiured></textarea>");
 		} else {
 			$("#confid").remove();
 			$("#arg").remove();

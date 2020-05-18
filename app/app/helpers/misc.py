@@ -2,6 +2,7 @@ from app import app
 from binascii import hexlify
 import os
 import psycopg2
+import binascii
 
 def rand_str(length):
     if length % 2 == 0:
@@ -104,3 +105,17 @@ def paging(cur_pg, ent_cnt, max_ent, max_pg):
                 pr = [cur_pg-ps, cur_pg+ps+1]
 
     return [pp, pr, np]
+
+def pend_base64_encode(arg, confid):
+    argslen = len(arg) + 1
+    args = bytearray(argslen + 2)
+    args[0] = int(confid)
+    args[1] = argslen
+
+    bstr = bytes(arg.encode('utf-8'))
+    i = 0
+    while i < argslen - 1:
+        args[2+i] = bstr[i]
+        i += 1
+
+    return binascii.b2a_base64(args).decode('utf-8')

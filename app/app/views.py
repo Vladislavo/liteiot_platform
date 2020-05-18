@@ -16,8 +16,8 @@ import app.dao.notification_queue.notification_queue as nq
 import app.helpers.misc as misc
 import app.helpers.mailer as mailer
 
-import binascii
 import os
+import binascii
 
 
 MAX_PG = 5
@@ -31,7 +31,6 @@ def index():
         apps = ad.get_list(session['name'])
         
         session.pop('appkey', None)
-        # print('apps: ', apps)
         if apps[0]:
             return render_template('public/index.html', apps=apps[1], users_signup=app.config['USERS_SIGNUP'])
         else:
@@ -185,8 +184,6 @@ def new_dev():
     if 'name' in session:
         dev_list = dd.get_list(session['appkey'])
     
-    #print('dev list : ', dev_list)
-
         if not dev_list[0]:
             return render_template('public/add-dev.html', feedback=dev_list[1])
         else:
@@ -254,19 +251,7 @@ def dev_conf():
             else:
                 return render_template('public/dev-conf.html', devname=session['devname'])
         else:
-            argslen = len(request.form['arg']) + 1
-            args = bytearray(argslen + 2)
-            args[0] = int(request.form['confid'])
-            args[1] = argslen
-        
-            bstr = bytes(request.form['arg'].encode('utf-8'))
-            i = 0
-            while i < argslen - 1:
-                args[2+i] = bstr[i]
-                i += 1
-
-            base64_args = binascii.b2a_base64(args).decode('utf-8')
-
+            base64_args = pend_base64_encode(request.form['arg'], request.form['confid'])
             pend.create(session['appkey'], session['devid'], base64_args)
 
             return redirect(url_for('dev', id=session['devid']))
@@ -387,7 +372,6 @@ def dashboard():
             
         if 'users_filter' in session:
             users = ud.get_range_name(session['users_filter'], [MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
-            print(users)
             rd = misc.paging(cur_pg, len(users[1]), MAX_PG_ENTRIES_USERS, MAX_PG)
         else:
             users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
@@ -412,7 +396,6 @@ def user():
         apps = ad.get_list(name)
         
         session.pop('appkey', None)
-        # print('apps: ', apps)
         if apps[0]:
             return render_template('admin/user.html', apps=apps[1], username=name)
         else:
@@ -431,27 +414,22 @@ def user_delete():
         if app_list[0]:
             for app in app_list[1]:
                 devs = dd.get_list(app[1])
-                print('devs: {}'.format(devs))
                 for dev in devs[1]:
                     res = data.delete_table(app[1], dev[1])
-                    print ('data del {}'.format(res))
                     if not res[0]:
                         break
     
                 if res[0]:
                     res = dd.delete_table(app[1])
-                    print ('devices del {}'.format(res))
                     
                 if res[0]:
                     res = ad.delete(app[1])
-                    print ('app del {}'.format(res))
 
                 if not res[0]:
                     break
 
         if res[0]:
             res = ud.delete(user[1][0])
-            print ('user del {}'.format(res))
 
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
@@ -544,20 +522,21 @@ def alert():
             # create new notification
             nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
             dev = dd.get(session['appkey'], request.form['devid'])
-
-            desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
-
-            res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
-            if res[0]:
-                # create new function and trigger
-                r = tr.create_function(session['appkey'], request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
-                print ('tr.create_function', r)
-                r = tr.create(session['appkey'], request.form['devid'], nid)
-                print('tr.create', r)
-                return redirect(url_for('alerts'))
-            else:
-                flash('Error creating new notification: {}'.format(res[1]), 'danger')
-                return redirect(url_for('alerts'))
+            
+            try:
+                desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
+                res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
+                if res[0]:
+                    # create new function and trigger
+                    tr.create_function(session['appkey'], request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    tr.create(session['appkey'], request.form['devid'], nid)
+                    return redirect(url_for('alerts'))
+                else:
+                    flash('Error creating new alert: {}'.format(res[1]), 'danger')
+                    return redirect(url_for('alerts'))
+            except Exception as e:
+                flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
+                return redirect(url_for('new_alert'))
         else:
             return redirect(url_for('index'))
     else:
@@ -566,7 +545,7 @@ def alert():
 @app.route('/alert-rm')
 def alarm_rm():
     if 'name' in session:
-        nq.delete_list(session['appkey'])
+        nq.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
         tr.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
         tr.delete_function(session['appkey'], request.args.get('devid'), request.args.get('id'))
         res = nfs.delete(session['appkey'], request.args.get('devid'), request.args.get('id'))
@@ -589,7 +568,28 @@ def automation():
             return render_template('public/automation.html', auto_list=auto[1])
         elif request.method == 'POST':
             # new automation
-            return redirect(url_for('autmation'))
+            nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
+            dev = dd.get(session['appkey'], request.form['devid'])
+            adev = dd.get(session['appkey'], request.form['adevid'])
+            try:
+                desc = 'IF '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']+' THEN '+adev[1][0]+'.confID_'+request.form['confid']+' = '+request.form['arg']
+                # action format: '<devid>#<confid>#<arg>'
+                action = request.form['adevid']+'#'+request.form['confid']+'#'+request.form['arg']
+                res = nfs.create(nid, session['appkey'], request.form['devid'], request.form['automationname'], desc, 'automation', action)
+                if res[0]:
+                    # create new function and trigger
+                    tr.create_function(session['appkey'], request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    tr.create(session['appkey'], request.form['devid'], nid)
+                    return redirect(url_for('automation'))
+                else:
+                    flash('Error creating new alert: {}'.format(res[1]), 'danger')
+                    return redirect(url_for('automation'))
+            
+                return redirect(url_for('autmation'))
+            except Exception as e:
+                flash('Error creating new automation: {}. Make sure you have filled all form fields correctly.'.format(e), 'danger')
+                return redirect(url_for('automation'))
+
     else:
         return redirect(url_for('index'))
 
@@ -608,17 +608,16 @@ def pend_delete_all_ack():
 
 def fire_notifications(app):
     fnfs = nq.get_all()
-    print ('nq.get_all ', fnfs)
     if fnfs[0]:
         for fnf in fnfs[1]:
             nf = nfs.get(fnf[1], fnf[2], fnf[0])
-            print('nfs.get ', nf)
             if nf[1][5] == 'alert':
                 # send mail
                 mailer.send_mail(app, nf[1], fnf)
-                nq.delete(fnf[1], fnf[2], fnf[0])
-                print('send alert mail')
             elif nf[1][5] == 'automation':
-                # enqueue conf id
-                print('automation')
-
+                # enqueue confid
+                # action format: '<devid>#<confid>#<arg>'
+                action = nf[1][6].split('#')
+                base64_args = misc.pend_base64_encode(action[2], action[1])
+                pend.create(nf[1][1], action[0], base64_args)
+            nq.delete(fnf[1], fnf[2], fnf[0])

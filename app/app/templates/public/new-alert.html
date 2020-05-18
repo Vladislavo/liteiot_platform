@@ -69,7 +69,7 @@
 	function onvar() {
 		if (!document.getElementById("operation")) {
 			$("#alertform").append("<select class='form-control notifelem' name='operation' id='operation' required><option default>></option><option>>=</option><option><</option><option><=</option><option>=</option></select>");
-			$("#alertform").append("<input type='numeric' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' required>");
+			$("#alertform").append("<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>");
 		} else {
 			var var_sel = document.getElementById("varname");
 			var sel_var = var_sel.options[var_sel.selectedIndex].value;
