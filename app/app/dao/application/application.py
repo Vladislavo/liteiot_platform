@@ -1,14 +1,14 @@
 from app.helpers.misc import with_psql
 
 @with_psql
-def create(cur, name, appkey, username, desc):
+def create(cur, name, appkey, username, desc, secure, secure_key):
     query = """
     INSERT INTO
         applications
     VALUES
-        (%s, %s, %s, %s)
+        (%s, %s, %s, %s, %s, %s)
     """
-    cur.execute(query, (name, appkey, username, desc))
+    cur.execute(query, (name, appkey, username, desc, secure, secure_key))
        
     return (True,)
 
@@ -54,17 +54,18 @@ def get_list(cur, username):
     return (True, cur.fetchall())
 
 @with_psql
-def update(cur, appkey, name, desc):
+def update(cur, appkey, name, desc, secure):
     query = """
     UPDATE
         applications
     SET
         name = %s,
         description = %s,
+        secure = %s
     WHERE
         app_key = %s
     """
-    cur.execute(query, (name, desc, appkey))
+    cur.execute(query, (name, desc, secure, appkey))
 
     return (True,)
 
@@ -75,5 +76,18 @@ def get_count(cur):
         applications
     """
     cur.execute(query, ())
+
+    return (True, cur.fetchone())
+
+
+@with_psql
+def get_count_by_user(cur, username):
+    query = """
+    SELECT COUNT(*) FROM
+        applications
+    WHERE
+        username = %s
+    """
+    cur.execute(query, (username,))
 
     return (True, cur.fetchone())

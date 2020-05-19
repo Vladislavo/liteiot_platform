@@ -144,7 +144,13 @@ def app_():
                 return render_template('public/new-app.html', feedback=error)
             else:
                 appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
-                res = ad.create(request.form['appname'], appkey, session['name'], request.form['appdesc'])
+                secure_key = misc.gen_skey_b64(16)
+                secure = False
+
+                if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'true':
+                    secure = True
+
+                res = ad.create(request.form['appname'], appkey, session['name'], request.form['appdesc'], secure, secure_key)
             
                 if not res[0]:
                     return render_template('public/new-app.html', feedback=res[1])

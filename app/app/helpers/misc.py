@@ -10,6 +10,12 @@ def rand_str(length):
     else:
         return hexlify(os.urandom(length//2 + 1))
 
+def gen_skey_b64(nbytes):
+    return binascii.b2a_base64(os.urandom(nbytes)).decode('utf-8')
+
+def skey_b64_to_hex(b64_skey):
+    return hexlify(binascii.a2b_base64(b64_skey))
+
 def prep_id_range(devlist):
     r = list(range(1,255))
 
