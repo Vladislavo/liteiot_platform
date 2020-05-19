@@ -42,7 +42,9 @@ CREATE TABLE public.applications (
     name character varying(30) NOT NULL,
     app_key character varying(30) NOT NULL,
     username character varying(30) NOT NULL,
-    description character varying(200)
+    description character varying(200),
+    secure_key character varying(100) NOT NULL,
+    secure boolean DEFAULT false NOT NULL,
 );
 
 
