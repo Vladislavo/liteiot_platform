@@ -3,6 +3,7 @@ from binascii import hexlify
 import os
 import psycopg2
 import binascii
+from datetime import datetime
 
 def rand_str(length):
     if length % 2 == 0:
@@ -125,3 +126,20 @@ def pend_base64_encode(arg, confid):
         i += 1
 
     return binascii.b2a_base64(args).decode('utf-8')
+
+def utc_roundhour(hour_offset = 0):
+    n = datetime.utcnow()
+    return int((datetime(n.year, n.month, n.day, n.hour) - datetime(1970,1,1,hour_offset)).total_seconds())
+
+
+def utc_roundday(day_offset = 0):
+    n = datetime.utcnow()
+    return int((datetime(n.year, n.month, n.day) - datetime(1970,1,1+day_offset)).total_seconds())
+
+
+def utc_hour(hour_offset):
+    return ((datetime.utcnow().hour - hour_offset) % 24)
+
+def utc_weekday(day_offset = 0):
+    d = {0:'Mo',1:'Tu',2:'We',3:'Th',4:'Fr',5:'Sa',6:'Su'}
+    return (d[((datetime.utcnow().weekday() - day_offset) % 7)])
