@@ -32,11 +32,11 @@ def index():
         
         session.pop('appkey', None)
         if apps[0]:
-            return render_template('public/index.html', apps=apps[1], users_signup=app.config['USERS_SIGNUP'])
+            return render_template('old/public/index.html', apps=apps[1], users_signup=app.config['USERS_SIGNUP'])
         else:
-            return render_template('public/index.html', feedback=apps[1], users_signup=app.config['USERS_SIGNUP'])
+            return render_template('old/public/index.html', feedback=apps[1], users_signup=app.config['USERS_SIGNUP'])
     else:
-        return render_template('public/index.html', users_signup=app.config['USERS_SIGNUP'])
+        return render_template('new/public/login.html', users_signup=app.config['USERS_SIGNUP'])
 
 
 
@@ -44,10 +44,10 @@ def index():
 def signup():
     if request.method == 'GET':
         if session['role'] and session['role'] == 'admin':
-            return render_template('admin/signup.html', users_signup=app.config['USERS_SIGNUP'])
+            return render_template('old/admin/signup.html', users_signup=app.config['USERS_SIGNUP'])
         else:
             if app.config['USERS_SIGNUP']:
-                return render_template('public/signup.html', users_signup=app.config['USERS_SIGNUP'])
+                return render_template('old/public/signup.html', users_signup=app.config['USERS_SIGNUP'])
             else:
                 return redirect(url_for('index', users_signup=app.config['USERS_SIGNUP']))
     else:
@@ -57,7 +57,7 @@ def signup():
             
             if (username == '' or password == ''):
                 feedback = 'Username or password fields cannot be empty'
-                return render_template('public/signup.html', feedback=feedback, users_signup=app.config['USERS_SIGNUP'])
+                return render_template('old/public/signup.html', feedback=feedback, users_signup=app.config['USERS_SIGNUP'])
             elif (len(password) < 8):
                 flash('Password length must be at least 8 characters.', 'danger')
                 return redirect(request.url, users_signup=app.config['USERS_SIGNUP'])
@@ -86,7 +86,7 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('public/login.html')
+        return render_template('old/public/login.html')
     else: 
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
@@ -117,7 +117,7 @@ def logout():
 @app.route('/new-app')
 def new_application():
     if 'name' in session:
-        return render_template('public/new-app.html')
+        return render_template('old/public/new-app.html')
     else:
         return redirect(url_for('index'))
 
@@ -135,13 +135,13 @@ def app_():
             session['appname'] = ap[1][0]
             
             if session['role'] == 'admin' or session['name'] == ap[1][2]:
-                return render_template('public/app.html', app=ap[1], devs=devs[1])
+                return render_template('old/public/app.html', app=ap[1], devs=devs[1])
             else:
                 return redirect(url_for('index'))
         else:
             if request.form['appname'] == '':
                 error = 'Application name cannot be empty.'
-                return render_template('public/new-app.html', feedback=error)
+                return render_template('old/public/new-app.html', feedback=error)
             else:
                 appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
                 secure_key = misc.gen_skey_b64(16)
@@ -153,13 +153,13 @@ def app_():
                 res = ad.create(request.form['appname'], appkey, session['name'], request.form['appdesc'], secure, secure_key)
             
                 if not res[0]:
-                    return render_template('public/new-app.html', feedback=res[1])
+                    return render_template('old/public/new-app.html', feedback=res[1])
             
                 res = dd.create_table(appkey)
             
                 if not res[0]:
                     ad.delete(appkey)
-                    return render_template('public/new-app.html', feedback=res[1])
+                    return render_template('old/public/new-app.html', feedback=res[1])
             
                 return redirect(url_for('index'))
     else:
@@ -191,9 +191,9 @@ def new_dev():
         dev_list = dd.get_list(session['appkey'])
     
         if not dev_list[0]:
-            return render_template('public/add-dev.html', feedback=dev_list[1])
+            return render_template('old/public/add-dev.html', feedback=dev_list[1])
         else:
-            return render_template('public/add-dev.html', free_ids=misc.prep_id_range(dev_list[1]))
+            return render_template('old/public/add-dev.html', free_ids=misc.prep_id_range(dev_list[1]))
     else:
         return redirect(url_for('index'))
  
@@ -217,20 +217,20 @@ def dev():
                 if last[0]:
                     ltup = last[1][0][1]
 
-                return render_template('public/dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
+                return render_template('old/public/dev.html', dev=dev[1], appkey=session['appkey'], ltup=ltup)
             else:
                 return redirect(url_for('index'))
         else:
             res = dd.create(request.form['devname'], request.form['devid'], session['appkey'], request.form['devdesc'])
 
             if not res[0]:
-                return render_template('public/add-dev.html', feedback=res[1])
+                return render_template('old/public/add-dev.html', feedback=res[1])
             else:
                 res = data.create_table(session['appkey'], request.form['devid'])
             
                 if not res[0]:
                     dd.delete(session['appkey'], request.form['devid'])
-                    return render_template('public/add-dev.html', feedback=res[1])
+                    return render_template('old/public/add-dev.html', feedback=res[1])
                 else:
                     return redirect(url_for('app_', appkey=session['appkey']))
     else:
@@ -253,9 +253,9 @@ def dev_conf():
                     ack = pm[3]
                     config_list.append((config_id, config_args, ack, pm[2]))
 
-                return render_template('public/dev-conf.html', devname=session['devname'], config_list=config_list)
+                return render_template('old/public/dev-conf.html', devname=session['devname'], config_list=config_list)
             else:
-                return render_template('public/dev-conf.html', devname=session['devname'])
+                return render_template('old/public/dev-conf.html', devname=session['devname'])
         else:
             base64_args = pend_base64_encode(request.form['arg'], request.form['confid'])
             pend.create(session['appkey'], session['devid'], base64_args)
@@ -307,12 +307,12 @@ def dev_data_pg():
             rd = misc.paging(cur_pg, ent_cnt[1][0], MAX_PG_ENTRIES_DATA, MAX_PG)
 
             if ent_cnt[1][0] > 0:
-                return render_template('public/dev-data-t.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=rd[2], pp=rd[0], pr=rd[1], devname=session['devname'])
+                return render_template('old/public/dev-data-t.html', data=last[1], total=ent_cnt[1][0], cp=cur_pg, np=rd[2], pp=rd[0], pr=rd[1], devname=session['devname'])
             else:
-                return render_template('public/dev-data-t.html', devname=session['devname'])
+                return render_template('old/public/dev-data-t.html', devname=session['devname'])
         else:
             flash('Error: {}'.format(ent_cnt[1]), 'danger')
-            return render_template('public/dev-data-t.html', devname=session['devname'])
+            return render_template('old/public/dev-data-t.html', devname=session['devname'])
     else:
         return redirect(utl_for('index'))
 
@@ -383,7 +383,7 @@ def dashboard():
             users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])
             rd = misc.paging(cur_pg, user_cnt[1][0], MAX_PG_ENTRIES_USERS, MAX_PG)
         
-        return render_template('admin/dashboard.html', users_cnt=user_cnt[1][0], apps_cnt=apps_cnt[1][0], dev_cnt=devs_cnt, users=users[1], pp=rd[0], pr=rd[1], np=rd[2], cp=cur_pg, usn=(cur_pg-1)*MAX_PG_ENTRIES_USERS+1)
+        return render_template('old/admin/dashboard.html', users_cnt=user_cnt[1][0], apps_cnt=apps_cnt[1][0], dev_cnt=devs_cnt, users=users[1], pp=rd[0], pr=rd[1], np=rd[2], cp=cur_pg, usn=(cur_pg-1)*MAX_PG_ENTRIES_USERS+1)
     else:
         return redirect(url_for('index'))
 
@@ -403,11 +403,11 @@ def user():
         
         session.pop('appkey', None)
         if apps[0]:
-            return render_template('admin/user.html', apps=apps[1], username=name)
+            return render_template('old/admin/user.html', apps=apps[1], username=name)
         else:
-            return render_template('admin/user.html', feedback=apps[1], username=name)
+            return render_template('old/admin/user.html', feedback=apps[1], username=name)
     else:
-        return render_template('public/index.html')
+        return render_template('old/public/index.html')
 
 
 @app.route('/user-delete')
@@ -439,7 +439,7 @@ def user_delete():
 
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
-            return render_template('admin/user.html', username=user[1][0])
+            return render_template('old/admin/user.html', username=user[1][0])
         else:
                 return redirect(url_for('dashboard'))
     else:
@@ -451,9 +451,9 @@ def user_delete():
 def settings():
     if request.method == 'GET':
         if session['role'] == 'admin':
-            return render_template('admin/settings.html', username=session['name'], users_signup=app.config['USERS_SIGNUP'])
+            return render_template('old/admin/settings.html', username=session['name'], users_signup=app.config['USERS_SIGNUP'])
         else:
-            return render_template('public/settings.html', username=session['name'])
+            return render_template('old/public/settings.html', username=session['name'])
     else:
         if request.form['name'] != session['name']:
             res = ud.update_name(session['name'], request.form['name'])
@@ -508,7 +508,7 @@ def dev_data(var, dest, page):
 def alerts():
     if 'name' in session:
         alerts = nfs.get_alerts_list(session['appkey'])
-        return render_template('public/alerts.html', alert_list=alerts[1])
+        return render_template('old/public/alerts.html', alert_list=alerts[1])
     else:
         return redirect(url_for('index'))
 
@@ -516,7 +516,7 @@ def alerts():
 def new_alert():
     if 'name' in session:
         devs = dd.get_list(session['appkey'])
-        return render_template('public/new-alert.html', devs=devs[1])
+        return render_template('old/public/new-alert.html', devs=devs[1])
     else:
         return redirect(url_for('index'))
 
@@ -571,7 +571,7 @@ def automation():
     if 'name' in session:
         if request.method == 'GET':
             auto = nfs.get_automation_list(session['appkey'])
-            return render_template('public/automation.html', auto_list=auto[1])
+            return render_template('old/public/automation.html', auto_list=auto[1])
         elif request.method == 'POST':
             # new automation
             nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
@@ -604,7 +604,7 @@ def automation():
 def new_automation():
     if 'name' in session:
         devs = dd.get_list(session['appkey'])
-        return render_template('public/new-automation.html', devs=devs[1])
+        return render_template('old/public/new-automation.html', devs=devs[1])
     else:
         return redirect(url_for('index'))
 
