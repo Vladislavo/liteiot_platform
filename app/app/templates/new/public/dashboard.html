@@ -93,7 +93,7 @@
                 </div>
                 <div class="col">
                   <ul class="nav nav-pills justify-content-end">
-                    <li class="nav-item mr-2 mr-md-0" data-toggle="chart" data-target="#chart-sales" data-prefix="$" data-suffix="k">
+                    <li class="nav-item mr-2 mr-md-0" data-toggle="chart" data-target="#chart-sales" data-suffix="messages">
                       <a href="#" class="nav-link py-2 px-3 active" data-toggle="tab">
                         <span class="d-none d-md-block">Last 12 Hours</span>
                         <span class="d-md-none">M</span>
@@ -275,11 +275,11 @@
   			},
   			data:
   			{
-  				labels: ['12pm', '1am', '2ap', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12am'],
+																							      labels: {{ day_chart.keys()|list }},
   				datasets: [
   				{
   					label: "Performance",
-  					data: [0, 20, 10, 60, 15, 40, 20, 60, 80, 100, 50, 10, 30]
+					data: {{ day_chart.values()|list }} 
   				}]
   			}
   		}), e.data("chart", a))
