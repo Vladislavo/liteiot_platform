@@ -41,10 +41,10 @@ def get_user_data_count_per_hour(cur, username, hour):
     i = 0
     for a in apps:
         for d in devs[i]:
-           query += 'SELECT COUNT(*) FROM dev_{}_{} UNION ALL '.format(a[1], d[1])
+           query += 'SELECT utc FROM dev_{}_{} UNION ALL '.format(a[1], d[1])
         i += 1
     query = query[0:-10]
-    query += ') SELECT SUM(count) FROM t WHERE utc > {} AND utc < {}'.format(utc_hour, utc_hour+60*60)
+    query += ') SELECT COUNT(*) FROM t WHERE utc > {} AND utc < {}'.format(utc_hour, utc_hour+60*60)
 
     #print(query)
     cur.execute(query, ())
@@ -53,7 +53,60 @@ def get_user_data_count_per_hour(cur, username, hour):
 
 
 @with_psql
+def get_user_data_count_per_hour_period(cur, username, period):
+    apps = ad.get_list(username)[1]
+    devs = []
+    
+    for a in apps:
+        devs.append(dd.get_list(a[1])[1])
+
+    utc_hour = [utc_roundhour(x) for x in range(period,-1,-1)]
+
+    query = 'WITH t AS ('
+    i = 0
+    for a in apps:
+        for d in devs[i]:
+           query += 'SELECT utc FROM dev_{}_{} UNION ALL '.format(a[1], d[1])
+        i += 1
+    query = query[0:-10]
+    query += ') SELECT * FROM ('
+    for uh in utc_hour:
+        query +=' SELECT COUNT(*) FROM t WHERE utc > {} AND utc < {} UNION ALL'.format(uh, uh+60*60)
+    query = query[0:-9]
+    query += ') w'
+
+    cur.execute(query, ())
+    
+    return (True,cur.fetchall())
+
+
+@with_psql
 def get_user_data_count_per_day(cur, username, day=0):
+    apps = ad.get_list(username)[1]
+    devs = []
+    
+    for a in apps:
+        devs.append(dd.get_list(a[1])[1])
+
+    utc_day = utc_roundday(day)
+
+    query = 'WITH t AS ('
+    i = 0
+    for a in apps:
+        for d in devs[i]:
+           query += 'SELECT utc FROM dev_{}_{} UNION ALL '.format(a[1], d[1])
+        i += 1
+    query = query[0:-10]
+    query += ') SELECT COUNT(*) FROM t WHERE utc > {} AND utc < {}'.format(utc_day, utc_day+24*60*60)
+
+    cur.execute(query, ())
+    
+    return (True,cur.fetchone())
+
+
+
+@with_psql
+def get_user_data_count_per_day_period(cur, username, period):
     apps = ad.get_list(username)[1]
     devs = []
     
@@ -96,7 +149,6 @@ def get_recent_activity(cur, username, n=5):
             UNION ALL""".format(a[1],d[1], a[0],d[0])
     query = query[0:-9]
     query += ' ORDER BY utc DESC LIMIT {}'.format(n)
-    print(query)
 
     cur.execute(query, ())
 

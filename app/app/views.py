@@ -33,9 +33,7 @@ def index():
         active_devices = dd.get_count_by_user(session['name'])
         total_activity = md.get_user_data_count(session['name'])[1][0]
         last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
-
         recent_activity = md.get_recent_activity(session['name'])[1]
-
 
         #print('created_apps', created_apps)
         #print('active_devices', active_devices)
@@ -43,7 +41,14 @@ def index():
         #print('last_activity', last_activity)
         info = [created_apps, active_devices, total_activity, last_activity]
 
-        return render_template('new/public/dashboard.html', info=info, recent_activity=recent_activity)
+        r = md.get_user_data_count_per_hour_period(session['name'], 12)[1]
+        r = [x[0] for x in r]
+        
+        day_chart = {}
+        for i in range(12,-1,-1):
+            day_chart[misc.utc_hour(i)] = r[i]
+
+        return render_template('new/public/dashboard.html', info=info, recent_activity=recent_activity, day_chart=day_chart)
         
         #apps = ad.get_list(session['name'])
        
