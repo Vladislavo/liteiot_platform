@@ -1,6 +1,6 @@
 {% extends 'general_layout.html' %}
 
-{% block title %} HPC&amp;A IoT - Login {% endblock %}
+{% block title %} HPC&amp;A IoT - Register {% endblock %}
 
 {% block content %}
 
@@ -10,7 +10,7 @@
     <nav class="navbar navbar-top navbar-horizontal navbar-expand-md navbar-dark">
       <div class="container px-4">
         <a class="navbar-brand" href="../">
-	<img src="{{ url_for('static', filename='assets/img/brand/white.png') }}" />
+	  <img src="{{ url_for('static', filename='assets/img/brand/white.png') }}" />
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse-main" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -20,8 +20,8 @@
           <div class="navbar-collapse-header d-md-none">
             <div class="row">
               <div class="col-6 collapse-brand">
-                <a href="../index.html">
-		<img src="{{ url_for('static', filename='assets/img/brand/blue.png') }}">
+                <a href="../">
+	  	  <img src="{{ url_for('static', filename='assets/img/brand/blue.png') }}" />
                 </a>
               </div>
               <div class="col-6 collapse-close">
@@ -59,7 +59,7 @@
           <div class="row justify-content-center">
             <div class="col-lg-5 col-md-6">
               <h1 class="text-white">Welcome!</h1>
-              <p class="text-lead text-light">Log in to discover all the powerful functionality of lightweight HPC&amp; IoT Server</p>
+              <p class="text-lead text-light">Use these awesome forms to login or create new account in your project for free.</p>
             </div>
           </div>
         </div>
@@ -72,20 +72,21 @@
     </div>
     <!-- Page content -->
     <div class="container mt--8 pb-5">
+      <!-- Table -->
       <div class="row justify-content-center">
-        <div class="col-lg-5 col-md-7">
+        <div class="col-lg-6 col-md-8">
           <div class="card bg-secondary shadow border-0">
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
-                <small>Sign in with credentials</small>
+                <small>Sign up with credentials</small>
               </div>
-              <form role="form" action="login" method="post">
-                <div class="form-group mb-3">
-                  <div class="input-group input-group-alternative">
+              <form role="form" action="register" method="post">
+                <div class="form-group">
+                  <div class="input-group input-group-alternative mb-3">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-single-02"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Username" maxlength="30" type="text" id="username" name="username">
+                    <input class="form-control" maxlength="30" placeholder="Username" type="text" id="username" name="username">
                   </div>
                 </div>
                 <div class="form-group">
@@ -93,32 +94,42 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Password" type="password" id="password" name="password">
+                    <input class="form-control" placeholder="Password" type="password" minlength="8" id="password" name="password" onkeyup="return validate_password();">
                   </div>
                 </div>
-                <div class="custom-control custom-control-alternative custom-checkbox">
-                  <input class="custom-control-input" id=" customCheckLogin" type="checkbox">
-                  <label class="custom-control-label" for=" customCheckLogin">
-                    <span class="text-muted">Remember me</span>
-                  </label>
+                <div class="form-group">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                    </div>
+                    <input class="form-control" placeholder="Repeat password" type="password" minlength="8" id="rpassword" name="rpassword" onkeyup="return validate_password();">
+                  </div>
                 </div>
+                <div class="text-muted font-italic"><small>Required password strength: <span class="text-success font-weight-700">At least 8 characters.</span></small></div>
+                <div class="text-muted font-italic"><small id="passvalidation"></small></div>
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary my-4">Sign in</button>
+                  <button type="sumbit" id="submit" class="btn btn-primary mt-4">Create account</button>
                 </div>
               </form>
             </div>
           </div>
-          <div class="row mt-3">
-            <div class="col-6">
-              <a href="#" class="text-light"><small>Forgot password?</small></a>
-            </div>
-            <div class="col-6 text-right">
-		    {% if users_signup %}
-              <a href="/register" class="text-light"><small>Create new account</small></a>
-            	    {% endif %}
-	    </div>
-          </div>
         </div>
       </div>
     </div>
+  </div>
+  <script type="text/javascript">
+    var password = document.getElementById("password");
+    var rpassword = document.getElementById("rpassword");
+    $("#submit").prop("disabled", true);
+
+    function validate_password() {
+      if (password.value != rpassword.value) {
+        $("#passvalidation").html("<span class='text-danger font-weight-700'>Passwords do not match.</span>");
+        $("#submit").prop("disabled", true);
+      } else {
+        $("#passvalidation").html("<span class='text-success font-weight-700'>Passwords match.</span>");
+        $("#submit").prop("disabled", false);
+      }
+    }
+  </script>
 {% endblock %}

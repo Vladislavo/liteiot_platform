@@ -7,7 +7,7 @@ def create_datatable(cur, appkey, dev_id):
     cur.execute(
         sql.SQL(
             """CREATE TABLE {} (
-                utc NUMERIC(10) NOT NULL,
+                utc NUMERIC(10) DEFAULT EXTRACT(EPOCH FROM now())::int NOT NULL,
                 timedate VARCHAR(100) NOT NULL,
                 data json NOT NULL
             )"""

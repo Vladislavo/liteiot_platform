@@ -40,18 +40,18 @@ def index():
 
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
-        if session['role'] and session['role'] == 'admin':
+        if 'role' in session and session['role'] == 'admin':
             return render_template('old/admin/signup.html', users_signup=app.config['USERS_SIGNUP'])
         else:
             if app.config['USERS_SIGNUP']:
-                return render_template('old/public/signup.html', users_signup=app.config['USERS_SIGNUP'])
+                return render_template('new/public/register.html', users_signup=app.config['USERS_SIGNUP'])
             else:
                 return redirect(url_for('index', users_signup=app.config['USERS_SIGNUP']))
     else:
-        if app.config['USERS_SIGNUP'] or session['role'] == 'admin':
+        if app.config['USERS_SIGNUP'] or ('role' in session and session['role'] == 'admin'):
             username = request.form['username']
             password = request.form['password'].encode('utf-8')
             
@@ -63,7 +63,7 @@ def signup():
                 return redirect(request.url, users_signup=app.config['USERS_SIGNUP'])
             else:
                 role = 'user'
-                if request.form['role'] and request.form['role'] == 'administrator':
+                if 'role' in request.form and request.form['role'] == 'administrator':
                     role = 'admin'
 
                 res = ud.create(username, password, role)
@@ -75,7 +75,7 @@ def signup():
                     
                     flash('User successfully created.', 'success')
 
-                    if session['role'] and session['role'] == 'admin':
+                    if 'role' in session and session['role'] == 'admin':
                         return redirect(url_for('dashboard'))
                     else:
                         return redirect(url_for('index'))
@@ -86,7 +86,7 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('old/public/login.html')
+        return render_template('new/public/login.html')
     else: 
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
