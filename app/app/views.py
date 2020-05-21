@@ -41,7 +41,7 @@ def index():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def signup():
+def register():
     if request.method == 'GET':
         if 'role' in session and session['role'] == 'admin':
             return render_template('old/admin/signup.html', users_signup=app.config['USERS_SIGNUP'])
@@ -56,11 +56,11 @@ def signup():
             password = request.form['password'].encode('utf-8')
             
             if (username == '' or password == ''):
-                feedback = 'Username or password fields cannot be empty'
-                return render_template('old/public/signup.html', feedback=feedback, users_signup=app.config['USERS_SIGNUP'])
+                flash('Username or password fields cannot be empty', 'danger')
+                return redirect(url_for('register', users_signup=app.config['USERS_SIGNUP']))
             elif (len(password) < 8):
                 flash('Password length must be at least 8 characters.', 'danger')
-                return redirect(request.url, users_signup=app.config['USERS_SIGNUP'])
+                return redirect(url_for('register', users_signup=app.config['USERS_SIGNUP']))
             else:
                 role = 'user'
                 if 'role' in request.form and request.form['role'] == 'administrator':
