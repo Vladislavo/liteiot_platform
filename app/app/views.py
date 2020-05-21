@@ -12,6 +12,7 @@ import app.dao.data.data as data
 import app.dao.notification.notification as nfs
 import app.dao.trigger.trigger as tr
 import app.dao.notification_queue.notification_queue as nq
+import app.dao.misc.misc as md
 
 import app.helpers.misc as misc
 import app.helpers.mailer as mailer
@@ -28,13 +29,26 @@ MAX_PG_ENTRIES_GRAPH_HOURS = 24
 @app.route('/')
 def index():
     if 'name' in session and len(session['name']) > 0:
-        apps = ad.get_list(session['name'])
+        created_apps = ad.get_count_by_user(session['name'])[1][0]
+        active_devices = dd.get_count_by_user(session['name'])
+        total_activity = md.get_user_data_count(session['name'])[1][0]
+        last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
+
+        print('created_apps', created_apps)
+        print('active_devices', active_devices)
+        print('total_activity', total_activity)
+        print('last_activity', last_activity)
+        info = [created_apps, active_devices, total_activity, last_activity]
+
+        return render_template('new/public/dashboard.html', info=info)
         
-        session.pop('appkey', None)
-        if apps[0]:
-            return render_template('old/public/index.html', apps=apps[1], users_signup=app.config['USERS_SIGNUP'])
-        else:
-            return render_template('old/public/index.html', feedback=apps[1], users_signup=app.config['USERS_SIGNUP'])
+        #apps = ad.get_list(session['name'])
+       
+        #session.pop('appkey', None)
+        #if apps[0]:
+        #    return render_template('old/public/index.html', apps=apps[1], users_signup=app.config['USERS_SIGNUP'])
+        #else:
+        #    return render_template('old/public/index.html', feedback=apps[1], users_signup=app.config['USERS_SIGNUP'])
     else:
         return render_template('new/public/login.html', users_signup=app.config['USERS_SIGNUP'])
 

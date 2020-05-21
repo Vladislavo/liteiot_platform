@@ -1,5 +1,6 @@
 from psycopg2 import sql
 from app.helpers.misc import with_psql
+import app.dao.application.application as ad
 
 @with_psql
 def create_datatable(cur, appkey, dev_id):
@@ -119,25 +120,30 @@ def get_count(cur, appkey):
     return (True, cur.fetchone())
 
 @with_psql
-def get_device_table_names(cur):
+def get_count_all(cur):
     query = """
-        SELECT table_name FROM
+        SELECT COUNT(*) FROM
             information_schema.tables
         WHERE
-            table_name ~ '^devices'
+            table_name ~ '^dev_'
         """
     cur.execute(query, ())
-    return(True, cur.fetchall())
+    return(True, cur.fetchone())
 
 
-def get_count_all():
+@with_psql
+def get_count_by_user(cur, username):
+    apps = ad.get_list(username)[1]
     count = 0
-    tns = get_device_table_names()
-    if tns[0] and len(tns[1]) > 0:
-        for tn in tns[1]:
-           sp = tn[0].split('_')
-           r = get_count(sp[1])
-           if r[0]:
-               count += r[1][0]
+
+    for a in apps:
+        query = """
+        SELECT COUNT(*) FROM
+            information_schema.tables
+        WHERE
+            table_name ~ '^dev_{}'
+        """.format(a[1])
+        cur.execute(query, ())
+        count += cur.fetchone()[0]
 
     return count
