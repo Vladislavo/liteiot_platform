@@ -154,75 +154,21 @@
                 </thead>
                 <tbody>
                   <tr>
+	  	    {% for ra in recent_activity %}
                     <th scope="row">
-                      /argon/
+		    	{{ ra[1] }}
                     </th>
                     <td>
-                      4,569
+			{{ ra[2] }}
                     </td>
                     <td>
-                      340
+                      	{{ ra[0] }}
                     </td>
                     <td>
-                      46,53%
+                      	{{ ra[3] }}
                     </td>
                   </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/index.html
-                    </th>
-                    <td>
-                      3,985
-                    </td>
-                    <td>
-                      319
-                    </td>
-                    <td>
-                      46,53%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/charts.html
-                    </th>
-                    <td>
-                      3,513
-                    </td>
-                    <td>
-                      294
-                    </td>
-                    <td>
-                      36,49%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/tables.html
-                    </th>
-                    <td>
-                      2,050
-                    </td>
-                    <td>
-                      147
-                    </td>
-                    <td>
-                      50,87%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/profile.html
-                    </th>
-                    <td>
-                      1,795
-                    </td>
-                    <td>
-                      190
-                    </td>
-                    <td>
-                      46,53%
-                    </td>
-                  </tr>
+		  {% endfor %}
                 </tbody>
               </table>
             </div>

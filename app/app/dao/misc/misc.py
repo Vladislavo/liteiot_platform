@@ -71,28 +71,31 @@ def get_user_data_count_per_day(cur, username, day=0):
     query = query[0:-10]
     query += ') SELECT COUNT(*) FROM t WHERE utc > {} AND utc < {}'.format(utc_day, utc_day+24*60*60)
 
-    print(query)
     cur.execute(query, ())
     
     return (True,cur.fetchone())
 
 
 @with_psql
-def get_recent_activity(cur, apps, devs, n):
-    query = ''
-    i = 0
+def get_recent_activity(cur, username, n=5):
+    apps = ad.get_list(username)[1]
+    devs = []
+    
     for a in apps:
-        for d in devs[i]:
+        devs.append(dd.get_list(a[1])[1])
+    
+    query = ''
+    for a in apps:
+        devs = dd.get_list(a[1])
+        for d in devs[1]:
             query += """
-            (SELECT utc, appname, devname, data from 
-                (SELECT utc, data from dev_{}_{} limit 5) AS utc, 
+            (SELECT timedate, appname, devname, data, utc from 
+                (SELECT utc, timedate, data from dev_{}_{} limit 5) AS utc, 
                 (SELECT '{}' as appname) AS appname,
-                (SELECT {} as devname) AS devname)
-            UNION ALL
-            """.format(a[1],d[1], a[0],d[0])
-        i += 1
+                (SELECT '{}' as devname) AS devname)
+            UNION ALL""".format(a[1],d[1], a[0],d[0])
     query = query[0:-9]
-    query += 'ORDER BY utc DESC LIMIT 5'
+    query += ' ORDER BY utc DESC LIMIT {}'.format(n)
     print(query)
 
     cur.execute(query, ())

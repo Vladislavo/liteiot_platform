@@ -34,13 +34,16 @@ def index():
         total_activity = md.get_user_data_count(session['name'])[1][0]
         last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
 
-        print('created_apps', created_apps)
-        print('active_devices', active_devices)
-        print('total_activity', total_activity)
-        print('last_activity', last_activity)
+        recent_activity = md.get_recent_activity(session['name'])[1]
+
+
+        #print('created_apps', created_apps)
+        #print('active_devices', active_devices)
+        #print('total_activity', total_activity)
+        #print('last_activity', last_activity)
         info = [created_apps, active_devices, total_activity, last_activity]
 
-        return render_template('new/public/dashboard.html', info=info)
+        return render_template('new/public/dashboard.html', info=info, recent_activity=recent_activity)
         
         #apps = ad.get_list(session['name'])
        
