@@ -101,7 +101,7 @@ def register():
                     flash('User successfully created.', 'success')
 
                     if 'role' in session and session['role'] == 'admin':
-                        return redirect(url_for('dashboard'))
+                        return redirect(url_for('administration'))
                     else:
                         return redirect(url_for('index'))
         else:
@@ -383,8 +383,8 @@ def data_csv():
         return redirect(utl_for('index'))
 
 
-@app.route('/dashboard', methods=['GET', 'POST'])
-def dashboard():
+@app.route('/administration', methods=['GET', 'POST'])
+def administration():
     if 'role' in session and session['role'] == 'admin':
         user_cnt = ud.get_count()
         apps_cnt = ad.get_count()
@@ -417,7 +417,7 @@ def dashboard():
 def dashboard_clean_search():
     if 'users_filter' in session:
         session.pop('users_filter', None)
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('administration'))
 
 
 @app.route('/user')
@@ -466,7 +466,7 @@ def user_delete():
             flash('Error: {}'.format(res[1]), 'danger')
             return render_template('old/admin/user.html', username=user[1][0])
         else:
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('administraion'))
     else:
         flash('Warning: the user is admin or does not exist.' ,'warning')
         return redirect(url_for('index'))
