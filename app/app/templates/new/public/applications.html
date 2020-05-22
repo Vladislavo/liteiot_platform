@@ -1,0 +1,41 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} HPC&amp;A IoT - Applications {% endblock %}
+
+{% block location %} <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="./applications">Applications</a> {% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Applications</h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+		{% for a in apps %}
+                  <div class="col-lg-6 col-md-6" style="margin-bottom : 30px;">
+                      <div class="card">
+                        <div class="card-body">
+			  <h5 class="card-title">{{ a[0] }}</h5>
+			  <p class="card-text">{{ a[3] }}</p>
+			  <a href="./application/{{ a[1] }}" class="btn btn-primary">Details</a>
+                        </div>
+                      </div>
+                  </div>
+		{% endfor %}
+              </div>
+
+              <div class="row" style="margin-top: 30px;">
+                  <div class="col-lg-4">
+		<a href="../new-application"><button type="submit" class="btn btn-primary btn-block">New application</button></a>
+               </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

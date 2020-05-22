@@ -4,85 +4,80 @@
 
 {% block location %} <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="./">Dashboard</a> {% endblock %}
 
-{% block body %}
-    <!-- Header -->
-    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
-      <div class="container-fluid">
-        <div class="header-body">
-          <!-- Card stats -->
-          <div class="row">
-            <div class="col-xl-3 col-lg-6">
-              <div class="card card-stats mb-4 mb-xl-0">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Created Apps</h5>
-                      <span class="h2 font-weight-bold mb-0">{{ info[0] }}</span>
-                    </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                        <i class="fas fa-chart-bar"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-6">
-              <div class="card card-stats mb-4 mb-xl-0">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Active Devices</h5>
-		      <span class="h2 font-weight-bold mb-0">{{ info[1] }}</span>
-                    </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                        <i class="fas fa-chart-pie"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-6">
-              <div class="card card-stats mb-4 mb-xl-0">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Total Activity</h5>
-		      <span class="h2 font-weight-bold mb-0">{{ info[2] }}</span>
-                    </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
-                        <i class="fas fa-users"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-lg-6">
-              <div class="card card-stats mb-4 mb-xl-0">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Last 24 Hours Activity</h5>
-		      <span class="h2 font-weight-bold mb-0">{{ info[3] }}</span>
-                    </div>
-                    <div class="col-auto">
-                      <div class="icon icon-shape bg-info text-white rounded-circle shadow">
-                        <i class="fas fa-percent"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+{% block stats %}
+  <div class="row">
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Created Apps</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[0] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+		<i class="fas fa-chart-bar"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
       </div>
     </div>
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Active Devices</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[1] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+		<i class="fas fa-chart-pie"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Total Activity</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[2] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
+		<i class="fas fa-users"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Last 24 Hours Activity</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[3] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+		<i class="fas fa-percent"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block body %}
     <div class="container-fluid mt--7">
       <div class="row">
         <div class="col-xl-8 mb-5 mb-xl-0">
@@ -278,6 +273,56 @@
   				}]
   			}
   		}), e.data("chart", a))
-  	}()
+  	}();
+	(function worker() {
+		var e = $("#chart-sales");
+		$.get('./chart-update', function(cdata) {
+			cdata = eval(cdata);
+			var a = new Chart(e,
+			{
+				type: "line",
+				options:
+				{
+					scales:
+					{
+						yAxes: [
+						{
+							gridLines:
+							{
+								lineWidth: 1,
+								color: Charts.colors.gray[900],
+								zeroLineColor: Charts.colors.gray[900]
+							}
+						}]
+					},
+					tooltips:
+					{
+						callbacks:
+						{
+							label: function (e, a)
+							{
+								var t = a.datasets[e.datasetIndex].label || "",
+									o = e.yLabel,
+									n = "";
+								return 1 < a.datasets.length && (n += '<span class="popover-body-label mr-auto">' + t + "</span>"), n += '<span class="popover-body-value">' + o + "</span>"
+							}
+						}
+					}
+				},
+				data:
+				{
+																								      labels: cdata[0],
+					datasets: [
+					{
+						label: "Performance",
+						data: cdata[1]
+					}]
+				}
+			});
+			e.data("chart", a);
+			setTimeout(worker, 600000);
+		});
+	})();
+	
   </script>
 {% endblock %}
