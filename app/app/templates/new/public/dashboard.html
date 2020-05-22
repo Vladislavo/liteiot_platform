@@ -223,11 +223,11 @@
   			},
   			data:
   			{
-  				labels: ["Sun", "Mon", "Tue", "Wen", "Thu", "Fri", "Sat"],
+				labels: {{ week_chart[0]|safe }},
   				datasets: [
   				{
   					label: "Sales",
-  					data: [25, 20, 30, 22, 36, 29, 15]
+					data: {{ week_chart[1] }}
   				}]
   			}
   		}), e.data("chart", a))
@@ -249,13 +249,6 @@
   							lineWidth: 1,
   							color: Charts.colors.gray[900],
   							zeroLineColor: Charts.colors.gray[900]
-  						},
-  						ticks:
-  						{
-  							callback: function (e)
-  							{
-  								if (!(e % 10)) return /*"$"*/ + e
-  							}
   						}
   					}]
   				},
@@ -268,18 +261,18 @@
   							var t = a.datasets[e.datasetIndex].label || "",
   								o = e.yLabel,
   								n = "";
-  							return 1 < a.datasets.length && (n += '<span class="popover-body-label mr-auto">' + t + "</span>"), n += '<span class="popover-body-value">$' + o + "k</span>"
+  							return 1 < a.datasets.length && (n += '<span class="popover-body-label mr-auto">' + t + "</span>"), n += '<span class="popover-body-value">' + o + "</span>"
   						}
   					}
   				}
   			},
   			data:
   			{
-																							      labels: {{ day_chart.keys()|list }},
+																							      labels: {{ day_chart[0] }},
   				datasets: [
   				{
   					label: "Performance",
-					data: {{ day_chart.values()|list }} 
+					data: {{ day_chart[1] }} 
   				}]
   			}
   		}), e.data("chart", a))

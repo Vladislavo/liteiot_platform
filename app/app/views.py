@@ -41,14 +41,17 @@ def index():
         #print('last_activity', last_activity)
         info = [created_apps, active_devices, total_activity, last_activity]
 
-        r = md.get_user_data_count_per_hour_period(session['name'], 12)[1]
-        r = [x[0] for x in r]
-        
-        day_chart = {}
-        for i in range(12,-1,-1):
-            day_chart[misc.utc_hour(i)] = r[i]
+        day_chart_values = md.get_user_data_count_per_hour_period(session['name'], 11)[1]
+        day_chart_values = [x[0] for x in day_chart_values]
+        day_chart_labels = [misc.local_hour(x) for x in range(11,-1,-1)]
+        day_chart = [day_chart_labels, day_chart_values]
 
-        return render_template('new/public/dashboard.html', info=info, recent_activity=recent_activity, day_chart=day_chart)
+        week_chart_values = md.get_user_data_count_per_day_period(session['name'], 6)[1]
+        week_chart_values = [x[0] for x in week_chart_values]
+        week_chart_labels = [misc.local_weekday(x) for x in range(6,-1,-1)]
+        week_chart = [week_chart_labels, week_chart_values]
+
+        return render_template('new/public/dashboard.html', info=info, recent_activity=recent_activity, day_chart=day_chart, week_chart=week_chart)
         
         #apps = ad.get_list(session['name'])
        

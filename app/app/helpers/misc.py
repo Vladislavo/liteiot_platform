@@ -143,3 +143,10 @@ def utc_hour(hour_offset):
 def utc_weekday(day_offset = 0):
     d = {0:'Mo',1:'Tu',2:'We',3:'Th',4:'Fr',5:'Sa',6:'Su'}
     return (d[((datetime.utcnow().weekday() - day_offset) % 7)])
+
+def local_hour(hour_offset):
+    return ((datetime.now().hour - hour_offset) % 24)
+
+def local_weekday(day_offset = 0):
+    d = {0:'Mo',1:'Tu',2:'We',3:'Th',4:'Fr',5:'Sa',6:'Su'}
+    return (d[((datetime.now().weekday() - day_offset) % 7)])
