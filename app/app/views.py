@@ -244,6 +244,35 @@ def application_add_device(appkey):
     else:
         return redirect(url_for('login'))
 
+
+@app.route('/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
+def application_device_configuration(appkey, devid):
+    if 'name' in session:
+        if request.method == 'GET':
+            pend_msgs = pend.get_list(appkey, devid)
+            ap = ad.get(appkey)[1]
+            dev = dd.get(appkey, devid)[1]
+            if pend_msgs[0]:
+                config_list = []
+
+                for pm in pend_msgs[1]:
+                    cntt = binascii.a2b_base64(pm[2])
+                    config_id = int(cntt[0])
+                    config_args = cntt[2:(len(cntt)-1)].decode('utf-8')
+                    ack = pm[3]
+                    config_list.append((config_id, config_args, ack, pm[2]))
+
+            return render_template('new/public/device-configuration.html', dev=dev, app=ap, config_list=config_list)
+        else:
+            base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
+            pend.create(appkey, devid, base64_args)
+
+            return redirect(url_for('applications'))
+    else:
+        return redirect(url_for('login'))
+
+
+
 @app.route('/new-app')
 def new_app():
     if 'name' in session:
