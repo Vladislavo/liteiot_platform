@@ -79,7 +79,7 @@
               <h3 class="mb-0">Devices</h3>
             </div>
               <div class="row icon-examples">
-
+		{% if devs %}
 		{% for d in devs %}
                 <div class="col-lg-3 col-md-6">
 		    <button type="button" class="btn-icon-clipboard" data-clipboard-text="atom" title="{{ d[0] }}">
@@ -90,6 +90,11 @@
                   </button>
                 </div>
 		{% endfor %}
+		{% else %}
+                <div class="col-lg-12 col-md-12">
+		<center><p> There are no registered devices yet. </p></center>
+		</div>
+		{% endif %}
 
 	      </div>	
               <div class="row" style="margin-top: 30px;">

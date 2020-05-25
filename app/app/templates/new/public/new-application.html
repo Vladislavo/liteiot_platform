@@ -1,0 +1,47 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} HPC&amp;A IoT - New Application {% endblock %}
+
+{% block location %} <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="./applications">Applications</a> {% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Applications</h3>
+            </div>
+            <div class="card-body">
+	      <form action="new-application" method="post">
+			<div class="form-group">
+				<label>Name:</label><br>
+				<input type="text" maxlength="30" class="form-control" id="appname" name="appname" required><br>
+			</div>
+			<div class="form-group">
+				<label>Description:</label><br>
+				<textarea id="appdesc" maxlength="200" class="form-control" name="appdesc" rows="5"></textarea>
+			</div>
+			<br>
+			<div class="custom-control custom-control-alternative custom-checkbox">
+			  <input class="custom-control-input" id="secure" type="checkbox" name="secure">
+			  <label class="custom-control-label" for="secure">
+			    <span class="text-muted">Secure</span>
+			  </label>
+			</div>
+			<br>
+			<p> Note, if you use secure option, make sure your device uses aes128 ctr with the corresponding key.</p>
+			
+			<br>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary">Create Application</button>
+			</div>
+		</form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

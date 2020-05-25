@@ -157,6 +157,41 @@ def application(appkey):
         return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
 
 
+@app.route('/new-application', methods=['GET', 'POST'])
+def new_application():
+    if 'name' in session:
+        if request.method == 'GET':
+            return render_template('new/public/new-application.html')
+        elif request.method == 'POST':
+            if request.form['appname'] == '':
+                flash('Application name cannot be empty.', 'danger')
+                return render_template(request.url)
+            else:
+                appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
+                secure_key = misc.gen_skey_b64(16)
+                secure = False
+
+                if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'true':
+                    secure = True
+
+                res = ad.create(request.form['appname'], appkey, session['name'], request.form['appdesc'], secure, secure_key)
+            
+                if not res[0]:
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return render_template(request.url)
+            
+                res = dd.create_table(appkey)
+            
+                if not res[0]:
+                    ad.delete(appkey)
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return render_template(request.url)
+            
+                return redirect(url_for('applications'))
+    else:
+        return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
+
+
 @app.route('/application/<appkey>/device/<devid>')
 def app_device(appkey, devid):
     if 'name' in session:
@@ -183,7 +218,7 @@ def app_device(appkey, devid):
 
 
 @app.route('/new-app')
-def new_application():
+def new_app():
     if 'name' in session:
         return render_template('old/public/new-app.html')
     else:
