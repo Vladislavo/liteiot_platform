@@ -261,13 +261,13 @@ def application_device_configuration(appkey, devid):
                     config_args = cntt[2:(len(cntt)-1)].decode('utf-8')
                     ack = pm[3]
                     config_list.append((config_id, config_args, ack, pm[2]))
-
+            
             return render_template('new/public/device-configuration.html', dev=dev, app=ap, config_list=config_list)
-        else:
+        elif request.method == 'POST':
             base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
             pend.create(appkey, devid, base64_args)
-
-            return redirect(url_for('applications'))
+            
+            return '', 201
     else:
         return redirect(url_for('login'))
 
@@ -430,10 +430,10 @@ def dev_conf_rm(appkey, devid):
 
         if res[0]:
             flash('Configuration message successfully removed.','success')
-            return redirect(url_for('applications'))
         else:
             flash('Error removing configuration message: {}'.format(res[1]), 'danger')
-            return redirect(url_for('applications'))
+        
+        return '', 200
     else:
         return redirect(url_for('login'))
 
