@@ -171,7 +171,7 @@ def new_application():
                 secure_key = misc.gen_skey_b64(16)
                 secure = False
 
-                if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'true':
+                if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'on':
                     secure = True
 
                 res = ad.create(request.form['appname'], appkey, session['name'], request.form['appdesc'], secure, secure_key)
