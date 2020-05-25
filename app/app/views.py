@@ -272,6 +272,33 @@ def application_device_configuration(appkey, devid):
         return redirect(url_for('login'))
 
 
+@app.route('/application/<appkey>/device/<devid>/download-csv')
+def application_device_download_csv(appkey, devid):
+    if 'name' in session:
+        dumpd = data.get_all(appkey, devid)
+        ap = ad.get(appkey)[1]
+        dev = dd.get(appkey, devid)[1]
+
+        fn = ap[0]+ '-' +dev[0]+ '-data.csv'
+
+        with open(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+fn, 'w+') as f: 
+            f.write('utc,timestamp,')
+            for d in dumpd[1][0][2]:
+                f.write(d)
+                f.write(',')
+            f.write('\n')
+        
+            for row in dumpd[1]:
+                f.write('{},{},'.format(row[0],row[1]))
+                for v in row[2]:
+                    f.write(str(row[2][v]))
+                    f.write(',')
+                f.write('\n')
+    
+        return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
+    else:
+        return redirect(utl_for('login'))
+
 
 @app.route('/new-app')
 def new_app():
