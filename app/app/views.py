@@ -267,6 +267,7 @@ def application_device_configuration(appkey, devid):
             base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
             pend.create(appkey, devid, base64_args)
             
+            flash('Message enqueued', 'success')
             return '', 201
     else:
         return redirect(url_for('login'))
@@ -464,6 +465,20 @@ def dev_conf_rm(appkey, devid):
     else:
         return redirect(url_for('login'))
 
+
+@app.route('/application/<appkey>/device/<devid>/variables')
+def application_device_variables(appkey, devid):
+    if 'name' in session:
+        last = data.get_last_n(appkey, devid, 1)
+        if last[0]:
+            select = '<select class="form-control" id="varname" name="varname" onchange="validate_form();" required>'
+            select += '<option value="-">Select Variable</option>'
+            for k in last[1][0][2]:
+                select += '<option>'+k+'</option>'
+            select += '</select>'
+            return select
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/delete-dev')
 def delete_dev():
@@ -691,7 +706,7 @@ def dev_data(var, dest, page):
 
 
 @app.route('/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
-def new_dev_data(appkey, devid, var, dest, page):
+def application_device_data(appkey, devid, var, dest, page):
     if dest == 'graph':
         last = data.get_last_hours(appkey, devid, MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
         arr = '[["Time", "{}"],'.format(var)
@@ -708,6 +723,67 @@ def new_dev_data(appkey, devid, var, dest, page):
             for d in last[1]:
                 t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
+
+
+@app.route('/application/<appkey>/alerts')
+def application_alerts(appkey):
+    if 'name' in session:
+        ap = ad.get(appkey)
+        alerts = nfs.get_alerts_list(appkey)
+        print(alerts)
+        return render_template('new/public/alerts.html', alert_list=alerts[1], app=ap[1])
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/application/<appkey>/new-alert', methods=['GET', 'POST'])
+def application_new_alert(appkey):
+    if 'name' in session:
+        if request.method == 'GET':
+            ap = ad.get(appkey)
+            devs = dd.get_list(appkey)
+            
+            return render_template('new/public/new-alert.html', devs=devs[1], app=ap[1])
+        elif request.method == 'POST':
+            # create new notification
+            nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
+            dev = dd.get(appkey, request.form['devid'])
+            
+            try:
+                desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
+                res = nfs.create(nid, appkey, request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
+                if res[0]:
+                    # create new function and trigger
+                    tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    tr.create(appkey, request.form['devid'], nid)
+                    flash('Alert created', 'success')
+                    return redirect(url_for('application_alerts', appkey=appkey))
+                else:
+                    flash('Error creating new alert: {}'.format(res[1]), 'danger')
+                    return redirect(request.url) 
+            except Exception as e:
+                flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
+                return redirect(request.url) 
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/application/<appkey>/remove-alert')
+def application_alert_remove(appkey):
+    if 'name' in session:
+        nq.delete(appkey, request.args.get('devid'), request.args.get('id'))
+        tr.delete(appkey, request.args.get('devid'), request.args.get('id'))
+        tr.delete_function(appkey, request.args.get('devid'), request.args.get('id'))
+        res = nfs.delete(appkey, request.args.get('devid'), request.args.get('id'))
+
+        if res[0]:
+            flash('Alert removed', 'success')
+            return '', 200
+        else:
+            flash('Alert cannot be removed : {}'.format(res[1]), 'danger')
+            return '', 500
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/alerts')
