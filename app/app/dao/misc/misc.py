@@ -1,5 +1,5 @@
 from psycopg2 import sql
-from app.helpers.misc import with_psql, utc_roundhour, utc_roundday
+from app.helpers.misc import with_psql, utc_roundhour, utc_roundday, utc_local_diff
 import app.dao.application.application as ad
 import app.dao.device.device as dd
 
@@ -146,7 +146,7 @@ def get_recent_activity(cur, username, n=5):
         for d in devs[1]:
             query += """
             (SELECT timedate, appname, devname, data, utc from 
-                (SELECT utc, timedate, data from dev_{}_{} limit 5) AS utc, 
+                (SELECT utc, timedate, data from dev_{}_{} ORDER BY utc DESC limit 5) AS utc, 
                 (SELECT '{}' as appname) AS appname,
                 (SELECT '{}' as devname) AS devname)
             UNION ALL""".format(a[1],d[1], a[0],d[0])

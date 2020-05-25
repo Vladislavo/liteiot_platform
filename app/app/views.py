@@ -34,11 +34,7 @@ def index():
         total_activity = md.get_user_data_count(session['name'])[1][0]
         last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
         recent_activity = md.get_recent_activity(session['name'])[1]
-
-        #print('created_apps', created_apps)
-        #print('active_devices', active_devices)
-        #print('total_activity', total_activity)
-        #print('last_activity', last_activity)
+        print (recent_activity)
         info = [created_apps, active_devices, total_activity, last_activity]
 
         day_chart_values = md.get_user_data_count_per_hour_period(session['name'], 11)[1]
@@ -53,16 +49,16 @@ def index():
 
         return render_template('new/public/dashboard.html', info=info, recent_activity=recent_activity, day_chart=day_chart, week_chart=week_chart)
         
-        #apps = ad.get_list(session['name'])
-       
-        #session.pop('appkey', None)
-        #if apps[0]:
-        #    return render_template('old/public/index.html', apps=apps[1], users_signup=app.config['USERS_SIGNUP'])
-        #else:
-        #    return render_template('old/public/index.html', feedback=apps[1], users_signup=app.config['USERS_SIGNUP'])
     else:
         return render_template('new/public/login.html', users_signup=app.config['USERS_SIGNUP'])
 
+@app.route('/chart-update')
+def chart_update():
+    day_chart_values = md.get_user_data_count_per_hour_period(session['name'], 11)[1]
+    day_chart_values = [x[0] for x in day_chart_values]
+    day_chart_labels = [misc.local_hour(x) for x in range(11,-1,-1)]
+    day_chart = [day_chart_labels, day_chart_values]
+    return "{}".format(day_chart)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -131,12 +127,59 @@ def login():
                 return redirect(url_for('index'))
 
 
-
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
 
+
+@app.route('/applications')
+def applications():
+    if 'name' in session:
+        apps = ad.get_list(session['name'])
+       
+        session.pop('appkey', None)
+        
+        return render_template('new/public/applications.html', apps=apps[1])
+    else:
+        return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
+
+
+@app.route('/application/<appkey>')
+def application(appkey):
+    if 'name' in session:    
+        ap = list(ad.get(appkey)[1])
+        ap[5] = misc.skey_b64_to_hex(ap[5])
+        devs = dd.get_list(ap[1])[1]
+
+        return render_template('new/public/application.html', app=ap, devs=devs)
+    else:
+        return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
+
+
+@app.route('/application/<appkey>/device/<devid>')
+def app_device(appkey, devid):
+    if 'name' in session:
+        ap = ad.get(appkey)
+        if session['role'] == 'admin' or session['name'] == ap[1][2]:
+            dev = dd.get(appkey, devid)
+
+            session['devid'] = int(dev[1][1])
+            session['devname'] = dev[1][0]
+    
+            ld = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, 0])
+            cnt = data.get_count(appkey, devid)
+    
+            print(ld)
+
+            ltup = 'Device have not any sent data yet'
+
+            if ld[0] and ld[1][0] != []:
+                ltup = ld[1][0][1]
+
+            return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, data=ld[1], total=cnt[1][0])
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/new-app')
@@ -147,7 +190,6 @@ def new_application():
         return redirect(url_for('index'))
 
 
-
 @app.route('/app', methods=['GET', 'POST'])
 def app_():
     if 'name' in session:
@@ -155,8 +197,9 @@ def app_():
             session['appkey'] = request.args.get('appkey')
 
             ap = ad.get(session['appkey'])
+            print(ap)
             devs = dd.get_list(ap[1][1])
-
+            print(devs)
             session['appname'] = ap[1][0]
             
             if session['role'] == 'admin' or session['name'] == ap[1][2]:
@@ -526,6 +569,26 @@ def dev_data(var, dest, page):
             for d in last[1]:
                 t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         #t += '</tbody>'
+        return t
+
+
+@app.route('/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
+def new_dev_data(appkey, devid, var, dest, page):
+    if dest == 'graph':
+        last = data.get_last_hours(appkey, devid, MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
+        arr = '[["Time", "{}"],'.format(var)
+        if last[0]:
+            for d in last[1]:
+                arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
+            arr += ']'
+        return arr
+    elif dest == 'table':
+        # for table <cnt> is in items
+        last = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, (int(page)-1)*MAX_PG_ENTRIES_DATA])
+        t = ''
+        if last[0]:
+            for d in last[1]:
+                t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
 
 
