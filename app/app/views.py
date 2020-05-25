@@ -193,7 +193,7 @@ def new_application():
 
 
 @app.route('/application/<appkey>/device/<devid>')
-def app_device(appkey, devid):
+def application_device(appkey, devid):
     if 'name' in session:
         ap = ad.get(appkey)
         if session['role'] == 'admin' or session['name'] == ap[1][2]:
@@ -212,10 +212,37 @@ def app_device(appkey, devid):
             if ld[0] and ld[1][0] != []:
                 ltup = ld[1][0][1]
 
-            return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, data=ld[1], total=cnt[1][0])
+            if ld[0]: 
+                return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, data=ld[1], total=cnt[1][0])
+            else:
+                return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, data=[], total=cnt[1][0])
     else:
         return redirect(url_for('login'))
 
+@app.route('/application/<appkey>/add-device', methods=['GET', 'POST'])
+def application_add_device(appkey):
+    if 'name' in session:
+        if request.method == 'GET':
+            ap = ad.get(appkey)
+            dev_list = dd.get_list(appkey)
+            return render_template('new/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]))
+        elif request.method == 'POST':
+            res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'])
+
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return render_template(request.url)
+            else:
+                res = data.create_table(appkey, request.form['devid'])
+            
+                if not res[0]:
+                    dd.delete(session['appkey'], request.form['devid'])
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return render_template(request.url)
+                else:
+                    return redirect(url_for('applications'))
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/new-app')
 def new_app():
