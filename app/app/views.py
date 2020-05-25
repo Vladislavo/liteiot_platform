@@ -423,19 +423,19 @@ def dev_conf():
     else:
         return redirect(url_for('index'))
 
-@app.route('/dev-conf-rm')
-def dev_conf_rm():
-    if 'name' in session and 'appkey' in session and 'devid' in session:
-        res = pend.delete(session['appkey'], session['devid'], request.args.get('conf')+'_')
+@app.route('/application/<appkey>/device/<devid>/remove-configuration')
+def dev_conf_rm(appkey, devid):
+    if 'name' in session:
+        res = pend.delete(appkey, devid, request.args.get('conf')+'_')
 
         if res[0]:
             flash('Configuration message successfully removed.','success')
-            return redirect(url_for('dev_conf'))
+            return redirect(url_for('applications'))
         else:
             flash('Error removing configuration message: {}'.format(res[1]), 'danger')
-            return redirect(url_for('dev_conf'))
+            return redirect(url_for('applications'))
     else:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
 
 
 @app.route('/delete-dev')

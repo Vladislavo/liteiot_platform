@@ -2,6 +2,8 @@
 
 {% block title %} HPC&amp;A IoT - Device Configuration {% endblock %}
 
+{% block header %} <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> {% endblock %}
+
 {% block location %} <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="./applications">Applications</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/application/{{ app[1] }}">{{ app[0] }}</a> 
@@ -60,7 +62,7 @@
 					{% endif %}
 						</span>
 					</td>
-					<td> <a href="/dev-conf-rm?conf={{ c[3] }}"> <span class="glyphicon glyphicon-remove"</span> </a> </td>
+					<td> <a href="/application/{{ app[1] }}/device/{{ dev[1] }}/remove-configuration?conf={{ c[3] }}"> <span class="fa fa-remove"</span> </a> </td>
 				</tr>
 				{% endfor %}
 			</tbody>
