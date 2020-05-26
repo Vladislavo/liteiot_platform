@@ -778,8 +778,8 @@ def application_new_alert(appkey):
         return redirect(url_for('login'))
 
 
-@app.route('/application/<appkey>/remove-alert')
-def application_alert_remove(appkey):
+@app.route('/application/<appkey>/remove-<ntype>')
+def application_notification_remove(appkey, ntype):
     if 'name' in session:
         nq.delete(appkey, request.args.get('devid'), request.args.get('id'))
         tr.delete(appkey, request.args.get('devid'), request.args.get('id'))
@@ -787,10 +787,10 @@ def application_alert_remove(appkey):
         res = nfs.delete(appkey, request.args.get('devid'), request.args.get('id'))
 
         if res[0]:
-            flash('Alert removed', 'success')
+            flash('{} removed'.format(ntype.capitalize()), 'success')
             return '', 200
         else:
-            flash('Alert cannot be removed : {}'.format(res[1]), 'danger')
+            flash('{} cannot be removed : {}'.format(ntype.capitalize(), res[1]), 'danger')
             return '', 500
     else:
         return redirect(url_for('login'))
@@ -803,6 +803,41 @@ def application_automation(appkey):
         ats = nfs.get_automation_list(appkey)
         
         return render_template('new/public/automation.html', automations=ats[1], app=ap[1])
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/application/<appkey>/new-automation', methods=['GET', 'POST'])
+def application_new_automation(appkey):
+    if 'name' in session:
+        if request.method == 'GET':
+            ap = ad.get(appkey)
+            devs = dd.get_list(appkey)
+            
+            return render_template('new/public/new-automation.html', devs=devs[1], app=ap[1])
+        elif request.method == 'POST':
+            # create new notification
+            nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
+            dev = dd.get(appkey, request.form['devid'])
+            adev = dd.get(appkey, request.form['adevid'])
+            
+            try:
+                desc = 'IF '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']+' THEN '+adev[1][0]+'.confID_'+request.form['confid']+' = '+request.form['arg']
+                # action format: '<devid>#<confid>#<arg>'
+                action = request.form['adevid']+'#'+request.form['confid']+'#'+request.form['arg']
+                res = nfs.create(nid, appkey, request.form['devid'], request.form['automationname'], desc, 'automation', action)
+                if res[0]:
+                    # create new function and trigger
+                    tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    tr.create(appkey, request.form['devid'], nid)
+                    flash('Automation created', 'success')
+                    return redirect(url_for('application_automation', appkey=appkey))
+                else:
+                    flash('Error creating new alert: {}'.format(res[1]), 'danger')
+                    return redirect(request.url) 
+            except Exception as e:
+                flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
+                return redirect(request.url) 
     else:
         return redirect(url_for('login'))
 

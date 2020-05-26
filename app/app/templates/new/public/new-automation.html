@@ -1,6 +1,6 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} HPC&amp;A IoT - New Alert {% endblock %}
+{% block title %} HPC&amp;A IoT - New Automation {% endblock %}
 
 {% block location %} 
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/applications">Applications</a> 
@@ -16,13 +16,13 @@
         <div class="col">
           <div class="card shadow">
             <div class="card-header bg-transparent">
-              <h3 class="mb-0">New Alert</h3>
+              <h3 class="mb-0">New Automation</h3>
             </div>
             <div class="card-body">
-		<form action="/application/{{ app[1] }}/new-alert" method="post">
+		<form action="/application/{{ app[1] }}/new-automation" method="post">
 			<div class="form-group">
 				<label>Name:</label><br>
-				<input type="text" maxlength="30" class="form-control" id="alertname" name="alertname" required><br>
+				<input type="text" maxlength="30" class="form-control" id="automationname" name="automationname" required><br>
 			</div>
 			<h3> Condition: </h3>
 			<h4> IF </h4>
@@ -37,7 +37,7 @@
 				<option value="-">Select variable</option>
 			</select>
 			<br>
-			<select class='form-control notifelem' name='operation' id='operation' required>
+			<select class='form-control' name='operation' id='operation' required>
 				<option default>></option>
 				<option>>=</option>
 				<option><</option>
@@ -45,21 +45,29 @@
 				<option>=</option>
 			</select>
 			<br>
-			<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>
+			<input type='text' class='form-control' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>
 			<p> Use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean. <br>
 			Keep types consistently for each variable for both, alerts and automations. </p>
 
 			<br>
 			<h4> THEN </h4>
-			<h5> Send email to: </h5>
-
-			<input class="form-control" type="email" id="alertemail" name="alertemail" placeholder="Type email..." required>
+			<h5> Set config on </h5>
+		
+			<select class="form-control" id="adevid" onchange="return validate_form();" name="adevid" required>
+				<option default value="-">Select Device</option>
+				{% for d in devs %}
+				<option value="{{ d[1] }}">{{ d[0] }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<input type='number' size='3' min='0' max='255' class='form-control' id='confid' name='confid' placeholder='Conf ID' required>
+			<br>
+			<textarea type='text' maxlength='50' class='form-control' id='arg' name='arg' rows='2' placeholder='Args' required></textarea>
 			<br><br>
 			<div class="form-group">
-				<button type="submit" id="submit" class="btn btn-primary">Create Alert</button>
+				<button type="submit" id="submit" class="btn btn-primary">Create Automation</button>
 			</div>
 		</form>
-
             </div>
           </div>
         </div>
@@ -75,8 +83,10 @@
 		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
 		var var_sel = document.getElementById("varname");
 		var sel_var = var_sel.options[var_sel.selectedIndex].value;
+		var adev_sel = document.getElementById("adevid");
+		var sel_aop = adev_sel.options[adev_sel.selectedIndex].value;
 		
-		if (sel_op == "-" || sel_var == "-") {
+		if (sel_op == "-" || sel_var == "-" || sel_aop == "-") {
 			$("#submit").prop("disabled", true);
 			console.log("not validated: "+sel_op+" "+sel_var);
 		} else {
