@@ -40,36 +40,6 @@ def index():
     else:
         return render_template('new/public/login.html', users_signup=app.config['USERS_SIGNUP'])
 
-@app.route('/chart-update')
-def chart_update():
-    if 'name' in session:
-        day_chart_values = md.get_user_data_count_per_hour_period(session['name'], 11)[1]
-        day_chart_values = [x[0] for x in day_chart_values]
-        day_chart_labels = [misc.local_hour(x) for x in range(11,-1,-1)]
-        day_chart = [day_chart_labels, day_chart_values]
-
-        week_chart_values = md.get_user_data_count_per_day_period(session['name'], 6)[1]
-        week_chart_values = [x[0] for x in week_chart_values]
-        week_chart_labels = [misc.local_weekday(x) for x in range(6,-1,-1)]
-        week_chart = [week_chart_labels, week_chart_values]
-        
-        return "[{}, {}]".format(day_chart, week_chart)
-    else:
-        return '', 401
-
-@app.route('/recent-activity')
-def recent_activity():
-    if 'name' in session:
-        recent_activity = md.get_recent_activity(session['name'])[1]
-        ra = ''
-        
-        for r in recent_activity:
-            ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(r[3])+'</th></tr>'
-
-        return ra, 200
-    else:
-        return '', 401
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
@@ -308,6 +278,37 @@ def application_device_download_csv(appkey, devid):
         return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
     else:
         return redirect(utl_for('login'))
+
+
+@app.route('/chart-update')
+def chart_update():
+    if 'name' in session:
+        day_chart_values = md.get_user_data_count_per_hour_period(session['name'], 11)[1]
+        day_chart_values = [x[0] for x in day_chart_values]
+        day_chart_labels = [misc.local_hour(x) for x in range(11,-1,-1)]
+        day_chart = [day_chart_labels, day_chart_values]
+
+        week_chart_values = md.get_user_data_count_per_day_period(session['name'], 6)[1]
+        week_chart_values = [x[0] for x in week_chart_values]
+        week_chart_labels = [misc.local_weekday(x) for x in range(6,-1,-1)]
+        week_chart = [week_chart_labels, week_chart_values]
+        
+        return "[{}, {}]".format(day_chart, week_chart)
+    else:
+        return '', 401
+
+@app.route('/recent-activity')
+def recent_activity():
+    if 'name' in session:
+        recent_activity = md.get_recent_activity(session['name'])[1]
+        ra = ''
+        
+        for r in recent_activity:
+            ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(r[3])+'</th></tr>'
+
+        return ra, 200
+    else:
+        return '', 401
 
 
 @app.route('/new-app')
@@ -791,6 +792,17 @@ def application_alert_remove(appkey):
         else:
             flash('Alert cannot be removed : {}'.format(res[1]), 'danger')
             return '', 500
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/application/<appkey>/automation')
+def application_automation(appkey):
+    if 'name' in session:
+        ap = ad.get(appkey)
+        ats = nfs.get_automation_list(appkey)
+        
+        return render_template('new/public/automation.html', automations=ats[1], app=ap[1])
     else:
         return redirect(url_for('login'))
 
