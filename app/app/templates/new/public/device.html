@@ -124,32 +124,8 @@
 		       <a href="./{{ dev[1] }}/download-csv"<button type="submit" class="btn btn-primary btn-block">Download CSV</button></a>
                </div>
                <div class="col-lg-4">
-                   <button type="submit" class="btn btn-primary btn-block">Settings</button>
+		       <a href="./{{ dev[1] }}/settings"<button type="submit" class="btn btn-primary btn-block">Settings</button></a>
                </div>
-               <!-- put inside settings
-               <div class="col-lg-3">
-               <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#exampleModal">Delete</button>
-               <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        Modal Body ....
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-danger">Delete Application</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-               </div>
-               -->
               </div>
             </div>
           </div>
@@ -205,35 +181,10 @@
   		// Declare all variables
   		var i, tabcontent, tablinks;
 
-  		// Get all elements with class="tabcontent" and hide them
-  		//tabcontent = document.getElementsByClassName("tab-content");
-  		//for (i = 0; i < tabcontent.length; i++) {
-    		//	tabcontent[i].style.display = "none";
-  		//}
-
-  		// Get all elements with class="tablinks" and remove the class "active"
-  		//tablinks = document.getElementsByClassName("tablinks");
-  		//for (i = 0; i < tablinks.length; i++) {
-    		//	tablinks[i].className = tablinks[i].className.replace(" active", "");
-  		//}
-
-  		// Show the current tab, and add an "active" class to the button that opened the tab
-  		//document.getElementById(dname).style.display = "block";
-  		//evt.currentTarget.className += " active";
-
 		tscroll = init_scroll();
 
 		fetch('/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/graph/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
 		fetch('/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').html(data));
-	
-		/*	
-		window.onscroll = function (ev) {
-			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-				tscroll[dname] += 1;
-				fetch(window.origin+'/dev-data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').append(data));
-			}
-		};
-		*/
 	}
 	
 	function show_first_page() {

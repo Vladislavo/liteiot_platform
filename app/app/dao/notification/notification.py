@@ -61,6 +61,19 @@ def get_list(cur, appkey):
 
     return (True, cur.fetchall())
 
+@with_psql
+def get_per_device(cur, appkey, devid):
+    query = """
+    SELECT * FROM
+        notifications
+    WHERE
+        app_key = %s
+    AND
+        dev_id = %s
+    """
+    cur.execute(query, (appkey, devid))
+
+    return (True, cur.fetchall())
 
 @with_psql
 def get_alerts_list(cur, appkey):

@@ -94,6 +94,21 @@ def get(cur, appkey, dev_id):
     else:
         return (True, dev)
 
+@with_psql
+def update(cur, appkey, devid, name, desc):
+    tn = 'devices_'+appkey
+    query = """
+        UPDATE
+            {}
+        SET
+            name = %s,
+            description = %s
+        WHERE
+            dev_id = %s
+    """.format(tn)
+    cur.execute(query, (name, desc, devid))
+
+    return (True,)
 
 @with_psql
 def get_list(cur, appkey):

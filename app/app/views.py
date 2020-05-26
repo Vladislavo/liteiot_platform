@@ -178,6 +178,13 @@ def application_delete(appkey):
     
         for dev in devs[1]:
             data.delete_table(appkey, dev[1])
+            # delete notifications
+            nq.delete_per_device(appkey, dev[1])
+            nfss = nfs.get_per_device(appkey, dev[1])
+            for nf in nfss[1]:
+                tr.delete(appkey, dev[1], nf[0])
+                tr.delete_function(appkey, dev[1], nf[0])
+                nfs.delete(appkey, dev[1], nf[0])
     
         dd.delete_table(appkey)
     
@@ -205,8 +212,6 @@ def application_device(appkey, devid):
     
             ld = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, 0])
             cnt = data.get_count(appkey, devid)
-    
-            print(ld)
 
             ltup = 'Device have not any sent data yet'
 
@@ -241,9 +246,27 @@ def application_add_device(appkey):
                     flash('Error: {}'.format(res[1]), 'danger')
                     return render_template(request.url)
                 else:
-                    return redirect(url_for('applications'))
+                    return redirect(url_for('application', appkey=appkey))
     else:
         return redirect(url_for('login'))
+
+
+@app.route('/application/<appkey>/device/<devid>/delete')
+def application_device_delete(appkey, devid):
+    if 'name' in session:
+        nq.delete_per_device(appkey, devid)
+        nfss = nfs.get_per_device(appkey, devid)
+        for nf in nfss[1]:
+            tr.delete(appkey, devid, nf[0])
+            tr.delete_function(appkey, devid, nf[0])
+            nfs.delete(appkey, devid, nf[0])
+
+        data.delete_table(appkey, devid)
+        res = dd.delete(appkey, devid)
+
+        return redirect(url_for('application', appkey=appkey))
+    else:
+        return redirect(utl_for('login'))
 
 
 @app.route('/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
@@ -348,9 +371,7 @@ def app_():
             session['appkey'] = request.args.get('appkey')
 
             ap = ad.get(session['appkey'])
-            print(ap)
             devs = dd.get_list(ap[1][1])
-            print(devs)
             session['appname'] = ap[1][0]
             
             if session['role'] == 'admin' or session['name'] == ap[1][2]:
@@ -762,7 +783,6 @@ def application_alerts(appkey):
     if 'name' in session:
         ap = ad.get(appkey)
         alerts = nfs.get_alerts_list(appkey)
-        print(alerts)
         return render_template('new/public/alerts.html', alert_list=alerts[1], app=ap[1])
     else:
         return redirect(url_for('login'))
@@ -800,7 +820,7 @@ def application_new_alert(appkey):
         return redirect(url_for('login'))
 
 
-@app.route('/application/<appkey>/remove-<ntype>')
+@app.route('/application/<appkey>/delete-<ntype>')
 def application_notification_remove(appkey, ntype):
     if 'name' in session:
         nq.delete(appkey, request.args.get('devid'), request.args.get('id'))
@@ -878,6 +898,27 @@ def application_settings(appkey):
                 secure = False
             
             res = ad.update(appkey, request.form['appname'], request.form['appdesc'], secure)
+        
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return render_template(request.url)
+        
+            return redirect(request.url)
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
+def application_device_settings(appkey, devid):
+    if 'name' in session:
+        if request.method == 'GET':
+            ap = ad.get(appkey)
+            dev = dd.get(appkey, devid)
+            dev_list = dd.get_list(appkey)
+
+            return render_template('new/public/device-settings.html', app=ap[1], dev=dev[1], free_ids=misc.prep_id_range(dev_list[1]))
+        elif request.method == 'POST':
+            res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'])
         
             if not res[0]:
                 flash('Error: {}'.format(res[1]), 'danger')

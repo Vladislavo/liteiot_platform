@@ -59,7 +59,22 @@ def delete_list(cur, appkey):
     cur.execute(query, (appkey,))
     
     return (True,)
-    
+
+
+@with_psql
+def delete_per_device(cur, appkey, devid):
+    query = """
+    DELETE FROM
+        notifications_queue
+    WHERE
+        app_key = %s
+    AND
+        dev_id = %s
+    """
+    cur.execute(query, (appkey, devid))
+        
+    return (True,)
+
 @with_psql
 def get_all(cur):
     query = """

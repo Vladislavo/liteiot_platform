@@ -1,0 +1,77 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} HPC&amp;A IoT - Device Settings {% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/applications">Applications</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/application/{{ app[1] }}">{{ app[0] }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
+{% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Device Settings</h3>
+            </div>
+            <div class="card-body">
+		<form action="/application/{{ app[1] }}/device/{{ dev[1] }}/settings" method="post" id="devsettings">
+			<div class="form-group">
+				<label>Name:</label><br>
+				<input type="text" maxlength="30" class="form-control" id="devname" name="devname" value="{{ dev[0] }}" required><br>
+			</div>
+			<div class="form-group">
+				<label>Description:</label><br>
+				<textarea id="devdesc" maxlength="200" class="form-control" name="devdesc" rows="5"></textarea>
+			</div>
+		</form>
+		<br>
+             	<div class="row" style="margin-top: 30px;">
+                  	<div class="col-lg-3">
+				<button type="submit" form="devsettings" class="btn btn-primary btn-block">Save</button>
+               		</div>
+               <div class="col-lg-3">
+               </div>
+               <div class="col-lg-3">
+               </div>
+               <div class="col-lg-3">
+               <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#exampleModal">Delete</button>
+               <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  	<div class="modal-dialog">
+                    		<div class="modal-content">
+                      			<div class="modal-header">
+                        			<h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+                        			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          				<span aria-hidden="true">&times;</span>
+                        			</button>
+                      			</div>
+                      			<div class="modal-body">
+                        			This action will remove permanently the device and its corresponding data.
+                      			</div>
+                      		<div class="modal-footer">
+                        	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<a href="/application/{{ app[1] }}/device/{{ dev[1] }}/delete"><button type="button" class="btn btn-danger">Delete Device</button></a>
+                      	</div>
+		</div>
+                  </div>
+                </div>
+               </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	document.getElementById("devdesc").value = "{{ dev[2] }}";
+</script>
+{% endblock %}
