@@ -137,7 +137,7 @@ def application(appkey):
 
 
 @app.route('/new-application', methods=['GET', 'POST'])
-def new_application():
+def application_create():
     if 'name' in session:
         if request.method == 'GET':
             return render_template('new/public/new-application.html')
@@ -145,7 +145,7 @@ def new_application():
             if request.form['appname'] == '':
                 flash('Application name cannot be empty.', 'danger')
                 return render_template(request.url)
-            else:
+            elif request.method == 'POST':
                 appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
                 secure_key = misc.gen_skey_b64(16)
                 secure = False
@@ -169,6 +169,28 @@ def new_application():
                 return redirect(url_for('applications'))
     else:
         return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
+
+
+@app.route('/application/<appkey>/delete')
+def application_delete(appkey):
+    if 'name' in session:
+        devs = dd.get_list(appkey)
+    
+        for dev in devs[1]:
+            data.delete_table(appkey, dev[1])
+    
+        dd.delete_table(appkey)
+    
+        res = ad.delete(appkey)
+    
+        if not res[0]:
+            flash('Error deleting application: {}'.format(res[1]), 'danger')
+            return redirect(url_for('application', appkey=appkey))
+        else:
+            flash('Application deleted.', 'success')
+            return redirect(url_for('applications'))
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/application/<appkey>/device/<devid>')
@@ -842,6 +864,30 @@ def application_new_automation(appkey):
         return redirect(url_for('login'))
 
 
+@app.route('/application/<appkey>/settings', methods=['GET', 'POST'])
+def application_settings(appkey):
+    if 'name' in session:
+        if request.method == 'GET':
+            ap = ad.get(appkey)
+
+            return render_template('new/public/application-settings.html', app=ap[1])
+        elif request.method == 'POST':
+            if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'on':
+                secure = True
+            else:
+                secure = False
+            
+            res = ad.update(appkey, request.form['appname'], request.form['appdesc'], secure)
+        
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return render_template(request.url)
+        
+            return redirect(request.url)
+    else:
+        return redirect(url_for('login'))
+
+
 @app.route('/alerts')
 def alerts():
     if 'name' in session:
@@ -849,6 +895,7 @@ def alerts():
         return render_template('old/public/alerts.html', alert_list=alerts[1])
     else:
         return redirect(url_for('index'))
+
 
 @app.route('/new-alert')
 def new_alert():
