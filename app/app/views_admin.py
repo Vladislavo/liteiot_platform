@@ -20,8 +20,6 @@ from app.helpers.misc import restricted
 
 MAX_PG = 5
 MAX_PG_ENTRIES_USERS = 10
-MAX_PG_ENTRIES_DATA = 10
-MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
 @app.route('/administration', methods=['GET', 'POST'])
 @restricted(access_level='admin')
@@ -40,4 +38,35 @@ def administration():
             app.config['USERS_SIGNUP'] = False
         
         return redirect(request.url)
+
+
+@app.route('/administration/users')
+@restricted(access_level='admin')
+def administration_users():
+    cur_pg = 1
+    users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])[1]
+
+    return render_template('new/admin/users.html', users=users)
+
+
+@app.route('/administration/users/<name>')
+@restricted(access_level='admin')
+def administration_users_user(name):
+    cur_pg = 1
+    users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])[1]
+
+    return render_template('new/admin/user.html', users=users)
+
+
+@app.route('/administration/users/table-<option>/<page>')
+@restricted(access_level='admin')
+def administration_users_table(option, page):
+    if option == 'filter':
+        users = ud.get_range_name(request.args.get('name'), [MAX_PG_ENTRIES_USERS, (int(page)-1)*MAX_PG_ENTRIES_USERS])[1]
+    elif option == 'page':
+        users = ud.get_range([MAX_PG_ENTRIES_USERS, (int(page)-1)*MAX_PG_ENTRIES_USERS])[1]
+
+    users = [[u[0],u[2]] for u in users]
+
+    return str(users), 200
 
