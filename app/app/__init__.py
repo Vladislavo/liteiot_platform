@@ -11,4 +11,5 @@ else:
 mail = Mail(app)
 
 from app import views
+from app import views_admin
 from app.helpers import maintainer

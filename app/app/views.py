@@ -612,8 +612,8 @@ def data_csv():
         return redirect(utl_for('index'))
 
 
-@app.route('/administration', methods=['GET', 'POST'])
-def administration():
+@app.route('/administration_old', methods=['GET', 'POST'])
+def administration_old():
     if 'role' in session and session['role'] == 'admin':
         user_cnt = ud.get_count()
         apps_cnt = ad.get_count()

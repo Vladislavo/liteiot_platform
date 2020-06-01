@@ -2,7 +2,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
 
-    SECRET_KEY = b'ksj^*(s90*Dklds;osdj'
+    SECRET_KEY = 'al1DuE8cFpk3EJNlFHG73Fd'
 
     DB_NAME = 'iotserver'
     DB_USERNAME = 'pi'

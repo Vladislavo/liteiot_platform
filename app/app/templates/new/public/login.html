@@ -34,7 +34,7 @@
           </div>
           <!-- Navbar items -->
           <ul class="navbar-nav ml-auto">
-		{% if users_signup %}
+		{% if config['USERS_SIGNUP'] %}
             <li class="nav-item">
               <a class="nav-link nav-link-icon" href="/register">
                 <i class="ni ni-circle-08"></i>
@@ -113,7 +113,7 @@
               <a href="#" class="text-light"><small>Forgot password?</small></a>
             </div>
             <div class="col-6 text-right">
-		    {% if users_signup %}
+		    {% if config['USERS_SIGNUP'] %}
               <a href="/register" class="text-light"><small>Create new account</small></a>
             	    {% endif %}
 	    </div>

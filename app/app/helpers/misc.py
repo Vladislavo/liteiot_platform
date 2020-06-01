@@ -1,9 +1,11 @@
 from app import app
+from flask import session,flash,redirect,url_for
 from binascii import hexlify
 import os
 import psycopg2
 import binascii
 from datetime import datetime
+from functools import wraps
 
 def rand_str(length):
     if length % 2 == 0:
@@ -74,6 +76,19 @@ def with_psql(f):
     
         return res
     return _with_psql
+
+
+def restricted(access_level):
+    def user_control(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'role' in session and session['role'] != access_level:
+                flash('Access level "{}" required for this page.'.format(access_level), 'danger')
+                return redirect(url_for('index'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return user_control
+
 
 def clean_data_folder():
     try:
