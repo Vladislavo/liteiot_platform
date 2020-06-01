@@ -6,6 +6,49 @@
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
 {% endblock %}
 
+{% block stats %}
+<!-- Header -->
+          <div class="row">
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Users</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ info[0] }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Applications</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ info[1] }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Devices</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ info[2] }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+	  {% endblock %}
+
+
 {% block body %}
     <!-- Page content -->
     <div class="container-fluid mt--7">
@@ -30,13 +73,7 @@
                   	<div class="col-lg-3">
 				<button type="submit" form="administration" class="btn btn-primary btn-block">Save</button>
                		</div>
-                     </div>
-                  </div>
                 </div>
-               </div>
-
-              </div>
-            </div>
           </div>
         </div>
       </div>

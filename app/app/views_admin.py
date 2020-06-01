@@ -29,7 +29,7 @@ def administration():
     if request.method == 'GET':
         user_cnt = ud.get_count()[1][0]
         apps_cnt = ad.get_count()[1][0]
-        devs_cnt = dd.get_count_all()
+        devs_cnt = dd.get_count_all()[1][0]
         info = [user_cnt, apps_cnt, devs_cnt]
 
         return render_template('new/admin/administration.html', info=info)
