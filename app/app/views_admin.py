@@ -200,6 +200,16 @@ def administration_users_user_application_new_alert(name, appkey):
             flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
             return redirect(request.url) 
 
+
+@app.route('/administration/users/<name>/application/<appkey>/automation')
+@restricted(access_level='admin')
+def administration_users_user_application_automation(name, appkey):
+    ap = ad.get(appkey)
+    ats = nfs.get_automation_list(appkey)
+    
+    return render_template('new/admin/user-application-automation.html', automations=ats[1], app=ap[1], user=name)
+
+
 @app.route('/administration/users/<name>/application/<appkey>/delete-<ntype>')
 @restricted(access_level='admin')
 def administration_users_user_application_notification_remove(name, appkey, ntype):
