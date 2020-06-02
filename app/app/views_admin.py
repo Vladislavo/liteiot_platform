@@ -171,6 +171,64 @@ def administration_users_user_application_alerts(name, appkey):
     return render_template('new/admin/user-application-alerts.html', alert_list=alerts[1], app=ap[1], user=name)
 
 
+@app.route('/administration/users/<name>/application/<appkey>/new-alert', methods=['GET', 'POST'])
+@restricted(access_level='admin')
+def administration_users_user_application_new_alert(name, appkey):
+    if request.method == 'GET':
+        ap = ad.get(appkey)
+        devs = dd.get_list(appkey)
+        
+        return render_template('new/admin/user-new-alert.html', devs=devs[1], app=ap[1], user=name)
+    elif request.method == 'POST':
+        # create new notification
+        nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
+        dev = dd.get(appkey, request.form['devid'])
+        
+        try:
+            desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
+            res = nfs.create(nid, appkey, request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
+            if res[0]:
+                # create new function and trigger
+                tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                tr.create(appkey, request.form['devid'], nid)
+                flash('Alert created', 'success')
+                return redirect(url_for('administration_users_user_application_alerts', name=name, appkey=appkey))
+            else:
+                flash('Error creating new alert: {}'.format(res[1]), 'danger')
+                return redirect(request.url) 
+        except Exception as e:
+            flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
+            return redirect(request.url) 
+
+@app.route('/administration/users/<name>/application/<appkey>/delete-<ntype>')
+@restricted(access_level='admin')
+def administration_users_user_application_notification_remove(name, appkey, ntype):
+    nq.delete(appkey, request.args.get('devid'), request.args.get('id'))
+    tr.delete(appkey, request.args.get('devid'), request.args.get('id'))
+    tr.delete_function(appkey, request.args.get('devid'), request.args.get('id'))
+    res = nfs.delete(appkey, request.args.get('devid'), request.args.get('id'))
+
+    if res[0]:
+        flash('{} removed'.format(ntype.capitalize()), 'success')
+        return '', 200
+    else:
+        flash('{} cannot be removed : {}'.format(ntype.capitalize(), res[1]), 'danger')
+        return '', 500
+
+
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>/variables')
+@restricted(access_level='admin')
+def administration_users_user_application_device_variables(name, appkey, devid):
+        last = data.get_last_n(appkey, devid, 1)
+        if last[0]:
+            select = '<select class="form-control" id="varname" name="varname" onchange="validate_form();" required>'
+            select += '<option value="-">Select Variable</option>'
+            for k in last[1][0][2]:
+                select += '<option>'+k+'</option>'
+            select += '</select>'
+            return select
+
+
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
 @restricted(access_level='admin')
 def administration_users_user_application_device_data(name, appkey, devid, var, dest, page):

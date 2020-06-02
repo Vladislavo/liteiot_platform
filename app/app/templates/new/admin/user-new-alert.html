@@ -1,0 +1,103 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} Administration - {{ name }} - {{ app[1] }} - New Alert HPC&amp;A IoT {% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+{% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">New Alert</h3>
+            </div>
+            <div class="card-body">
+		<form action="/administration/users/{{ user }}/application/{{ app[1] }}/new-alert" method="post">
+			<div class="form-group">
+				<label>Name:</label><br>
+				<input type="text" maxlength="30" class="form-control" id="alertname" name="alertname" required><br>
+			</div>
+			<h3> Condition: </h3>
+			<h4> IF </h4>
+			<select class="form-control" id="devid" name="devid" onchange="return ondev();" required>
+				<option default value="-">Select Device</option>
+				{% for d in devs %}
+				<option value="{{ d[1] }}">{{ d[0] }}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<select class="form-control" id="varname" name="varname" onchange="return validate_form();" required>
+				<option value="-">Select variable</option>
+			</select>
+			<br>
+			<select class='form-control notifelem' name='operation' id='operation' required>
+				<option default>></option>
+				<option>>=</option>
+				<option><</option>
+				<option><=</option>
+				<option>=</option>
+			</select>
+			<br>
+			<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>
+			<p> Use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean. <br>
+			Keep types consistently for each variable for both, alerts and automations. </p>
+
+			<br>
+			<h4> THEN </h4>
+			<h5> Send email to: </h5>
+
+			<input class="form-control" type="email" id="alertemail" name="alertemail" placeholder="Type email..." required>
+			<br><br>
+			<div class="form-group">
+				<button type="submit" id="submit" class="btn btn-primary">Create Alert</button>
+			</div>
+		</form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	$("#submit").prop("disabled", true);
+
+	function validate_form() {
+		var dev_sel = document.getElementById("devid");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
+		var var_sel = document.getElementById("varname");
+		var sel_var = var_sel.options[var_sel.selectedIndex].value;
+		
+		if (sel_op == "-" || sel_var == "-") {
+			$("#submit").prop("disabled", true);
+			console.log("not validated: "+sel_op+" "+sel_var);
+		} else {
+			$("#submit").prop("disabled", false);
+			console.log("validated: "+sel_op+" "+sel_var);
+		}
+	}
+	
+	function ondev() {
+		var dev_sel = document.getElementById("devid");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
+		if (sel_op != "-") {
+			fetch("/administration/users/{{ user }}/application/{{ app[1] }}/device/"+sel_op+"/variables").then(res => res.text()).then(data => $("#varname").html(data));
+		}
+		validate_form();
+	}
+</script>
+{% endblock %}

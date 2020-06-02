@@ -54,7 +54,7 @@
 		{% endif %}
 		<br>
                 <div class="col-lg-4">
-			<a href="/administration/{{ user }}/application/{{ app[1] }}/new-alert"><button class="btn btn-primary" type="submit">New Alert</button></a>
+			<a href="/administration/users/{{ user }}/application/{{ app[1] }}/new-alert"><button class="btn btn-primary" type="submit">New Alert</button></a>
 		</div>
 		
             </div>
@@ -67,7 +67,7 @@
 <script type="text/javascript">
 	function remove_alert(id, devid) {
 		$.ajax({
-			url:"/administration/{{ name }}/application/{{ app[1] }}/delete-alert?id="+id+"&devid="+devid,
+			url:"/administration/users/{{ user }}/application/{{ app[1] }}/delete-alert?id="+id+"&devid="+devid,
 			type:"get",
 			success: function() {
 				location.reload();
