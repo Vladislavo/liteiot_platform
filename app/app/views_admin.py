@@ -74,6 +74,16 @@ def administration_users_user_applications(name):
     return render_template('new/admin/user-applications.html', apps=apps, user=name)
 
 
+@app.route('/administration/users/<name>/application/<appkey>')
+@restricted(access_level='admin')
+def administration_users_user_application(name, appkey):
+    ap = list(ad.get(appkey)[1])
+    ap[5] = misc.skey_b64_to_hex(ap[5])
+    devs = dd.get_list(ap[1])[1]
+
+    return render_template('new/admin/user-application.html', app=ap, devs=devs, user=name)
+
+
 @app.route('/administration/users/<name>/chart-update')
 @restricted(access_level='admin')
 def administration_users_user_chart_update(name):

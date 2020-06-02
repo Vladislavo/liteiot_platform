@@ -1,0 +1,126 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} HPC&amp;A IoT - {{ app[1] }} {% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+{% endblock %}
+
+{% block stats %}
+<!-- Card stats -->
+  <div class="row">
+    <div class="col-xl-4 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Name</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ app[0] }}</span>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">App-Key</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ app[1] }}</span>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Secure</h5>
+	      <span class="h2 font-weight-bold mb-0">{% if app[4] %} Yes {% else %} No {% endif %}</span>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="col-lg-12 col-md-6" style="margin-bottom : 30px;">
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Description</h5>
+			<p class="card-text">{{ app[3] }}</p>
+                      </div>
+                    </div>
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Security key (HEX)</h5>
+			<p class="card-text">{{ app[5] }}</p>
+                      </div>
+                    </div>
+                </div>
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Devices</h3>
+            </div>
+              <div class="row icon-examples">
+		{% if devs %}
+		{% for d in devs %}
+                <div class="col-lg-3 col-md-6">
+		    <button type="button" class="btn-icon-clipboard" data-clipboard-text="atom" title="{{ d[0] }}">
+                    <div>
+                      <i class="ni ni-atom"></i>
+		      <span><a href="./{{ app[1] }}/device/{{ d[1] }}">{{ d[0] }}</a></span>
+                    </div>
+                  </button>
+                </div>
+		{% endfor %}
+		{% else %}
+                <div class="col-lg-12 col-md-12">
+		<center><p> There are no registered devices yet. </p></center>
+		</div>
+		{% endif %}
+
+	      </div>	
+              <div class="row" style="margin-top: 30px;">
+                  <div class="col-lg-3">
+		<a href="./{{ app[1] }}/add-device"><button type="submit" class="btn btn-primary btn-block">Add device</button></a>
+               </div>
+               <div class="col-lg-3">
+		       <a href="./{{ app[1] }}/alerts"><button type="submit" class="btn btn-primary btn-block">Alerts</button></a>
+	       </div>
+               <div class="col-lg-3">
+		<a href="./{{ app[1] }}/automation"><button type="submit" class="btn btn-primary btn-block">Automation</button></a>
+               </div>
+               <div class="col-lg-3">
+		<a href="./{{ app[1] }}/settings"><button type="submit" class="btn btn-primary btn-block">Settings</button></a>
+               </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
