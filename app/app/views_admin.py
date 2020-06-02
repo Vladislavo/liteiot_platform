@@ -516,3 +516,62 @@ def administration_users_new_user():
             else:
                 return redirect(url_for('administration/users', name=username))
 
+
+@app.route('/administration/users/<name>/settings', methods=['GET', 'POST'])
+@restricted(access_level='admin')
+def administration_users_user_settings(name):
+    if request.method == 'GET':
+        return render_template('new/admin/user-settings.html', user=name)
+    else:
+        if request.form['name'] != name:
+            res = ud.update_name(name, request.form['name'])
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return redirect(request.url);
+        if request.form['password'] != '':
+            res = ud.update_password(name, request.form['password'].encode('utf-8'))
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return redirect(request.url)
+
+        flash('Settings successfully saved.', 'success')
+        return redirect(request.url)
+
+
+@app.route('/administration/users/<name>/delete-account')
+@restricted(access_level='admin')
+def administration_users_user_delete_account(name):
+    user = ud.get(name)
+    if user[0] and user[1][2] != 'admin':
+        app_list = ad.get_list(user[1][0])
+
+        res = (True,)
+        if app_list[0]:
+            for app in app_list[1]:
+                devs = dd.get_list(app[1])
+                for dev in devs[1]:
+                    res = data.delete_table(app[1], dev[1])
+                    if not res[0]:
+                        break
+    
+                if res[0]:
+                    res = dd.delete_table(app[1])
+                    
+                if res[0]:
+                    res = ad.delete(app[1])
+
+                if not res[0]:
+                    break
+
+        if res[0]:
+            res = ud.delete(user[1][0])
+
+        if not res[0]:
+            flash('Error: {}'.format(res[1]), 'danger')
+            return render_template('new/admin/user-settings.html', user=name)
+        else:
+            flash('User {} was successfully deleted'.format(name), 'success')
+            return redirect(url_for('administration_users'))
+    else:
+        flash('Warning: the user is admin or does not exist.' ,'danger')
+        return redirect(url_for('administration_users_user_settings', name=name))

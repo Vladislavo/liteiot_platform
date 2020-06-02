@@ -13,7 +13,7 @@ def get_user_data_count(cur, username):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
     
-    if apps != [] and devs != []:
+    if apps != [] and devs != [[]]:
         query = 'WITH t AS ('
         i = 0
         for a in apps:
@@ -38,7 +38,7 @@ def get_user_data_count_per_hour(cur, username, hour):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
 
-    if apps != [] and devs != []:
+    if apps != [] and devs != [[]]:
         utc_hour = utc_roundhour(hour)
 
         query = 'WITH t AS ('
@@ -66,7 +66,7 @@ def get_user_data_count_per_hour_period(cur, username, period):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
 
-    if apps != [] and devs != []:
+    if apps != [] and devs != [[]]:
         utc_hour = [utc_roundhour(x) for x in range(period,-1,-1)]
         query = 'WITH t AS ('
         i = 0
@@ -97,7 +97,7 @@ def get_user_data_count_per_day(cur, username, day=0):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
 
-    if apps != [] and devs != []:
+    if apps != [] and devs != [[]]:
         utc_day = utc_roundday(day)
 
         query = 'WITH t AS ('
@@ -124,7 +124,7 @@ def get_user_data_count_per_day_period(cur, username, period):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
 
-    if apps != [] and devs != []:
+    if apps != [] and devs != [[]]:
         utc_hour = [utc_roundday(x) for x in range(period,-1,-1)]
 
         query = 'WITH t AS ('
@@ -155,7 +155,7 @@ def get_recent_activity(cur, username, n=5):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
     
-    if apps != [] and devs != []:
+    if apps != [] and devs != [[]]:
         query = ''
         for a in apps:
             devs = dd.get_list(a[1])

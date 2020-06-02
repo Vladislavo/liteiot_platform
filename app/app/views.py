@@ -647,10 +647,10 @@ def user():
         return render_template('old/public/index.html')
 
 
-@app.route('/user-delete')
-def user_delete():
+@app.route('/delete-account')
+def delete_account():
     user = ud.get(request.args.get('name'))
-    if user[0] and user[1][2] != 'admin' and session['role'] == 'admin':
+    if user[0] and user[1][2] != 'admin':
         app_list = ad.get_list(user[1][0])
 
         res = (True,)
@@ -678,19 +678,17 @@ def user_delete():
             flash('Error: {}'.format(res[1]), 'danger')
             return render_template('old/admin/user.html', username=user[1][0])
         else:
-                return redirect(url_for('administraion'))
+            flash('User {} was successfully deleted'.format(request.args.get('name')), 'success')
+            return redirect(url_for('login'))
     else:
-        flash('Warning: the user is admin or does not exist.' ,'warning')
-        return redirect(url_for('index'))
+        flash('Warning: the user is admin or does not exist.' ,'danger')
+        return redirect(url_for('settings'))
 
 
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'GET':
-        if session['role'] == 'admin':
-            return render_template('old/admin/settings.html', username=session['name'])
-        else:
-            return render_template('old/public/settings.html', username=session['name'])
+        return render_template('new/public/settings.html', user=session['name'])
     else:
         if request.form['name'] != session['name']:
             res = ud.update_name(session['name'], request.form['name'])
@@ -704,13 +702,8 @@ def settings():
             if not res[0]:
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
-        if session['role'] == 'admin':
-            if request.form.getlist('users_signup') and request.form.getlist('users_signup')[0] == 'us':
-                app.config['USERS_SIGNUP'] = True
-            else:
-                app.config['USERS_SIGNUP'] = False
 
-
+        flash('Settings successfully saved.', 'success')
         return redirect(request.url)
 
 

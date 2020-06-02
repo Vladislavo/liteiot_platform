@@ -1,0 +1,106 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} Administration - {{ user }} - Settings - HPC&amp;A IoT {% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/settings">Settings</a>
+{% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">User Settings</h3>
+            </div>
+            <div class="card-body">
+		<form action="/administration/users/{{ user }}/settings" method="post" id="settings">
+			<div class="form-group">
+				<label>Name:</label><br>
+				<input type="text" maxlength="30" class="form-control" id="name" name="name" value="{{ user }}" style="pointer-events: none;"><br>
+			</div>
+			<br>
+			<div class="form-group">
+			  <div class="input-group input-group-alternative">
+			    <div class="input-group-prepend">
+			      <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+			    </div>
+			    <input class="form-control" placeholder="Password" type="password" minlength="8" id="password" name="password" onkeyup="return validate_password();">
+			  </div>
+			</div>
+			<div class="form-group">
+			  <div class="input-group input-group-alternative">
+			    <div class="input-group-prepend">
+			      <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+			    </div>
+			    <input class="form-control" placeholder="Repeat password" type="password" minlength="8" id="rpassword" name="rpassword" onkeyup="return validate_password();">
+			  </div>
+			</div>
+			<div class="text-muted font-italic"><small>Required password strength: <span class="text-success font-weight-700">At least 8 characters.</span></small></div>
+			<div class="text-muted font-italic"><small id="passvalidation"></small></div>
+			
+			<br>
+		</form>
+             	<div class="row" style="margin-top: 30px;">
+                  	<div class="col-lg-3">
+				<button type="submit" form="settings" id="submit" class="btn btn-primary btn-block">Save</button>
+               		</div>
+               <div class="col-lg-3">
+               </div>
+               <div class="col-lg-3">
+               </div>
+               <div class="col-lg-3">
+               <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#exampleModal">Delete</button>
+               <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  	<div class="modal-dialog">
+                    		<div class="modal-content">
+                      			<div class="modal-header">
+                        			<h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+                        			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          				<span aria-hidden="true">&times;</span>
+                        			</button>
+                      			</div>
+                      			<div class="modal-body">
+                        			This action will remove permanently the account, applications and all its devices with their corresponding data.
+                      			</div>
+                      		<div class="modal-footer">
+                        	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<a href="/administration/users/{{ user }}/delete-account"><button type="button" class="btn btn-danger">Delete Account</button></a>
+                      	</div>
+		</div>
+                  </div>
+                </div>
+               </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    var password = document.getElementById("password");
+    var rpassword = document.getElementById("rpassword");
+
+    function validate_password() {
+      if (password.value != rpassword.value) {
+	$("#passvalidation").html("<span class='text-danger font-weight-700'>Passwords do not match.</span>");
+	$("#submit").prop("disabled", true);
+      } else {
+	$("#passvalidation").html("<span class='text-success font-weight-700'>Passwords match.</span>");
+	$("#submit").prop("disabled", false);
+      }
+    }
+</script>
+{% endblock %}
