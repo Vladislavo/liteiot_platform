@@ -67,6 +67,13 @@ def administration_users_user(name):
     return render_template('new/admin/user-dashboard.html', info=info, user=name)
 
 
+@app.route('/administration/users/<name>/applications')
+@restricted(access_level='admin')
+def administration_users_user_applications(name):
+    apps = ad.get_list(name)[1]
+    return render_template('new/admin/user-applications.html', apps=apps, user=name)
+
+
 @app.route('/administration/users/<name>/chart-update')
 @restricted(access_level='admin')
 def administration_users_user_chart_update(name):

@@ -102,8 +102,6 @@ def applications():
     if 'name' in session:
         apps = ad.get_list(session['name'])
        
-        session.pop('appkey', None)
-        
         return render_template('new/public/applications.html', apps=apps[1])
     else:
         return redirect(url_for('login'))
