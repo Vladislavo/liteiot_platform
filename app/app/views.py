@@ -435,7 +435,7 @@ def dev():
         
                 last = data.get_last_n(session['appkey'], session['devid'], 1)
         
-                ltup = 'Device have not sent data yet'
+                ltup = 'Device has not sent data yet'
 
                 if last[0]:
                     ltup = last[1][0][1]

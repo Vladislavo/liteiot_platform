@@ -77,6 +77,7 @@ def administration_users_user_applications(name):
 
 
 @app.route('/administration/users/<name>/new-application', methods=['GET', 'POST'])
+@restricted(access_level='admin')
 def administration_users_user_application_create(name):
     if request.method == 'GET':
         return render_template('new/admin/user-new-application.html', user=name)
@@ -118,6 +119,30 @@ def administration_users_user_application(name, appkey):
     return render_template('new/admin/user-application.html', app=ap, devs=devs, user=name)
 
 
+@app.route('/administration/users/<name>/application/<appkey>/add-device', methods=['GET', 'POST'])
+@restricted(access_level='admin')
+def administration_users_user_application_add_device(name, appkey):
+    if request.method == 'GET':
+        ap = ad.get(appkey)
+        dev_list = dd.get_list(appkey)
+        return render_template('new/admin/user-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), user=name)
+    elif request.method == 'POST':
+        res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'])
+
+        if not res[0]:
+            flash('Error: {}'.format(res[1]), 'danger')
+            return render_template(request.url)
+        else:
+            res = data.create_table(appkey, request.form['devid'])
+        
+            if not res[0]:
+                dd.delete(appkey, request.form['devid'])
+                flash('Error: {}'.format(res[1]), 'danger')
+                return render_template(request.url)
+            else:
+                return redirect(url_for('administration_users_user_application', name=name, appkey=appkey))
+
+
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>')
 @restricted(access_level='admin')
 def administration_users_user_application_device(name, appkey, devid):
@@ -127,7 +152,7 @@ def administration_users_user_application_device(name, appkey, devid):
     ld = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, 0])
     cnt = data.get_count(appkey, devid)
 
-    ltup = 'Device have not any sent data yet'
+    ltup = 'Device has not any sent data yet'
 
     if ld[0] and ld[1][0] != []:
         ltup = ld[1][0][1]
