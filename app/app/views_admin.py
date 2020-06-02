@@ -164,6 +164,41 @@ def administration_users_user_application_device(name, appkey, devid):
         return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, data=[], total=cnt[1][0], user=name)
 
 
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
+@restricted(access_level='admin')
+def administration_users_user_application_device_settings(name, appkey, devid):
+    if request.method == 'GET':
+        ap = ad.get(appkey)
+        dev = dd.get(appkey, devid)
+        dev_list = dd.get_list(appkey)
+
+        return render_template('new/admin/user-application-device-settings.html', app=ap[1], dev=dev[1], free_ids=misc.prep_id_range(dev_list[1]), user=name)
+    elif request.method == 'POST':
+        res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'])
+    
+        if not res[0]:
+            flash('Error: {}'.format(res[1]), 'danger')
+            return render_template(request.url)
+    
+        return redirect(request.url)
+
+
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>/delete')
+@restricted(access_level='admin')
+def administration_users_user_application_device_delete(name, appkey, devid):
+    nq.delete_per_device(appkey, devid)
+    nfss = nfs.get_per_device(appkey, devid)
+    for nf in nfss[1]:
+        tr.delete(appkey, devid, nf[0])
+        tr.delete_function(appkey, devid, nf[0])
+        nfs.delete(appkey, devid, nf[0])
+
+    data.delete_table(appkey, devid)
+    res = dd.delete(appkey, devid)
+
+    return redirect(url_for('administration_users_user_application', name=name, appkey=appkey))
+
+
 @app.route('/administration/users/<name>/application/<appkey>/alerts')
 @restricted(access_level='admin')
 def administration_users_user_application_alerts(name, appkey):
