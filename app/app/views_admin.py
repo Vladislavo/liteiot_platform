@@ -210,6 +210,39 @@ def administration_users_user_application_automation(name, appkey):
     return render_template('new/admin/user-application-automation.html', automations=ats[1], app=ap[1], user=name)
 
 
+@app.route('/administration/users/<name>/application/<appkey>/new-automation', methods=['GET', 'POST'])
+@restricted(access_level='admin')
+def administration_users_user_application_new_automation(name, appkey):
+    if request.method == 'GET':
+        ap = ad.get(appkey)
+        devs = dd.get_list(appkey)
+        
+        return render_template('new/admin/user-application-new-automation.html', devs=devs[1], app=ap[1], user=name)
+    elif request.method == 'POST':
+        # create new notification
+        nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
+        dev = dd.get(appkey, request.form['devid'])
+        adev = dd.get(appkey, request.form['adevid'])
+        
+        try:
+            desc = 'IF '+dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']+' THEN '+adev[1][0]+'.confID_'+request.form['confid']+' = '+request.form['arg']
+            # action format: '<devid>#<confid>#<arg>'
+            action = request.form['adevid']+'#'+request.form['confid']+'#'+request.form['arg']
+            res = nfs.create(nid, appkey, request.form['devid'], request.form['automationname'], desc, 'automation', action)
+            if res[0]:
+                # create new function and trigger
+                tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                tr.create(appkey, request.form['devid'], nid)
+                flash('Automation created', 'success')
+                return redirect(url_for('administration_users_user_application_automation', name=name, appkey=appkey))
+            else:
+                flash('Error creating new alert: {}'.format(res[1]), 'danger')
+                return redirect(request.url) 
+        except Exception as e:
+            flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
+            return redirect(request.url) 
+
+
 @app.route('/administration/users/<name>/application/<appkey>/delete-<ntype>')
 @restricted(access_level='admin')
 def administration_users_user_application_notification_remove(name, appkey, ntype):
