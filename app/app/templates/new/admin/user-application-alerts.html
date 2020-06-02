@@ -1,0 +1,79 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} Administration - Users - Application - Alerts - HPC&amp;A IoT {% endblock %}
+
+{% block header %} 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> 
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+{% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+{% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Alerts</h3>
+            </div>
+            <div class="card-body">
+		{% if alert_list %}
+		<table class="table">
+			<thead>
+				<th> Name </th>
+				<th> Condition </th>
+				<th> Email </th>
+				<th> </th>
+			</thead>
+			<tbody>
+				{% for a in alert_list %}
+				<tr>
+					<th> {{ a[3] }} </th>
+					<th> {{ a[4] }} </th>
+					<th> {{ a[6] }} </th>
+					<th> <a href="javascript:void(0)" onclick="return remove_alert('{{ a[0] }}', '{{ a[2] }}');"> <span class="fa fa-remove"</span> </a> </th>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		{% else %}
+		<center><p> There are no alerts for the given application.</p> </center>
+		{% endif %}
+		<br>
+                <div class="col-lg-4">
+			<a href="/administration/{{ user }}/application/{{ app[1] }}/new-alert"><button class="btn btn-primary" type="submit">New Alert</button></a>
+		</div>
+		
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	function remove_alert(id, devid) {
+		$.ajax({
+			url:"/administration/{{ name }}/application/{{ app[1] }}/delete-alert?id="+id+"&devid="+devid,
+			type:"get",
+			success: function() {
+				location.reload();
+			}
+		});
+	}
+</script>
+
+{% endblock %}

@@ -163,6 +163,14 @@ def administration_users_user_application_device(name, appkey, devid):
         return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, data=[], total=cnt[1][0], user=name)
 
 
+@app.route('/administration/users/<name>/application/<appkey>/alerts')
+@restricted(access_level='admin')
+def administration_users_user_application_alerts(name, appkey):
+    ap = ad.get(appkey)
+    alerts = nfs.get_alerts_list(appkey)
+    return render_template('new/admin/user-application-alerts.html', alert_list=alerts[1], app=ap[1], user=name)
+
+
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
 @restricted(access_level='admin')
 def administration_users_user_application_device_data(name, appkey, devid, var, dest, page):
