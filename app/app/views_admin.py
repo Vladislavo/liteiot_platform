@@ -243,6 +243,55 @@ def administration_users_user_application_new_automation(name, appkey):
             return redirect(request.url) 
 
 
+@app.route('/administration/users/<name>/application/<appkey>/delete')
+@restricted(access_level='admin')
+def administration_users_user_application_delete(name, appkey):
+    devs = dd.get_list(appkey)
+
+    for dev in devs[1]:
+        data.delete_table(appkey, dev[1])
+        # delete notifications
+        nq.delete_per_device(appkey, dev[1])
+        nfss = nfs.get_per_device(appkey, dev[1])
+        for nf in nfss[1]:
+            tr.delete(appkey, dev[1], nf[0])
+            tr.delete_function(appkey, dev[1], nf[0])
+            nfs.delete(appkey, dev[1], nf[0])
+
+    dd.delete_table(appkey)
+
+    res = ad.delete(appkey)
+
+    if not res[0]:
+        flash('Error deleting application: {}'.format(res[1]), 'danger')
+        return redirect(url_for('administration_users_user_application_settings', name=name, appkey=appkey))
+    else:
+        flash('Application deleted.', 'success')
+        return redirect(url_for('administration_users_user_applications', name=name))
+
+
+@app.route('/administration/users/<name>/application/<appkey>/settings', methods=['GET', 'POST'])
+@restricted(access_level='admin')
+def administration_users_user_application_settings(name, appkey):
+    if request.method == 'GET':
+        ap = ad.get(appkey)
+
+        return render_template('new/admin/user-application-settings.html', app=ap[1], user=name)
+    elif request.method == 'POST':
+        if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'on':
+            secure = True
+        else:
+            secure = False
+        
+        res = ad.update(appkey, request.form['appname'], request.form['appdesc'], secure)
+    
+        if not res[0]:
+            flash('Error: {}'.format(res[1]), 'danger')
+            return render_template(request.url)
+    
+        return redirect(request.url)
+
+
 @app.route('/administration/users/<name>/application/<appkey>/delete-<ntype>')
 @restricted(access_level='admin')
 def administration_users_user_application_notification_remove(name, appkey, ntype):
