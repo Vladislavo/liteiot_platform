@@ -1,0 +1,206 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} User Device - HPC&amp;A IoT {% endblock %}
+
+{% block header %} 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
+
+{% block location %}
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
+{% endblock %}
+
+{% block stats %}
+<!-- Header -->
+          <div class="row">
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Name</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ dev[0] }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Device ID</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ dev[1] }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Last time up</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ ltup }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+	  {% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="col-lg-12 col-md-6" style="margin-bottom : 30px;">
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Description</h5>
+			<p class="card-text">{{ dev[2] }}</p>
+                      </div>
+                    </div>
+                </div>
+		{% if data %}
+                <div>
+                  <ul class="nav nav-pills" id="pills-tab" role="tablist">
+		  {% for k in data[0][2] %}
+                      <li class="nav-item col-lg-3 col-md-6" role="presentation">
+			      <a class="nav-link" id="tab_{{ k }}" data-toggle="pill" href="#{{ k }}" role="tab" aria-controls="{{ k }}" aria-selected="true" onclick="display_data('{{ k }}')">{{ k }}</a>
+                      </li>
+		  {% endfor %}
+                  </ul>
+
+                  <div class="tab-content" id="pills-tabContent">
+		      {% for k in data[0][2] %}
+		      <div class="tab-pane fade card" id="{{ k }}" style="margin-top: 30px;" role="tabpanel" aria-labelledby="tab_{{ k }}">
+			<div class="card-body">
+              		      <h3 class="mb-0 card-header">Last 24 hours data</h3>
+			      <center>
+				<div id="curve_chart_{{ k }}"></div>
+			      </center>
+			      <p> Total: <strong> {{ total }} </strong> messages. </p>
+			      <table class="table" id="table_{{ k }}">
+				      <thead> 
+					      <th> Timestamp </th>
+				      	      <th> {{ k }} </th>
+				      </thead>
+				      <tbody id="table_{{ k }}_body">
+				      </tbody>
+			      </table>
+			      <center><a href="javascript:void(0);" onclick="return table_load_more('{{ k }}');">Load more</a></center>
+		        </div>
+		      </div>
+		      {% endfor %}
+                  </div>
+                </div>
+		{% else %}
+               <div class="col-lg-12">
+               		<p> Device has not sent any data yet. </p>
+	       </div>
+	       {% endif %}
+
+
+              <div class="row" style="margin-top: 30px;">
+               <div class="col-lg-4">
+		       <a href="./{{ dev[1] }}/configure"><button type="submit" class="btn btn-primary btn-block">Configure</button></a>
+               </div>
+               <div class="col-lg-4">
+		       <a href="./{{ dev[1] }}/download-csv"<button type="submit" class="btn btn-primary btn-block">Download CSV</button></a>
+               </div>
+               <div class="col-lg-4">
+		       <a href="./{{ dev[1] }}/settings"<button type="submit" class="btn btn-primary btn-block">Settings</button></a>
+               </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block script %}
+{% if data %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script type="text/javascript">
+	google.charts.load('current', {'packages':['corechart']});
+	google.charts.setOnLoadCallback(show_first_page);	
+
+	function init_scroll() {
+		var ts = {
+			{% for k in data[0][2] %}
+			{{ k }} : 1,
+			{% endfor %}
+		};
+		return ts;
+	}
+
+	var tscroll = init_scroll();
+     
+	function drawChart(dname, ddata) {
+		var data = google.visualization.arrayToDataTable(ddata);
+
+		var options = {
+			title: '{{ dev[0] }} > '+dname,
+          		curveType: 'function',
+			hAxis: { 
+				format: 'dd/MM hh:mm'
+			},
+			vAxis: {
+				format: 'decimal',
+				scaleType: 'linear',
+				textPosition: 'out'
+			},
+			legend: { position: 'none' },
+			height: 600,
+			/* width: 900, */
+			// interpolateNulls: true,
+			chartArea: { left: '5%', width: '90%', height: '80%' }
+        	};
+
+		var container = document.getElementById('curve_chart_'+dname);
+		var chart = new google.visualization.LineChart(container);
+		chart.draw(data, options);
+	}
+
+	function display_data(dname) {
+  		// Declare all variables
+  		var i, tabcontent, tablinks;
+
+		tscroll = init_scroll();
+
+		fetch('/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/graph/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
+		fetch('/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').html(data));
+	}
+	
+	function show_first_page() {
+		document.getElementById("tab_{{ data[0][2] | first }}").click();
+	}
+	
+	function table_load_more(dname) {
+		tscroll[dname] += 1;
+		fetch('/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').append(data));
+		fetch('/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => console.log(data));
+	}
+</script>
+{% endif %}
+{% endblock %}

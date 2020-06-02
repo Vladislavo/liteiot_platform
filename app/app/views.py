@@ -187,7 +187,7 @@ def application_delete(appkey):
 def application_device(appkey, devid):
     if 'name' in session:
         ap = ad.get(appkey)
-        if session['role'] == 'admin' or session['name'] == ap[1][2]:
+        if session['name'] == ap[1][2]:
             dev = dd.get(appkey, devid)
 
             session['devid'] = int(dev[1][1])

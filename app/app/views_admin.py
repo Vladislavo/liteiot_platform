@@ -21,6 +21,8 @@ import app.helpers.misc as misc
 
 MAX_PG = 5
 MAX_PG_ENTRIES_USERS = 10
+MAX_PG_ENTRIES_DATA = 10
+MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
 @app.route('/administration', methods=['GET', 'POST'])
 @restricted(access_level='admin')
@@ -74,6 +76,38 @@ def administration_users_user_applications(name):
     return render_template('new/admin/user-applications.html', apps=apps, user=name)
 
 
+@app.route('/administration/users/<name>/new-application', methods=['GET', 'POST'])
+def administration_users_user_application_create(name):
+    if request.method == 'GET':
+        return render_template('new/admin/user-new-application.html', user=name)
+    elif request.method == 'POST':
+        if request.form['appname'] == '':
+            flash('Application name cannot be empty.', 'danger')
+            return render_template(request.url)
+        elif request.method == 'POST':
+            appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
+            secure_key = misc.gen_skey_b64(16)
+            secure = False
+
+            if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'on':
+                secure = True
+
+            res = ad.create(request.form['appname'], appkey, name, request.form['appdesc'], secure, secure_key)
+        
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return render_template(request.url)
+        
+            res = dd.create_table(appkey)
+        
+            if not res[0]:
+                ad.delete(appkey)
+                flash('Error: {}'.format(res[1]), 'danger')
+                return render_template(request.url)
+        
+            return redirect(url_for('administration_users_user_applications', name=name))
+
+
 @app.route('/administration/users/<name>/application/<appkey>')
 @restricted(access_level='admin')
 def administration_users_user_application(name, appkey):
@@ -82,6 +116,47 @@ def administration_users_user_application(name, appkey):
     devs = dd.get_list(ap[1])[1]
 
     return render_template('new/admin/user-application.html', app=ap, devs=devs, user=name)
+
+
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>')
+@restricted(access_level='admin')
+def administration_users_user_application_device(name, appkey, devid):
+    ap = ad.get(appkey)
+    dev = dd.get(appkey, devid)
+
+    ld = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, 0])
+    cnt = data.get_count(appkey, devid)
+
+    ltup = 'Device have not any sent data yet'
+
+    if ld[0] and ld[1][0] != []:
+        ltup = ld[1][0][1]
+
+    if ld[0]: 
+        return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, data=ld[1], total=cnt[1][0], user=name)
+    else:
+        return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, data=[], total=cnt[1][0], user=name)
+
+
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
+@restricted(access_level='admin')
+def administration_users_user_application_device_data(name, appkey, devid, var, dest, page):
+    if dest == 'graph':
+        last = data.get_last_hours(appkey, devid, MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
+        arr = '[["Time", "{}"],'.format(var)
+        if last[0]:
+            for d in last[1]:
+                arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
+            arr += ']'
+        return arr
+    elif dest == 'table':
+        # for table <cnt> is in items
+        last = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, (int(page)-1)*MAX_PG_ENTRIES_DATA])
+        t = ''
+        if last[0]:
+            for d in last[1]:
+                t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
+        return t
 
 
 @app.route('/administration/users/<name>/chart-update')
