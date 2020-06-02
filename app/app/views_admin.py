@@ -16,7 +16,7 @@ import app.dao.misc.misc as md
 from app.helpers.misc import restricted
 import app.helpers.misc as misc
 
-#import binascii
+import binascii
 
 
 MAX_PG = 5
@@ -340,6 +340,45 @@ def administration_users_user_application_device_data(name, appkey, devid, var, 
             for d in last[1]:
                 t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
+
+
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
+@restricted(access_level='admin')
+def administration_users_user_application_device_configuration(name, appkey, devid):
+    if request.method == 'GET':
+        pend_msgs = pend.get_list(appkey, devid)
+        ap = ad.get(appkey)[1]
+        dev = dd.get(appkey, devid)[1]
+        if pend_msgs[0]:
+            config_list = []
+
+            for pm in pend_msgs[1]:
+                cntt = binascii.a2b_base64(pm[2])
+                config_id = int(cntt[0])
+                config_args = cntt[2:(len(cntt)-1)].decode('utf-8')
+                ack = pm[3]
+                config_list.append((config_id, config_args, ack, pm[2]))
+        
+        return render_template('new/admin/user-application-device-configuration.html', dev=dev, app=ap, config_list=config_list, user=name)
+    elif request.method == 'POST':
+        base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
+        pend.create(appkey, devid, base64_args)
+        
+        flash('Message enqueued', 'success')
+        return '', 201
+
+
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>/remove-configuration')
+@restricted(access_level='admin')
+def administration_users_user_application_device_configuration_remove(name, appkey, devid):
+    res = pend.delete(appkey, devid, request.args.get('conf')+'_')
+
+    if res[0]:
+        flash('Configuration message successfully removed.','success')
+    else:
+        flash('Error removing configuration message: {}'.format(res[1]), 'danger')
+    
+    return '', 200
 
 
 @app.route('/administration/users/<name>/chart-update')

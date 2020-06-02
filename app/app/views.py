@@ -488,7 +488,7 @@ def dev_conf():
         return redirect(url_for('index'))
 
 @app.route('/application/<appkey>/device/<devid>/remove-configuration')
-def dev_conf_rm(appkey, devid):
+def application_device_configuration_remove(appkey, devid):
     if 'name' in session:
         res = pend.delete(appkey, devid, request.args.get('conf')+'_')
 
