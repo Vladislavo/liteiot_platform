@@ -1,6 +1,6 @@
 from app import app
 
-from flask import render_template, request, redirect, url_for, session, flash
+from flask import render_template, request, redirect, url_for, session, flash, after_this_request, send_from_directory
 
 import app.dao.user.user as ud
 import app.dao.application.application as ad
@@ -17,6 +17,7 @@ from app.helpers.misc import restricted
 import app.helpers.misc as misc
 
 import binascii
+import os
 
 
 MAX_PG = 5
@@ -379,6 +380,41 @@ def administration_users_user_application_device_configuration_remove(name, appk
         flash('Error removing configuration message: {}'.format(res[1]), 'danger')
     
     return '', 200
+
+
+@app.route('/administration/users/<name>/application/<appkey>/device/<devid>/download-csv')
+@restricted(access_level='admin')
+def administration_users_user_application_device_download_csv(name, appkey, devid):
+    @after_this_request
+    def clean_data_folder(response):
+        try:
+            filelist = [f for f in os.listdir(app.config['DATA_DOWNLOAD_DIR_OS'])]
+            for f in filelist:
+                os.remove(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+f)
+        except OSError:
+            pass
+        return response
+    dumpd = data.get_all(appkey, devid)
+    ap = ad.get(appkey)[1]
+    dev = dd.get(appkey, devid)[1]
+
+    fn = ap[0]+ '-' +dev[0]+ '-data.csv'
+
+    with open(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+fn, 'w+') as f: 
+        f.write('utc,timestamp,')
+        for d in dumpd[1][0][2]:
+            f.write(d)
+            f.write(',')
+        f.write('\n')
+    
+        for row in dumpd[1]:
+            f.write('{},{},'.format(row[0],row[1]))
+            for v in row[2]:
+                f.write(str(row[2][v]))
+                f.write(',')
+            f.write('\n')
+
+    return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
 
 
 @app.route('/administration/users/<name>/chart-update')
