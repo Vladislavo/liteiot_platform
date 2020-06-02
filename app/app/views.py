@@ -36,51 +36,36 @@ def index():
         info = [created_apps, active_devices, total_activity, last_activity]
 
         return render_template('new/public/dashboard.html', info=info)
-        
     else:
-        return render_template('new/public/login.html', users_signup=app.config['USERS_SIGNUP'])
+        return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'GET':
-        if 'role' in session and session['role'] == 'admin':
-            return render_template('old/admin/signup.html', users_signup=app.config['USERS_SIGNUP'])
-        else:
-            if app.config['USERS_SIGNUP']:
-                return render_template('new/public/register.html', users_signup=app.config['USERS_SIGNUP'])
-            else:
-                return redirect(url_for('index', users_signup=app.config['USERS_SIGNUP']))
-    else:
-        if app.config['USERS_SIGNUP'] or ('role' in session and session['role'] == 'admin'):
+    if app.config['USERS_SIGNUP']:
+        if request.method == 'GET':
+            return render_template('new/public/register.html')
+        elif request.method == 'POST':
             username = request.form['username']
             password = request.form['password'].encode('utf-8')
             
             if (username == '' or password == ''):
                 flash('Username or password fields cannot be empty', 'danger')
-                return redirect(url_for('register', users_signup=app.config['USERS_SIGNUP']))
+                return redirect(request.url)
             elif (len(password) < 8):
                 flash('Password length must be at least 8 characters.', 'danger')
-                return redirect(url_for('register', users_signup=app.config['USERS_SIGNUP']))
+                return redirect(request.url)
             else:
-                role = 'user'
-                if 'role' in request.form and request.form['role'] == 'administrator':
-                    role = 'admin'
-
-                res = ud.create(username, password, role)
+                res = ud.create(username, password, 'user')
                 if (not res[0]):
                     flash('Error: {}'.format(res[1]), 'danger')
                     return redirect(request.url)
                 else:
                     session['name'] = username
-                    
-                    flash('User successfully created.', 'success')
+                    session['role'] = 'user'
+                    return redirect(url_for('index'))
+    else:
+        return redirect(url_for('login'))
 
-                    if 'role' in session and session['role'] == 'admin':
-                        return redirect(url_for('administration'))
-                    else:
-                        return redirect(url_for('index'))
-        else:
-            return redirect(url_for('index'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -121,7 +106,7 @@ def applications():
         
         return render_template('new/public/applications.html', apps=apps[1])
     else:
-        return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
+        return redirect(url_for('login'))
 
 
 @app.route('/application/<appkey>')
@@ -133,7 +118,7 @@ def application(appkey):
 
         return render_template('new/public/application.html', app=ap, devs=devs)
     else:
-        return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
+        return redirect(url_for('login'))
 
 
 @app.route('/new-application', methods=['GET', 'POST'])
@@ -168,7 +153,7 @@ def application_create():
             
                 return redirect(url_for('applications'))
     else:
-        return redirect(url_for('login', users_signup=app.config['USERS_SIGNUP']))
+        return redirect(url_for('login'))
 
 
 @app.route('/application/<appkey>/delete')
@@ -705,7 +690,7 @@ def user_delete():
 def settings():
     if request.method == 'GET':
         if session['role'] == 'admin':
-            return render_template('old/admin/settings.html', username=session['name'], users_signup=app.config['USERS_SIGNUP'])
+            return render_template('old/admin/settings.html', username=session['name'])
         else:
             return render_template('old/public/settings.html', username=session['name'])
     else:

@@ -1,0 +1,278 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} User Dashboard - HPC&amp;A IoT {% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="#">Dashboard</a> 
+{% endblock %}
+
+{% block stats %}
+  <div class="row">
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Created Apps</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[0] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+		<i class="fas fa-chart-bar"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Active Devices</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[1] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+		<i class="fas fa-chart-pie"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Total Activity</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[2] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
+		<i class="fas fa-users"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+	<div class="card-body">
+	  <div class="row">
+	    <div class="col">
+	      <h5 class="card-title text-uppercase text-muted mb-0">Last 24 Hours Activity</h5>
+	      <span class="h2 font-weight-bold mb-0">{{ info[3] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+		<i class="fas fa-percent"></i>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid mt--7">
+      <div class="row">
+        <div class="col-xl-8 mb-5 mb-xl-0">
+          <div class="card bg-gradient-default shadow">
+            <div class="card-header bg-transparent">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h6 class="text-uppercase text-light ls-1 mb-1">Day Overview</h6>
+                  <h2 class="text-white mb-0">Devices Activity</h2>
+                </div>
+                <div class="col">
+                  <ul class="nav nav-pills justify-content-end">
+                    <li class="nav-item mr-2 mr-md-0" data-toggle="chart" data-target="#chart-sales" data-suffix="messages">
+                      <a href="#" class="nav-link py-2 px-3 active" data-toggle="tab">
+                        <span class="d-none d-md-block">Last 12 Hours</span>
+                        <span class="d-md-none">M</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Chart -->
+              <div class="chart">
+                <!-- Chart wrapper -->
+                <canvas id="chart-sales" class="chart-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h6 class="text-uppercase text-muted ls-1 mb-1">Week Overview</h6>
+                  <h2 class="mb-0">Per-day Activity</h2>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Chart -->
+              <div class="chart">
+                <canvas id="chart-orders" class="chart-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-5">
+        <div class="col-xl-12 mb-5 mb-xl-0">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">Recen Activity</h3>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">App name</th>
+                    <th scope="col">Device name</th>
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">Message</th>
+                  </tr>
+                </thead>
+                <tbody id="recent_activity_body">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+  <script type="text/javascript">
+	(function worker() {
+		var e = $("#chart-sales");
+		var e1 = $("#chart-orders");
+		$.get('/administration/users/{{ user }}/chart-update', function(cdata) {
+			cdata = eval(cdata);
+			var a = new Chart(e,
+			{
+				type: "line",
+				options:
+				{
+					scales:
+					{
+						yAxes: [
+						{
+							gridLines:
+							{
+								lineWidth: 1,
+								color: Charts.colors.gray[900],
+								zeroLineColor: Charts.colors.gray[900]
+							}
+						}]
+					},
+					tooltips:
+					{
+						callbacks:
+						{
+							label: function (e, a)
+							{
+								var t = a.datasets[e.datasetIndex].label || "",
+									o = e.yLabel,
+									n = "";
+								return 1 < a.datasets.length && (n += '<span class="popover-body-label mr-auto">' + t + "</span>"), n += '<span class="popover-body-value">' + o + "</span>"
+							}
+						}
+					}
+				},
+				data:
+				{
+																								      labels: cdata[0][0],
+					datasets: [
+					{
+						label: "Performance",
+						data: cdata[0][1]
+					}]
+				}
+			});	
+			e.data("chart", a);
+
+			var a1 = new Chart(e1,
+			{
+				type: "bar",
+				options:
+				{
+					scales:
+					{
+						yAxes: [
+						{
+							gridLines:
+							{
+								lineWidth: 1,
+								color: "#dfe2e6",
+								zeroLineColor: "#dfe2e6"
+							},
+							ticks:
+							{
+								callback: function (e)
+								{
+									if (!(e % 10)) return e
+								}
+							}
+						}]
+					},
+					tooltips:
+					{
+						callbacks:
+						{
+							label: function (e, a)
+							{
+								var t = a.datasets[e.datasetIndex].label || "",
+									o = e.yLabel,
+									n = "";
+								return 1 < a.datasets.length && (n += '<span class="popover-body-label mr-auto">' + t + "</span>"), n += '<span class="popover-body-value">' + o + "</span>"
+							}
+						}
+					}
+				},
+				data:
+				{
+					labels: cdata[1][0],
+					datasets: [
+					{
+						label: "Sales",
+						data: cdata[1][1]
+					}]
+				}
+			});
+			e1.data("chart", a1);
+
+			setTimeout(worker, 600000);
+		});
+	})();
+	
+	$.get("/administration/users/{{ user }}/recent-activity", function(cdata) {
+		$("#recent_activity_body").html(cdata);
+	});
+	
+  </script>
+{% endblock %}

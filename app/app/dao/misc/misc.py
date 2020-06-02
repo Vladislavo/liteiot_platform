@@ -66,9 +66,8 @@ def get_user_data_count_per_hour_period(cur, username, period):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
 
-    utc_hour = [utc_roundhour(x) for x in range(period,-1,-1)]
-
     if apps != [] and devs != []:
+        utc_hour = [utc_roundhour(x) for x in range(period,-1,-1)]
         query = 'WITH t AS ('
         i = 0
         for a in apps:
@@ -86,7 +85,7 @@ def get_user_data_count_per_hour_period(cur, username, period):
         
         return (True,cur.fetchall())
     else:
-        return (True, (0,))
+        return (True, [(0,)])
 
 
 
@@ -145,7 +144,7 @@ def get_user_data_count_per_day_period(cur, username, period):
         
         return (True,cur.fetchall())
     else:
-        return (True, (0,))
+        return (True, [(0,)])
 
 
 @with_psql
@@ -156,21 +155,24 @@ def get_recent_activity(cur, username, n=5):
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
     
-    query = ''
-    for a in apps:
-        devs = dd.get_list(a[1])
-        for d in devs[1]:
-            query += """
-            (SELECT timedate, appname, devname, data, utc from 
-                (SELECT utc, timedate, data from dev_{}_{} ORDER BY utc DESC limit 5) AS utc, 
-                (SELECT '{}' as appname) AS appname,
-                (SELECT '{}' as devname) AS devname)
-            UNION ALL""".format(a[1],d[1], a[0],d[0])
-    query = query[0:-9]
-    query += ' ORDER BY utc DESC LIMIT {}'.format(n)
+    if apps != [] and devs != []:
+        query = ''
+        for a in apps:
+            devs = dd.get_list(a[1])
+            for d in devs[1]:
+                query += """
+                (SELECT timedate, appname, devname, data, utc from 
+                    (SELECT utc, timedate, data from dev_{}_{} ORDER BY utc DESC limit 5) AS utc, 
+                    (SELECT '{}' as appname) AS appname,
+                    (SELECT '{}' as devname) AS devname)
+                UNION ALL""".format(a[1],d[1], a[0],d[0])
+        query = query[0:-9]
+        query += ' ORDER BY utc DESC LIMIT {}'.format(n)
 
-    cur.execute(query, ())
+        cur.execute(query, ())
 
-    return (True, cur.fetchall())
+        return (True, cur.fetchall())
+    else:
+        return (True, [])
 
 
