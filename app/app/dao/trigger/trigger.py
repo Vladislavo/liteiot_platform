@@ -66,6 +66,41 @@ def create_function(cur, appkey, devid, nfid, expr):
     return (True, )
 
 
+# expr has a form of list [variable, operand, value]
+# new listen/notify function
+@with_psql
+def create_function_rt(cur, appkey, devid, nfid, expr, action_type, action):
+    query = """
+    CREATE OR REPLACE FUNCTION
+        nf_{}_{}_{}()
+    RETURNS trigger AS
+    $BODY$
+    BEGIN
+    """.format(appkey, devid, nfid)
+    
+            #PERFORM pg_notify('nf_channel', '{{"appkey":"{}", "devid":{}, "nfid":"{}", "data": row_to_json(NEW.*) }}');
+            #PERFORM pg_notify('nf_channel', json_build_object('appkey','{}','devid',{},'nfid','{}','data',NEW.data));
+    query += """
+        IF (NEW.data->>'{}')::{} {} {} THEN
+            PERFORM pg_notify('nf_channel', '{{"appkey":"{}", "devid":{}, "nfid":"{}", "action_type":"{}", "action":"{}", "message":' || row_to_json(NEW) || '}}');
+        END IF;
+    """.format( expr[0], get_type(expr[2]), expr[1], expr[2],
+                appkey, devid, nfid, action_type, action)
+    
+    query += """
+        RETURN NEW;
+    END;
+    $BODY$
+
+    LANGUAGE plpgsql VOLATILE
+    COST 100;
+    """
+    print(query)
+
+    cur.execute(query)
+        
+    return (True, )
+
 @with_psql
 def delete_function(cur, appkey, devid, nfid):
     query = """

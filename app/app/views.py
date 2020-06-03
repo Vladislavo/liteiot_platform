@@ -514,7 +514,9 @@ def application_new_alert(appkey):
                 res = nfs.create(nid, appkey, request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
                 if res[0]:
                     # create new function and trigger
-                    tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    #tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'alert',request.form['alertemail'])
+                    print(t)
                     tr.create(appkey, request.form['devid'], nid)
                     flash('Alert created', 'success')
                     return redirect(url_for('application_alerts', appkey=appkey))
@@ -578,7 +580,8 @@ def application_new_automation(appkey):
                 res = nfs.create(nid, appkey, request.form['devid'], request.form['automationname'], desc, 'automation', action)
                 if res[0]:
                     # create new function and trigger
-                    tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    #tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'automation', action)
                     tr.create(appkey, request.form['devid'], nid)
                     flash('Automation created', 'success')
                     return redirect(url_for('application_automation', appkey=appkey))
