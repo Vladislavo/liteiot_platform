@@ -2,6 +2,10 @@
 
 {% block title %} HPC&amp;A IoT - Add Device {% endblock %}
 
+{% block header %} 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> 
+{% endblock %}
+
 {% block location %} <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="./applications">Applications</a>
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/application/{{ app[1] }}">{{ app[0] }}</a> 
@@ -32,8 +36,56 @@
 				<label>dev_id: {{ free_ids }}</label><br>
 				<input type="number" size="3" min="1" max="255" class="form-control" id="devid" name="devid" required><br>
 			</div>
-			
 			<br>
+			<div class="form-group">
+				<label for="ddm"> Data Model: </label>
+				<select class="form-control" id="ddm" name="ddm" onclick="return onddm();">
+					<option value="json"> JSON </option>
+					<option value="mpack"> MessagePack </option>
+					<option value="raw"> raw bytes </option>
+				</select>
+			</div>
+			<div class="row" id="ddm_ext">
+				<div class="col-lg-4">	
+					<div class="form-group">
+						<label>Variable 1 Name:</label><br>
+						<input type="text" maxlength="30" class="form-control" id="varname1" name="varname1">
+					</div>
+				</div>
+				<div class="col-lg-4">	
+					<div class="form-group">
+						<label for="ddm"> Type: </label>
+						<select class="form-control" id="vartype1" name="vartype1">
+							<option value="f"> float </option>
+							<option value="?"> bool </option>
+							<option value="s"> string </option>
+							<option value="b"> uint8_t </option>
+							<option value="H"> uint16_t </option>
+							<option value="I"> uint32_t </option>
+							<option value="Q"> uint64_t </option>
+							<option value="b"> int8_t </option>
+							<option value="h"> uint16_t </option>
+							<option value="i"> uint32_t </option>
+							<option value="q"> uint64_t </option>
+						</select>
+					</div>
+				</div>
+				<div class="col-lg-3">	
+					<div class="form-group">
+						<label>Size:</label><br>
+						<input type="number" min="1" max="300" class="form-control" id="varsize1" name="varsize1" disabled>
+					</div>
+				</div>
+				<div class="col-lg-1">	
+					<br><br>
+					<a href="javascript:void(0)" onclick="return remove_variable('1');"> <span class="fa fa-remove"> </span> </a>
+				</div>
+			</div>
+			<div class="col-lg-12">	
+				<center><a href="javascript:void(0)" onclick="return add_variable();"> Add Variable </a></center>
+			</div>
+
+			<br><br>
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">Add Device</button>
 			</div>
@@ -43,4 +95,46 @@
           </div>
         </div>
       </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	var var_ctr = 1;
+
+	function onddm() {
+		var ddm_sel = document.getElementById("ddm");
+		var sel_op = ddm_sel.options[ddm_sel.selectedIndex].value;
+		
+
+		if (!document.getElementById("varname")) {
+			if (sel_op != "-") {
+				fetch(window.origin+'/dev-vars?id='+sel_op).then(res => res.text()).then(data => $("#alertform").append(data));
+			}
+		} else {
+			if (sel_op == "-") {
+				$("#varname").remove();
+				if (document.getElementById("operation")) {
+					$("#operation").remove();
+				}
+				if (document.getElementById("avalue")) {
+					$("#avalue").remove();
+				}
+
+			}
+		}
+	}
+	function onvar() {
+		if (!document.getElementById("operation")) {
+			$("#alertform").append("<select class='form-control notifelem' name='operation' id='operation' required><option default>></option><option>>=</option><option><</option><option><=</option><option>=</option></select>");
+			$("#alertform").append("<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>");
+		} else {
+			var var_sel = document.getElementById("varname");
+			var sel_var = var_sel.options[var_sel.selectedIndex].value;
+			if (sel_var == "-") {
+				$("#avalue").remove();
+				$("#operation").remove();
+			}
+		}
+	}
+</script>
 {% endblock %}
