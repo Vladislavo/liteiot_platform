@@ -19,6 +19,11 @@
 	      <h5 class="card-title text-uppercase text-muted mb-0">Name</h5>
 	      <span class="h2 font-weight-bold mb-0">{{ app[0] }}</span>
 	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+		<i class="fas fa-cube"></i>
+	      </div>
+	    </div>
 	  </div>
 	</div>
       </div>
@@ -30,6 +35,11 @@
 	    <div class="col">
 	      <h5 class="card-title text-uppercase text-muted mb-0">App-Key</h5>
 	      <span class="h2 font-weight-bold mb-0">{{ app[1] }}</span>
+	    </div>
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+		<i class="fas fa-key"></i>
+	      </div>
 	    </div>
 	  </div>
 	</div>
@@ -43,6 +53,19 @@
 	      <h5 class="card-title text-uppercase text-muted mb-0">Secure</h5>
 	      <span class="h2 font-weight-bold mb-0">{% if app[4] %} Yes {% else %} No {% endif %}</span>
 	    </div>
+	    {% if app[4] %}
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+		      <i class="fas fa-lock"></i>
+	      </div>
+	    </div>
+	    {% else %}
+	    <div class="col-auto">
+	      <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+		      <i class="fas fa-unlock"></i>
+	      </div>
+	    </div>
+	    {% endif %}
 	  </div>
 	</div>
       </div>
