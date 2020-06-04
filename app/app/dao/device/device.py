@@ -15,6 +15,19 @@ def create_datatable(cur, appkey, dev_id):
         ).format(sql.Identifier(tn)))
     return (True,)
 
+@with_psql
+def create_datatable_ddm(cur, appkey, dev_id, model):
+    tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
+    cur.execute(
+        sql.SQL(
+            """CREATE TABLE {} (
+                utc NUMERIC(10) DEFAULT EXTRACT(EPOCH FROM now())::int NOT NULL,
+                timedate VARCHAR(100) NOT NULL,
+                data bytea NOT NULL
+            )"""
+        ).format(sql.Identifier(tn)))
+    
+    return (True,)
     
 @with_psql
 def delete_datatable(cur, appkey, dev_id):
@@ -38,6 +51,19 @@ def create_table(cur, appkey):
         ).format(sql.Identifier(tn)))
     return (True,)
 
+@with_psql
+def create_table_ddm(cur, appkey):
+    tn = 'devices_' +str(appkey)
+    cur.execute(
+        sql.SQL(
+            """CREATE TABLE {} (
+                name VARCHAR(30) NOT NULL,
+                dev_id NUMERIC(3) PRIMARY KEY,
+                description VARCHAR(200),
+                device_data_model json NOT NULL
+            )"""
+        ).format(sql.Identifier(tn)))
+    return (True,)
     
 @with_psql
 def delete_table(cur, appkey):
@@ -59,6 +85,19 @@ def create(cur, name, dev_id, appkey, desc):
     """
     cur.execute(
         sql.SQL(query).format(sql.Identifier(tn)), [name, dev_id, desc])
+    return (True,)
+
+@with_psql
+def create_ddm(cur, name, dev_id, appkey, desc, ddm):
+    tn = 'devices_' +str(appkey)
+    query = """
+    INSERT INTO 
+        {}
+    VALUES
+        (%s, %s, %s, %s)
+    """
+    cur.execute(
+        sql.SQL(query).format(sql.Identifier(tn)), [name, dev_id, desc, ddm])
     return (True,)
 
 
@@ -107,6 +146,23 @@ def update(cur, appkey, devid, name, desc):
             dev_id = %s
     """.format(tn)
     cur.execute(query, (name, desc, devid))
+
+    return (True,)
+
+@with_psql
+def update_ddm(cur, appkey, devid, name, desc, ddm):
+    tn = 'devices_'+appkey
+    query = """
+        UPDATE
+            {}
+        SET
+            name = %s,
+            description = %s,
+            device_data_model = %s
+        WHERE
+            dev_id = %s
+    """.format(tn)
+    cur.execute(query, (name, desc, ddm, devid))
 
     return (True,)
 
