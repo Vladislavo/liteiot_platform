@@ -22,7 +22,7 @@
               <h3 class="mb-0">Add Device</h3>
             </div>
             <div class="card-body">
-		<form action="/application/{{ app[1] }}/add-device" method="post">
+		<form action="/application/{{ app[1] }}/add-device" method="post" id="device_form">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="devname" name="devname" required><br>
@@ -45,49 +45,11 @@
 					<option value="raw"> raw bytes </option>
 				</select>
 			</div>
-			<div class="row" id="ddm_ext">
-				<div class="col-lg-4">	
-					<div class="form-group">
-						<label>Variable 1 Name:</label><br>
-						<input type="text" maxlength="30" class="form-control" id="varname1" name="varname1">
-					</div>
-				</div>
-				<div class="col-lg-4">	
-					<div class="form-group">
-						<label for="ddm"> Type: </label>
-						<select class="form-control" id="vartype1" name="vartype1">
-							<option value="f"> float </option>
-							<option value="?"> bool </option>
-							<option value="s"> string </option>
-							<option value="b"> uint8_t </option>
-							<option value="H"> uint16_t </option>
-							<option value="I"> uint32_t </option>
-							<option value="Q"> uint64_t </option>
-							<option value="b"> int8_t </option>
-							<option value="h"> uint16_t </option>
-							<option value="i"> uint32_t </option>
-							<option value="q"> uint64_t </option>
-						</select>
-					</div>
-				</div>
-				<div class="col-lg-3">	
-					<div class="form-group">
-						<label>Size:</label><br>
-						<input type="number" min="1" max="300" class="form-control" id="varsize1" name="varsize1" disabled>
-					</div>
-				</div>
-				<div class="col-lg-1">	
-					<br><br>
-					<a href="javascript:void(0)" onclick="return remove_variable('1');"> <span class="fa fa-remove"> </span> </a>
-				</div>
+			<div id="ddm_div">
 			</div>
-			<div class="col-lg-12">	
-				<center><a href="javascript:void(0)" onclick="return add_variable();"> Add Variable </a></center>
-			</div>
-
 			<br><br>
 			<div class="form-group">
-				<button type="submit" class="btn btn-primary">Add Device</button>
+				<button type="submit" class="btn btn-primary" onsubmit="">Add Device</button>
 			</div>
 		</form>
 
@@ -100,41 +62,247 @@
 {% block script %}
 <script type="text/javascript">
 	var var_ctr = 1;
+	var var_cnt = {};
+	var types = {
+		"float" : {"type":"f", "size":4},
+		"bool" : {"type":"?", "size":1},
+		"string" : {"type":"s"},
+		"uint8_t" : {"type":"B", "size":1},
+		"uint16_t" : {"type":"H", "size":2},
+		"uint32_t" : {"type":"I", "size":4},
+		"uint64_t" : {"type":"Q", "size":8},
+		"int8_t" : {"type":"b", "size":1},
+		"int16_t" : {"type":"h", "size":2},
+		"int32_t" : {"type":"i", "size":4},
+		"int64_t" : {"type":"q", "size":8},
+	}
+
+	function add_variable_name(id) {
+		var div = document.createElement("div");
+		div.setAttribute("class", "col-lg-4");
+
+		var div_fg = document.createElement("div");
+		div_fg.setAttribute("class", "form-group");
+
+		var label = document.createElement("label");
+		label.setAttribute("for", "varname"+id);
+		label.innerHTML = "Variable name:";
+		
+		var input = document.createElement("input");
+		input.setAttribute("type", "text");
+		input.setAttribute("maxlength", "30");
+		input.setAttribute("class", "form-control");
+		input.setAttribute("id", "varname"+id);
+		input.setAttribute("name", "varname"+id);
+		input.setAttribute("onkeyup", "return onvarname('"+id+"');");
+
+		div_fg.appendChild(label);
+		div_fg.appendChild(input);
+		div.appendChild(div_fg);
+
+		return div;
+	}
+
+	function add_variable_type(id) {
+
+		var div = document.createElement("div");
+		div.setAttribute("class", "col-lg-4");
+
+		var div_fg = document.createElement("div");
+		div_fg.setAttribute("class", "form-group");
+
+		var label = document.createElement("label");
+		label.setAttribute("for", "vartype"+id);
+		label.innerHTML = "Type:";
+		
+		var select = document.createElement("select");
+		select.setAttribute("id", "vartype"+id);
+		select.setAttribute("name", "vartype"+id);
+		select.setAttribute("class", "form-control");
+		select.setAttribute("onchange", "return onvartype('"+id+"');");
+		for (var t in types) {
+			var option = document.createElement("option");
+			option.setAttribute("value", types[t].type);
+			option.text = t;
+			select.appendChild(option);
+		}
+
+		div_fg.appendChild(label);
+		div_fg.appendChild(select);
+		div.appendChild(div_fg);
+
+		return div;
+	}
+
+	function add_variable_size(id) {
+		var div = document.createElement("div");
+		div.setAttribute("class", "col-lg-3");
+
+		var div_fg = document.createElement("div");
+		div_fg.setAttribute("class", "form-group");
+
+		var label = document.createElement("label");
+		label.setAttribute("for", "varsize"+id);
+		label.innerHTML = "Size:";
+		
+		var input = document.createElement("input");
+		input.setAttribute("type", "number");
+		input.setAttribute("min", "1");
+		input.setAttribute("max", "256");
+		input.setAttribute("class", "form-control");
+		input.setAttribute("id", "varsize"+id);
+		input.setAttribute("name", "varsize"+id);
+		input.setAttribute("disabled", "true");
+		input.setAttribute("onkeyup", "return onvarsize('"+id+"');");
+
+		div_fg.appendChild(label);
+		div_fg.appendChild(input);
+		div.appendChild(div_fg);
+
+		return div;
+	}
+	
+	function add_variable_rm(id) {
+		var div = document.createElement("div");
+		div.setAttribute("class", "col-lg-1");
+
+		var a = document.createElement("a");
+		a.setAttribute("href", "javascript:void(0)");
+		a.setAttribute("onclick", "return remove_variable('"+id+"');");
+		var span = document.createElement("span");
+		span.setAttribute("class", "fa fa-remove");
+
+		a.appendChild(span);
+		div.appendChild(a);
+
+		return div;
+	}
+
+	function add_variable() {
+		var row = document.createElement("div");
+		row.setAttribute("class", "row");
+		row.setAttribute("id", "variable"+var_ctr);
+
+		var variable_name = add_variable_name(var_ctr);
+		var variable_type = add_variable_type(var_ctr);
+		var variable_size = add_variable_size(var_ctr);
+		var variable_rm = add_variable_rm(var_ctr);
+		
+		row.appendChild(variable_name);
+		row.appendChild(variable_type);
+		row.appendChild(variable_size);
+		row.appendChild(variable_rm);
+
+		var_cnt[var_ctr] = { "name": "", "type":"f", "size":4 };
+		var_ctr++;
+
+		return row;
+	}
+
+	function remove_variable(id) {
+		$("#variable"+id).remove();
+		delete var_cnt[id];
+	}
+	
+	function add_variable_link() {
+		var div = document.createElement("div");
+		div.setAttribute("class", "col-lg-12");
+		div.setAttribute("id", "addvarlink");
+
+		var center = document.createElement("center");
+		var a = document.createElement("a");
+		a.setAttribute("href", "javascript:void(0)");
+		a.onclick = add_new_variable;
+		a.text = "Add variable";
+
+		center.appendChild(a);
+		div.appendChild(center);
+		
+		return div;
+	}
+
+	function add_endianness() {
+		var div = document.createElement("div");
+		div.setAttribute("class", "form-group");
+
+		var label = document.createElement("label");
+		label.setAttribute("for", "endianness");
+		label.innerHTML = "Endianness:";
+
+		var select = document.createElement("select");
+		select.setAttribute("id", "endianness");
+		select.setAttribute("name", "endianness");
+		select.setAttribute("class", "form-control");
+		
+		var little = document.createElement("option");
+		little.setAttribute("value", "<");
+		little.text = "Little Endian"
+		var big = document.createElement("option");
+		big.setAttribute("value", ">");
+		big.text = "Big Endian";
+
+		select.appendChild(little);
+		select.appendChild(big);
+
+		div.appendChild(label);
+		div.appendChild(select);
+
+		return div;
+	}
+	
+	function add_ddm_ext() {
+		var ddm_div = document.createElement("div");
+		ddm_div.setAttribute("id", "ddm_ext");
+		
+		var endianness = add_endianness();
+		var variable = add_variable();
+		
+		ddm_div.appendChild(endianness);
+		ddm_div.appendChild(variable);
+
+		var div = document.getElementById("ddm_div");
+		div.appendChild(ddm_div);
+
+		var add_var = add_variable_link();
+		div.appendChild(add_var);
+	}
+
+	function add_new_variable() {
+		var ddm_div = document.getElementById("ddm_ext");
+		ddm_div.appendChild(add_variable());
+	}
 
 	function onddm() {
 		var ddm_sel = document.getElementById("ddm");
 		var sel_op = ddm_sel.options[ddm_sel.selectedIndex].value;
-		
-
-		if (!document.getElementById("varname")) {
-			if (sel_op != "-") {
-				fetch(window.origin+'/dev-vars?id='+sel_op).then(res => res.text()).then(data => $("#alertform").append(data));
-			}
-		} else {
-			if (sel_op == "-") {
-				$("#varname").remove();
-				if (document.getElementById("operation")) {
-					$("#operation").remove();
-				}
-				if (document.getElementById("avalue")) {
-					$("#avalue").remove();
-				}
-
-			}
+		if (sel_op == "raw" && !document.getElementById("ddm_ext")) {
+			add_ddm_ext();
+		} else if (sel_op != "raw" && document.getElementById("ddm_ext")) {
+			$("#ddm_ext").remove();
+			$("#addvarlink").remove();
 		}
 	}
-	function onvar() {
-		if (!document.getElementById("operation")) {
-			$("#alertform").append("<select class='form-control notifelem' name='operation' id='operation' required><option default>></option><option>>=</option><option><</option><option><=</option><option>=</option></select>");
-			$("#alertform").append("<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>");
+
+	function onvarname(id) {
+		var_cnt[id].name = document.getElementById("varname"+id).value; 
+	}
+	function onvartype(id) {
+		var type_sel = document.getElementById("vartype"+id);
+		var sel_op = type_sel.options[type_sel.selectedIndex];
+		var_cnt[id].type = sel_op.value;
+		if (sel_op.value == "s") {
+			document.getElementById("varsize"+id).disabled = false;
+			document.getElementById("varsize"+id).setAttribute("value", "");
+			var_cnt[id].size = "";
 		} else {
-			var var_sel = document.getElementById("varname");
-			var sel_var = var_sel.options[var_sel.selectedIndex].value;
-			if (sel_var == "-") {
-				$("#avalue").remove();
-				$("#operation").remove();
-			}
+			var_cnt[id].size = types[sel_op.text].size;
+			document.getElementById("varsize"+id).value = types[sel_op.text].size; 
+			document.getElementById("varsize"+id).setAttribute("disabled", "true");
 		}
 	}
+	function onvarsize(id) {
+		var_cnt[id].size = document.getElementById("varsize"+id).value;	
+	}
+
 </script>
 {% endblock %}
