@@ -16,6 +16,7 @@ import app.dao.misc.misc as md
 
 import app.helpers.misc as misc
 import app.helpers.mailer as mailer
+import app.helpers.device_data_model as ddm
 
 import os
 import binascii
@@ -142,7 +143,7 @@ def application_create():
                     flash('Error: {}'.format(res[1]), 'danger')
                     return render_template(request.url)
             
-                res = dd.create_table(appkey)
+                res = dd.create_table_ddm(appkey)
             
                 if not res[0]:
                     ad.delete(appkey)
@@ -189,10 +190,9 @@ def application_device(appkey, devid):
         ap = ad.get(appkey)
         if session['name'] == ap[1][2]:
             dev = dd.get(appkey, devid)
+            
+            print(dev);
 
-            session['devid'] = int(dev[1][1])
-            session['devname'] = dev[1][0]
-    
             ld = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, 0])
             cnt = data.get_count(appkey, devid)
 
@@ -214,22 +214,38 @@ def application_add_device(appkey):
         if request.method == 'GET':
             ap = ad.get(appkey)
             dev_list = dd.get_list(appkey)
-            return render_template('new/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]))
+            return render_template('new/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS)
         elif request.method == 'POST':
-            res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'])
+            ddmin = misc.extract_ddm(request)
+           
+            if False:
+                res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'])
 
-            if not res[0]:
-                flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
-            else:
-                res = data.create_table(appkey, request.form['devid'])
-            
                 if not res[0]:
-                    dd.delete(session['appkey'], request.form['devid'])
                     flash('Error: {}'.format(res[1]), 'danger')
                     return render_template(request.url)
                 else:
-                    return redirect(url_for('application', appkey=appkey))
+                    res = data.create_table(appkey, request.form['devid'])
+                
+                    if not res[0]:
+                        dd.delete(session['appkey'], request.form['devid'])
+                        flash('Error: {}'.format(res[1]), 'danger')
+                        return render_template(request.url)
+                    else:
+                        return redirect(url_for('application', appkey=appkey))
+            if True:
+                res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
+                if not res[0]:
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return render_template(request.url)
+                else:
+                    res = data.create_table_ddm(appkey, request.form['devid'])
+                    if not res[0]:
+                        dd.delete(session['appkey'], request.form['devid'])
+                        flash('Error: {}'.format(res[1]), 'danger')
+                        return render_template(request.url)
+                    else:
+                        return redirect(url_for('application', appkey=appkey))
     else:
         return redirect(url_for('login'))
 
@@ -367,16 +383,6 @@ def application_device_variables(appkey, devid):
             return select
     else:
         return redirect(url_for('login'))
-
-@app.route('/delete-dev')
-def delete_dev():
-    if 'name' in session and 'devid' in session:
-        data.delete_table(session['appkey'], session['devid'])
-        res = dd.delete(session['appkey'], session['devid'])
-
-        return redirect(url_for('app_', appkey=session['appkey']))
-    else:
-        return redirect(utl_for('index'))
 
 
 @app.route('/delete-account')
@@ -623,15 +629,17 @@ def application_device_settings(appkey, devid):
         if request.method == 'GET':
             ap = ad.get(appkey)
             dev = dd.get(appkey, devid)
-            dev_list = dd.get_list(appkey)
 
-            return render_template('new/public/device-settings.html', app=ap[1], dev=dev[1], free_ids=misc.prep_id_range(dev_list[1]))
+            return render_template('new/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS)
         elif request.method == 'POST':
-            res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'])
-        
+            ddmin = misc.extract_ddm(request)
+            print(ddmin)
+            #res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'])
+            res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
+            
             if not res[0]:
                 flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
+                return redirect(request.url)
         
             return redirect(request.url)
     else:

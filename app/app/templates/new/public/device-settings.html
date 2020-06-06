@@ -2,6 +2,10 @@
 
 {% block title %} HPC&amp;A IoT - Device Settings {% endblock %}
 
+{% block header %} 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> 
+{% endblock %}
+
 {% block location %} 
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/applications">Applications</a>
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
@@ -29,6 +33,53 @@
 			<div class="form-group">
 				<label>Description:</label><br>
 				<textarea id="devdesc" maxlength="200" class="form-control" name="devdesc" rows="5"></textarea>
+			</div>
+			<br>
+			<div class="form-group">
+				<label for="ddm"> Data Model: </label>
+				<select class="form-control" id="ddm" name="ddm" onchange="return onddm();">
+					{% for k,v in models.items() %}
+					<option value="{{ k }}"> {{ v }} </option>
+					{% endfor %}
+				</select>
+				<!--
+				<select class="form-control" id="ddm" name="ddm" onclick="return onddm();">
+					<option value="{{ dev[3]['model'] }}" default> {{ models[dev[3]['model']] }} </option>
+					{% for k,v in models.items() %}
+						{% if k != dev[3]['model'] %}
+					<option value="{{ k }}"> {{ v }} </option>
+						{% endif %}
+					{% endfor %}
+				</select>
+				-->
+			</div>
+			<div id="ddm_div">
+				<!--
+				{% if dev[3]['format'] != {} %}
+				<div id="ddm_ext">
+					{% if dev[3]['model'] == 'json' or dev[3]['model'] == 'mpack' %}
+					  {% for name, type in dev[3]['format'].items() %}
+					  <div class="row" id="variable_{{ loop.index }}">
+						  <div class="col-lg-6">
+							<div class="form-group">
+								<label for="varname_{{ loop.index }}"> Variable name: </label>
+								<input type="text" maxlength="30" class="form-control" id="varname_{{ loop.index }}" name="varname_{{ loop.index }}" value="{{ name }}">
+							</div>
+						  </div>
+						  <div class="col-lg-5">
+							<div class="form-group">
+								<label for="vartype_{{ loop.index }}"> Type: </label>
+								<select id="vartype_{{ loop.index }}" name="vartype_{{ loop.index }}" class="form-control" onchange="onvartype('{{ loop.index }}')">
+									<option value="{{ type }}"> {{ type }} </option>
+								</select>
+							</div>
+						  </div>
+					  </div>
+					  {% endfor %}
+					{% endif %}
+				</div>
+				{% endif %}
+				-->
 			</div>
 		</form>
 		<br>
@@ -73,5 +124,7 @@
 {% block script %}
 <script type="text/javascript">
 	document.getElementById("devdesc").value = "{{ dev[2] }}";
+	var device_data_model = {{ dev[3]|safe }};
 </script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/application-add-device.js') }}"></script>
 {% endblock %}

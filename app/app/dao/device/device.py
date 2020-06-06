@@ -1,6 +1,7 @@
-from psycopg2 import sql
+from psycopg2 import sql, Binary
 from app.helpers.misc import with_psql
 import app.dao.application.application as ad
+import json
 
 @with_psql
 def create_datatable(cur, appkey, dev_id):
@@ -60,7 +61,7 @@ def create_table_ddm(cur, appkey):
                 name VARCHAR(30) NOT NULL,
                 dev_id NUMERIC(3) PRIMARY KEY,
                 description VARCHAR(200),
-                device_data_model json NOT NULL
+                device_data_model bytea NOT NULL
             )"""
         ).format(sql.Identifier(tn)))
     return (True,)
@@ -97,7 +98,7 @@ def create_ddm(cur, name, dev_id, appkey, desc, ddm):
         (%s, %s, %s, %s)
     """
     cur.execute(
-        sql.SQL(query).format(sql.Identifier(tn)), [name, dev_id, desc, ddm])
+        sql.SQL(query).format(sql.Identifier(tn)), [name, dev_id, desc, Binary(json.dumps(ddm).encode('utf-8'))])
     return (True,)
 
 
@@ -127,10 +128,12 @@ def get(cur, appkey, dev_id):
     cur.execute(
         sql.SQL(query).format(sql.Identifier(tn)), [dev_id])
     dev = cur.fetchone()
-    
+    #print(json.loads(dev[3].tobytes()))
     if (dev is None):
         return (False, 'There is no device with dev_id = {}'.format(dev_id))
     else:
+        dev = [d for d in dev]
+        dev[3] = json.loads(dev[3].tobytes())
         return (True, dev)
 
 @with_psql
@@ -162,7 +165,7 @@ def update_ddm(cur, appkey, devid, name, desc, ddm):
         WHERE
             dev_id = %s
     """.format(tn)
-    cur.execute(query, (name, desc, ddm, devid))
+    cur.execute(query, (name, desc, Binary(json.dumps(ddm).encode('utf-8')), devid))
 
     return (True,)
 
