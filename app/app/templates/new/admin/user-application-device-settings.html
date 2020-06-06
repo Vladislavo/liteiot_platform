@@ -2,6 +2,10 @@
 
 {% block title %} Administration - {{ user }} - {{ app[0] }} - {{ dev[0] }} - Settings - HPC&amp;A IoT {% endblock %}
 
+{% block header %} 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> 
+{% endblock %}
+
 {% block location %} 
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
@@ -35,6 +39,17 @@
 			<div class="form-group">
 				<label>Description:</label><br>
 				<textarea id="devdesc" maxlength="200" class="form-control" name="devdesc" rows="5"></textarea>
+			</div>
+			<br>
+			<div class="form-group">
+				<label for="ddm"> Data Model: </label>
+				<select class="form-control" id="ddm" name="ddm" onchange="return onddm();">
+					{% for k,v in models.items() %}
+					<option value="{{ k }}"> {{ v }} </option>
+					{% endfor %}
+				</select>
+			</div>
+			<div id="ddm_div">
 			</div>
 		</form>
 		<br>
@@ -79,5 +94,7 @@
 {% block script %}
 <script type="text/javascript">
 	document.getElementById("devdesc").value = "{{ dev[2] }}";
+	var device_data_model = {{ dev[3]|safe }};
 </script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/application-add-device.js') }}"></script>
 {% endblock %}

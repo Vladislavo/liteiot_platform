@@ -14,6 +14,7 @@ import app.dao.misc.misc as md
 
 #import app.helpers.misc as misc
 from app.helpers.misc import restricted
+import app.helpers.device_data_model as ddm
 import app.helpers.misc as misc
 
 import binascii
@@ -126,20 +127,21 @@ def administration_users_user_application_add_device(name, appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
         dev_list = dd.get_list(appkey)
-        return render_template('new/admin/user-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), user=name)
+        return render_template('new/admin/user-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, user=name)
     elif request.method == 'POST':
-        res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'])
+        ddmin = misc.extract_ddm(request)
+        res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
 
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
-            return render_template(request.url)
+            return redirect(request.url)
         else:
             res = data.create_table(appkey, request.form['devid'])
         
             if not res[0]:
                 dd.delete(appkey, request.form['devid'])
                 flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
+                return rendirect(request.url)
             else:
                 return redirect(url_for('administration_users_user_application', name=name, appkey=appkey))
 
@@ -170,15 +172,15 @@ def administration_users_user_application_device_settings(name, appkey, devid):
     if request.method == 'GET':
         ap = ad.get(appkey)
         dev = dd.get(appkey, devid)
-        dev_list = dd.get_list(appkey)
 
-        return render_template('new/admin/user-application-device-settings.html', app=ap[1], dev=dev[1], free_ids=misc.prep_id_range(dev_list[1]), user=name)
+        return render_template('new/admin/user-application-device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS, user=name)
     elif request.method == 'POST':
-        res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'])
+        ddmin = misc.extract_ddm(request)
+        res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
     
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
-            return render_template(request.url)
+            return redirect(request.url)
     
         return redirect(request.url)
 

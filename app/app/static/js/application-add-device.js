@@ -38,6 +38,8 @@ function add_variable_name(id, type, name) {
 	input.setAttribute("class", "form-control");
 	input.setAttribute("id", "varname_"+id);
 	input.setAttribute("name", "varname_"+id);
+	input.setAttribute("required", "true");
+
 	if (typeof name !== "undefined") {
 		input.setAttribute("value", name);
 	}

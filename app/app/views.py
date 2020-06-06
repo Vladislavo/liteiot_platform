@@ -190,8 +190,6 @@ def application_device(appkey, devid):
         ap = ad.get(appkey)
         if session['name'] == ap[1][2]:
             dev = dd.get(appkey, devid)
-            
-            print(dev);
 
             ld = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, 0])
             cnt = data.get_count(appkey, devid)
@@ -521,7 +519,6 @@ def application_new_alert(appkey):
                 if res[0]:
                     # create new function and trigger
                     t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'alert',request.form['alertemail'])
-                    print(t)
                     tr.create(appkey, request.form['devid'], nid)
                     flash('Alert created', 'success')
                     return redirect(url_for('application_alerts', appkey=appkey))
@@ -633,7 +630,6 @@ def application_device_settings(appkey, devid):
             return render_template('new/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS)
         elif request.method == 'POST':
             ddmin = misc.extract_ddm(request)
-            print(ddmin)
             #res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'])
             res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
             

@@ -2,6 +2,10 @@
 
 {% block title %} Administration - {{ user }} - Add Device - HPC&amp;A IoT {% endblock %}
 
+{% block header %} 
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> 
+{% endblock %}
+
 {% block location %} 
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
@@ -39,8 +43,18 @@
 				<label>dev_id: {{ free_ids }}</label><br>
 				<input type="number" size="3" min="1" max="255" class="form-control" id="devid" name="devid" required><br>
 			</div>
-			
 			<br>
+			<div class="form-group">
+				<label for="ddm"> Data Model: </label>
+				<select class="form-control" id="ddm" name="ddm" onchange="return onddm();">
+					{% for k,v in models.items() %}
+					<option value="{{ k }}"> {{ v }} </option>
+					{% endfor %}
+				</select>
+			</div>
+			<div id="ddm_div">
+			</div>
+			<br><br>
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">Add Device</button>
 			</div>
@@ -50,4 +64,8 @@
           </div>
         </div>
       </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/application-add-device.js') }}"></script>
 {% endblock %}
