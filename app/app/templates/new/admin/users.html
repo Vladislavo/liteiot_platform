@@ -82,12 +82,14 @@
 			<thead>
 				<th> Name </th>
 				<th> Role </th>
+				<th> Privilege Level </th>
 			</thead>
 			<tbody id="users_body">
 				{% for u in users %}
 				<tr onclick="window.location='/administration/users/{{ u[0] }}';">
 					<th> {{ u[0] }} </th>
 					<th> {{ u[2] }} </th>
+					<th> {{ u[3] }} </th>
 				</tr>
 				{% endfor %}
 			</tbody>

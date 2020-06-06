@@ -27,6 +27,7 @@ MAX_PG_ENTRIES_USERS = 10
 MAX_PG_ENTRIES_DATA = 10
 MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
+
 @app.route('/')
 def index():
     if 'name' in session and len(session['name']) > 0:
@@ -39,6 +40,7 @@ def index():
         return render_template('new/public/dashboard.html', info=info)
     else:
         return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -68,7 +70,6 @@ def register():
         return redirect(url_for('login'))
 
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -88,6 +89,7 @@ def login():
             else:
                 session['name'] = username
                 session['role'] = res[1][2]
+                session['privilege'] = res[1][3]
         
                 return redirect(url_for('index'))
 
@@ -120,6 +122,7 @@ def application(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/new-application', methods=['GET', 'POST'])
 def application_create():
     if 'name' in session:
@@ -155,6 +158,7 @@ def application_create():
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/delete')
 def application_delete(appkey):
     if 'name' in session:
@@ -184,6 +188,7 @@ def application_delete(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>')
 def application_device(appkey, devid):
     if 'name' in session:
@@ -206,6 +211,8 @@ def application_device(appkey, devid):
     else:
         return redirect(url_for('login'))
 
+
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/add-device', methods=['GET', 'POST'])
 def application_add_device(appkey):
     if 'name' in session:
@@ -232,6 +239,7 @@ def application_add_device(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>/delete')
 def application_device_delete(appkey, devid):
     if 'name' in session:
@@ -251,6 +259,7 @@ def application_device_delete(appkey, devid):
         return redirect(utl_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
 def application_device_configuration(appkey, devid):
     if 'name' in session:
@@ -279,6 +288,7 @@ def application_device_configuration(appkey, devid):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>/download-csv')
 def application_device_download_csv(appkey, devid):
     if 'name' in session:
@@ -332,7 +342,6 @@ def recent_activity():
         ra = ''
         
         for r in recent_activity:
-            print(r)
             dev = dd.get(r[5], r[6])[1]
             ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
 
@@ -341,6 +350,7 @@ def recent_activity():
         return '', 401
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>/remove-configuration')
 def application_device_configuration_remove(appkey, devid):
     if 'name' in session:
@@ -356,6 +366,7 @@ def application_device_configuration_remove(appkey, devid):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>/variables')
 def application_device_variables(appkey, devid):
     if 'name' in session:
@@ -371,6 +382,7 @@ def application_device_variables(appkey, devid):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/delete-account')
 def delete_account():
     user = ud.get(request.args.get('name'))
@@ -409,6 +421,7 @@ def delete_account():
         return redirect(url_for('settings'))
 
 
+@misc.required_privilege(20)
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if request.method == 'GET':
@@ -431,6 +444,7 @@ def settings():
         return redirect(request.url)
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
 def application_device_data(appkey, devid, var, dest, page):
     dev = dd.get(appkey, devid)[1]
@@ -455,6 +469,7 @@ def application_device_data(appkey, devid, var, dest, page):
         return t
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/alerts')
 def application_alerts(appkey):
     if 'name' in session:
@@ -465,6 +480,7 @@ def application_alerts(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/new-alert', methods=['GET', 'POST'])
 def application_new_alert(appkey):
     if 'name' in session:
@@ -497,6 +513,7 @@ def application_new_alert(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/delete-<ntype>')
 def application_notification_remove(appkey, ntype):
     if 'name' in session:
@@ -515,6 +532,7 @@ def application_notification_remove(appkey, ntype):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/automation')
 def application_automation(appkey):
     if 'name' in session:
@@ -526,6 +544,7 @@ def application_automation(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/new-automation', methods=['GET', 'POST'])
 def application_new_automation(appkey):
     if 'name' in session:
@@ -561,6 +580,7 @@ def application_new_automation(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/settings', methods=['GET', 'POST'])
 def application_settings(appkey):
     if 'name' in session:
@@ -585,6 +605,7 @@ def application_settings(appkey):
         return redirect(url_for('login'))
 
 
+@misc.required_privilege(20)
 @app.route('/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
 def application_device_settings(appkey, devid):
     if 'name' in session:

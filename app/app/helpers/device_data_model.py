@@ -142,6 +142,7 @@ def read_data(data, ddm):
         for k, v in ddm['format'].items():
             if v[-1] == 's':
                 data[k] = data[k].decode('utf-8')
+                data[k] = data[k][:data[k].index('\0')]
         return data 
     elif ddm['model'] == 'json':
         return json.loads(data.decode('utf-8'))

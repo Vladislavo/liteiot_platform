@@ -87,12 +87,23 @@ def restricted(access_level):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if 'role' in session and session['role'] != access_level:
-                flash('Access level "{}" required for this page.'.format(access_level), 'danger')
+                flash('Access denied.', 'danger')
                 return redirect(url_for('index'))
             return f(*args, **kwargs)
         return decorated_function
     return user_control
 
+
+def required_privilege(privilege):
+    def privilege_control(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'privilege' in session and session['privilege'] < privilege:
+                flash('Access denied.', 'danger')
+                return redirect(url_for('index'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return privilege_control
 
 def clean_data_folder():
     try:

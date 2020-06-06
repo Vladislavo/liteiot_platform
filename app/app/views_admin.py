@@ -13,7 +13,7 @@ import app.dao.notification_queue.notification_queue as nq
 import app.dao.misc.misc as md
 
 #import app.helpers.misc as misc
-from app.helpers.misc import restricted
+from app.helpers.misc import restricted, required_privilege
 import app.helpers.device_data_model as ddm
 import app.helpers.misc as misc
 
@@ -26,6 +26,8 @@ MAX_PG_ENTRIES_USERS = 10
 MAX_PG_ENTRIES_DATA = 10
 MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
+
+@required_privilege(40)
 @app.route('/administration', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration():
@@ -45,6 +47,7 @@ def administration():
         return redirect(request.url)
 
 
+@required_privilege(40)
 @app.route('/administration/users')
 @restricted(access_level='admin')
 def administration_users():
@@ -59,6 +62,7 @@ def administration_users():
     return render_template('new/admin/users.html', users=users, info=info)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>')
 @restricted(access_level='admin')
 def administration_users_user(name):
@@ -71,6 +75,7 @@ def administration_users_user(name):
     return render_template('new/admin/user-dashboard.html', info=info, user=name)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/applications')
 @restricted(access_level='admin')
 def administration_users_user_applications(name):
@@ -78,6 +83,7 @@ def administration_users_user_applications(name):
     return render_template('new/admin/user-applications.html', apps=apps, user=name)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/new-application', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_create(name):
@@ -111,6 +117,7 @@ def administration_users_user_application_create(name):
             return redirect(url_for('administration_users_user_applications', name=name))
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>')
 @restricted(access_level='admin')
 def administration_users_user_application(name, appkey):
@@ -121,6 +128,7 @@ def administration_users_user_application(name, appkey):
     return render_template('new/admin/user-application.html', app=ap, devs=devs, user=name)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/add-device', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_add_device(name, appkey):
@@ -146,6 +154,7 @@ def administration_users_user_application_add_device(name, appkey):
                 return redirect(url_for('administration_users_user_application', name=name, appkey=appkey))
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>')
 @restricted(access_level='admin')
 def administration_users_user_application_device(name, appkey, devid):
@@ -166,6 +175,7 @@ def administration_users_user_application_device(name, appkey, devid):
         return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, data=[], total=cnt[1][0], user=name)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_device_settings(name, appkey, devid):
@@ -185,6 +195,7 @@ def administration_users_user_application_device_settings(name, appkey, devid):
         return redirect(request.url)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/delete')
 @restricted(access_level='admin')
 def administration_users_user_application_device_delete(name, appkey, devid):
@@ -201,6 +212,7 @@ def administration_users_user_application_device_delete(name, appkey, devid):
     return redirect(url_for('administration_users_user_application', name=name, appkey=appkey))
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/alerts')
 @restricted(access_level='admin')
 def administration_users_user_application_alerts(name, appkey):
@@ -209,6 +221,7 @@ def administration_users_user_application_alerts(name, appkey):
     return render_template('new/admin/user-application-alerts.html', alert_list=alerts[1], app=ap[1], user=name)
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/new-alert', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_new_alert(name, appkey):
@@ -239,6 +252,7 @@ def administration_users_user_application_new_alert(name, appkey):
             return redirect(request.url) 
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/automation')
 @restricted(access_level='admin')
 def administration_users_user_application_automation(name, appkey):
@@ -248,6 +262,7 @@ def administration_users_user_application_automation(name, appkey):
     return render_template('new/admin/user-application-automation.html', automations=ats[1], app=ap[1], user=name)
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/new-automation', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_new_automation(name, appkey):
@@ -281,6 +296,7 @@ def administration_users_user_application_new_automation(name, appkey):
             return redirect(request.url) 
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/delete')
 @restricted(access_level='admin')
 def administration_users_user_application_delete(name, appkey):
@@ -308,6 +324,7 @@ def administration_users_user_application_delete(name, appkey):
         return redirect(url_for('administration_users_user_applications', name=name))
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/settings', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_settings(name, appkey):
@@ -330,6 +347,7 @@ def administration_users_user_application_settings(name, appkey):
         return redirect(request.url)
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/delete-<ntype>')
 @restricted(access_level='admin')
 def administration_users_user_application_notification_remove(name, appkey, ntype):
@@ -346,6 +364,7 @@ def administration_users_user_application_notification_remove(name, appkey, ntyp
         return '', 500
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/variables')
 @restricted(access_level='admin')
 def administration_users_user_application_device_variables(name, appkey, devid):
@@ -359,6 +378,7 @@ def administration_users_user_application_device_variables(name, appkey, devid):
             return select
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
 @restricted(access_level='admin')
 def administration_users_user_application_device_data(name, appkey, devid, var, dest, page):
@@ -380,6 +400,7 @@ def administration_users_user_application_device_data(name, appkey, devid, var, 
         return t
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_device_configuration(name, appkey, devid):
@@ -406,6 +427,7 @@ def administration_users_user_application_device_configuration(name, appkey, dev
         return '', 201
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/remove-configuration')
 @restricted(access_level='admin')
 def administration_users_user_application_device_configuration_remove(name, appkey, devid):
@@ -419,6 +441,7 @@ def administration_users_user_application_device_configuration_remove(name, appk
     return '', 200
 
 
+@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/download-csv')
 @restricted(access_level='admin')
 def administration_users_user_application_device_download_csv(name, appkey, devid):
@@ -454,6 +477,7 @@ def administration_users_user_application_device_download_csv(name, appkey, devi
     return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/chart-update')
 @restricted(access_level='admin')
 def administration_users_user_chart_update(name):
@@ -470,6 +494,7 @@ def administration_users_user_chart_update(name):
     return "[{}, {}]".format(day_chart, week_chart)
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/recent-activity')
 @restricted(access_level='admin')
 def administration_users_user_recent_activity(name):
@@ -485,6 +510,7 @@ def administration_users_user_recent_activity(name):
         return '', 401
 
 
+@required_privilege(40)
 @app.route('/administration/users/table/<page>')
 @restricted(access_level='admin')
 def administration_users_table(page):
@@ -494,6 +520,7 @@ def administration_users_table(page):
     return str(users), 200
 
 
+@required_privilege(40)
 @app.route('/administration/users/new-user', methods=['POST', 'GET'])
 @restricted(access_level='admin')
 def administration_users_new_user():
@@ -519,6 +546,7 @@ def administration_users_new_user():
                 return redirect(url_for('administration/users', name=username))
 
 
+@required_privilege(40)
 @app.route('/administration/users/<name>/settings', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_settings(name):
@@ -540,11 +568,12 @@ def administration_users_user_settings(name):
         return redirect(request.url)
 
 
+@required_privilege(80)
 @app.route('/administration/users/<name>/delete-account')
 @restricted(access_level='admin')
 def administration_users_user_delete_account(name):
     user = ud.get(name)
-    if user[0] and user[1][2] != 'admin':
+    if user[0] and (user[1][2] != 'admin' or user[1][3] > 80):
         app_list = ad.get_list(user[1][0])
 
         res = (True,)

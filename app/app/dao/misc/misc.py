@@ -9,7 +9,6 @@ import app.dao.device.device as dd
 def get_user_data_count(cur, username):
     apps = ad.get_list(username)[1]
     devs = []
-    
     for a in apps:
         devs.append(dd.get_list(a[1])[1])
     
@@ -22,7 +21,7 @@ def get_user_data_count(cur, username):
             i += 1
         query = query[0:-9]
         query += ') SELECT SUM(count) FROM t'
-
+        print(query)
         cur.execute(query, ())
         
         return (True,cur.fetchone())
