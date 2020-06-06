@@ -1,6 +1,6 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} HPC&amp;A IoT - {{ app[1] }} - Devices {% endblock %}
+{% block title %} HPC&amp;A IoT - {{ app[0] }} - Devices {% endblock %}
 
 {% block header %} 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -175,7 +175,7 @@
 			title: '{{ dev[0] }} > '+dname,
           		curveType: 'function',
 			hAxis: { 
-				format: 'dd/MM hh:mm'
+				format: 'dd/MM HH:mm'
 			},
 			vAxis: {
 				format: 'decimal',

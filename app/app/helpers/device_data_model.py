@@ -96,7 +96,7 @@ def test_done():
     print(read_data_ddm(rdata, ddm))
 
 @misc.with_psql
-def insert_test(cur):
+def mpack_test(cur):
     import random
     
     m = {
@@ -108,6 +108,20 @@ def insert_test(cur):
         INSERT INTO dev_3b56f3d8_3 VALUES ({}, '{}', {})
     """.format(misc.get_utc(), datetime.now().strftime('%H:%M:%S'), Binary(m))
     print (query)
+    cur.execute(query)
+    
+    return (True,)
+
+
+@misc.with_psql
+def raw_test(cur):
+    import random
+    
+    upstr = '<fQ20s?h'
+    m = struct.pack(upstr, random.random()*1000, random.randint(10000,10000000), 'hello'.encode('utf-8'), random.randint(0,2), random.randint(0, 30000))
+    query = """
+        INSERT INTO dev_3b56f3d8_2 VALUES ({}, '{}', {})
+    """.format(misc.get_utc(), datetime.now().strftime('%H:%M:%S'), Binary(m))
     cur.execute(query)
     
     return (True,)
@@ -154,13 +168,14 @@ def extract(request):
             ddmin['format'][k]['type'] = v['size'] + 's'
             ddmin['format'][k].pop('size')
     # order dict
-    od = collections.OrderedDict(sorted(ddmin['format'].items()))
+    od = OrderedDict(sorted(ddmin['format'].items()))
     ddmin.pop('format')
-    ddmin['format'] = collections.OrderedDict()
+    ddmin['format'] = OrderedDict()
     # give it defined ddm format
     for k,v in od.items():
         ddmin['format'][v['name']] = v['type']
 
     return ddmin
 
-print('insert', insert_test())
+print('mpack insert', mpack_test())
+print('raw insert', raw_test())
