@@ -173,32 +173,5 @@ def local_weekday(day_offset = 0):
 def utc_local_diff():
     return abs((datetime.now() - datetime.utcnow()).total_seconds())
 
-def extract_ddm(request):
-    ddmin = {'model':request.form['ddm'], 'format':{}}
-    try:
-        ddmin['endianness'] = request.form['endianness']
-    except:
-        pass
-
-    # create dict with variables
-    for k,v in request.form.items():
-        if k.startswith("var"):
-            i = k.split("_")
-            if not int(i[1]) in ddmin['format']:
-                ddmin['format'][int(i[1])] = { i[0][3:] : v }
-            else:
-                ddmin['format'][int(i[1])][i[0][3:]] = v
-    # format size
-    for k,v in ddmin['format'].items():
-        if 'size' in v:
-            ddmin['format'][k]['type'] = v['size'] + 's'
-            ddmin['format'][k].pop('size')
-    # order dict
-    od = collections.OrderedDict(sorted(ddmin['format'].items()))
-    ddmin.pop('format')
-    ddmin['format'] = collections.OrderedDict()
-    # give it defined ddm format
-    for k,v in od.items():
-        ddmin['format'][v['name']] = v['type']
-
-    return ddmin
+def get_utc():
+    return int((datetime.now() - datetime(1970,1,1)).total_seconds())

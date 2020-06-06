@@ -2,7 +2,6 @@ from psycopg2 import sql
 from app.helpers.misc import with_psql
 from datetime import datetime
 
-
 @with_psql
 def create_table(cur, appkey, devid):
     tn = 'dev_' +str(appkey)+ '_' +str(devid)
@@ -97,7 +96,7 @@ def get_last_hours(cur, appkey, devid, hours, p):
     cur.execute(
         sql.SQL(query).format(sql.Identifier(tn)), [utcb, utcu])
     data = cur.fetchall()
-        
+    
     if (data == []):
         return (False, 'There is no data for the device.')
     else:

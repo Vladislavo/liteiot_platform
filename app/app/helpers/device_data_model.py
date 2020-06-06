@@ -2,6 +2,9 @@ import msgpack
 import struct
 from collections import OrderedDict
 import json
+import app.helpers.misc as misc
+from psycopg2 import Binary
+from datetime import datetime
 
 MODELS = {
     'json' : 'JSON',
@@ -71,20 +74,6 @@ def test_dev():
     print ('raw data json:')
     print (dru)
 
-def read_data_ddm(data, ddm):
-    if ddm['model'] == 'mpack':
-        return msgpack.unpackb(data)
-    elif ddm['model'] == 'raw':
-        upstr = ddm['endianness'] + ''.join(dict(ddm['format']).values())
-        data = struct.unpack(upstr, data)
-        data = dict(zip(ddm['format'].keys(), data))
-        for k, v in ddm['format'].items():
-            if v[-1] == 's':
-                data[k] = data[k].decode('utf-8')
-        return data 
-    elif ddm['model'] == 'json':
-        return json.loads(data.decode('utf-8'))
-
 def test_done():
     print ('test with json:')
     ddm = {
@@ -105,3 +94,73 @@ def test_done():
         'format' : OrderedDict([('some_int', 'H'), ('some_float', 'f'), ('some_bool', '?'), ('some_str', '7s')])
     }
     print(read_data_ddm(rdata, ddm))
+
+@misc.with_psql
+def insert_test(cur):
+    import random
+    
+    m = {
+            "temperature" : random.randint(0, 100),
+            "lever": random.randint(0,1)
+        }
+    m = msgpack.packb(m)
+    query = """
+        INSERT INTO dev_3b56f3d8_3 VALUES ({}, '{}', {})
+    """.format(misc.get_utc(), datetime.now().strftime('%H:%M:%S'), Binary(m))
+    print (query)
+    cur.execute(query)
+    
+    return (True,)
+
+
+def decode_datum(data, ddm):
+    data = [d for d in data]
+    data[2] = read_data(data[2].tobytes(), ddm)
+    return data
+
+def read_data(data, ddm):
+    if ddm['model'] == 'mpack':
+        return msgpack.unpackb(data)
+    elif ddm['model'] == 'raw':
+        upstr = ddm['endianness'] + ''.join(dict(ddm['format']).values())
+        data = struct.unpack(upstr, data)
+        data = dict(zip(ddm['format'].keys(), data))
+        for k, v in ddm['format'].items():
+            if v[-1] == 's':
+                data[k] = data[k].decode('utf-8')
+        return data 
+    elif ddm['model'] == 'json':
+        return json.loads(data.decode('utf-8'))
+
+
+def extract(request):
+    ddmin = {'model':request.form['ddm'], 'format':{}}
+    try:
+        ddmin['endianness'] = request.form['endianness']
+    except:
+        pass
+
+    # create dict with variables
+    for k,v in request.form.items():
+        if k.startswith("var"):
+            i = k.split("_")
+            if not int(i[1]) in ddmin['format']:
+                ddmin['format'][int(i[1])] = { i[0][3:] : v }
+            else:
+                ddmin['format'][int(i[1])][i[0][3:]] = v
+    # format size
+    for k,v in ddmin['format'].items():
+        if 'size' in v:
+            ddmin['format'][k]['type'] = v['size'] + 's'
+            ddmin['format'][k].pop('size')
+    # order dict
+    od = collections.OrderedDict(sorted(ddmin['format'].items()))
+    ddmin.pop('format')
+    ddmin['format'] = collections.OrderedDict()
+    # give it defined ddm format
+    for k,v in od.items():
+        ddmin['format'][v['name']] = v['type']
+
+    return ddmin
+
+print('insert', insert_test())

@@ -200,9 +200,9 @@ def application_device(appkey, devid):
                 ltup = ld[1][0][1]
 
             if ld[0]: 
-                return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, data=ld[1], total=cnt[1][0])
+                return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], table_max=MAX_PG_ENTRIES_DATA)
             else:
-                return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, data=[], total=cnt[1][0])
+                return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0])
     else:
         return redirect(url_for('login'))
 
@@ -214,36 +214,20 @@ def application_add_device(appkey):
             dev_list = dd.get_list(appkey)
             return render_template('new/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS)
         elif request.method == 'POST':
-            ddmin = misc.extract_ddm(request)
+            ddmin = ddm.extract(request)
            
-            if False:
-                res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'])
-
+            res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
+            if not res[0]:
+                flash('Error: {}'.format(res[1]), 'danger')
+                return render_template(request.url)
+            else:
+                res = data.create_table_ddm(appkey, request.form['devid'])
                 if not res[0]:
+                    dd.delete(session['appkey'], request.form['devid'])
                     flash('Error: {}'.format(res[1]), 'danger')
                     return render_template(request.url)
                 else:
-                    res = data.create_table(appkey, request.form['devid'])
-                
-                    if not res[0]:
-                        dd.delete(session['appkey'], request.form['devid'])
-                        flash('Error: {}'.format(res[1]), 'danger')
-                        return render_template(request.url)
-                    else:
-                        return redirect(url_for('application', appkey=appkey))
-            if True:
-                res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
-                if not res[0]:
-                    flash('Error: {}'.format(res[1]), 'danger')
-                    return render_template(request.url)
-                else:
-                    res = data.create_table_ddm(appkey, request.form['devid'])
-                    if not res[0]:
-                        dd.delete(session['appkey'], request.form['devid'])
-                        flash('Error: {}'.format(res[1]), 'danger')
-                        return render_template(request.url)
-                    else:
-                        return redirect(url_for('application', appkey=appkey))
+                    return redirect(url_for('application', appkey=appkey))
     else:
         return redirect(url_for('login'))
 
@@ -443,40 +427,16 @@ def settings():
         return redirect(request.url)
 
 
-@app.route('/dev-data/<var>/<dest>/<page>')
-def dev_data(var, dest, page):
-    if dest == 'graph':
-        last = data.get_last_hours(session['appkey'], session['devid'], MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
-        arr = '[["Time", "{}"],'.format(var)
-        if last[0]:
-            for d in last[1]:
-                arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
-            arr += ']'
-        return arr
-    elif dest == 'table':
-        # for table <cnt> is in items
-        last = data.get_last_range(session['appkey'], session['devid'], [MAX_PG_ENTRIES_DATA, (int(page)-1)*MAX_PG_ENTRIES_DATA])
-        #t = """ <thead>
-        #            <th>Time</th>
-        #            <th>{}</th>
-        #        </thead>
-        #        <tbody>
-        #""".format(var)
-        t = ''
-        if last[0]:
-            for d in last[1]:
-                t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
-        #t += '</tbody>'
-        return t
-
-
 @app.route('/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
 def application_device_data(appkey, devid, var, dest, page):
+    dev = dd.get(appkey, devid)[1]
     if dest == 'graph':
         last = data.get_last_hours(appkey, devid, MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
-        arr = '[["Time", "{}"],'.format(var)
+        arr = ''
         if last[0]:
-            for d in last[1]:
+            arr = '[["Time", "{}"],'.format(var)
+            last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
+            for d in last:
                 arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
             arr += ']'
         return arr
@@ -485,7 +445,8 @@ def application_device_data(appkey, devid, var, dest, page):
         last = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, (int(page)-1)*MAX_PG_ENTRIES_DATA])
         t = ''
         if last[0]:
-            for d in last[1]:
+            last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
+            for d in last:
                 t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
 
@@ -629,8 +590,7 @@ def application_device_settings(appkey, devid):
 
             return render_template('new/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS)
         elif request.method == 'POST':
-            ddmin = misc.extract_ddm(request)
-            #res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'])
+            ddmin = ddm.extract(request)
             res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
             
             if not res[0]:
