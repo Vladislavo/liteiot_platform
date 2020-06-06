@@ -136,7 +136,7 @@ def administration_users_user_application_add_device(name, appkey):
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
         else:
-            res = data.create_table(appkey, request.form['devid'])
+            res = data.create_table_ddm(appkey, request.form['devid'])
         
             if not res[0]:
                 dd.delete(appkey, request.form['devid'])

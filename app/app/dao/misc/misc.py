@@ -161,11 +161,13 @@ def get_recent_activity(cur, username, n=5):
             devs = dd.get_list(a[1])
             for d in devs[1]:
                 query += """
-                (SELECT timedate, appname, devname, data, utc from 
+                (SELECT timedate, appname, devname, data, utc, appkey, devid from 
                     (SELECT utc, timedate, data from dev_{}_{} ORDER BY utc DESC limit 5) AS utc, 
                     (SELECT '{}' as appname) AS appname,
+                    (SELECT '{}' as appkey) AS appkey,
+                    (SELECT '{}' as devid) AS devid,
                     (SELECT '{}' as devname) AS devname)
-                UNION ALL""".format(a[1],d[1], a[0],d[0])
+                UNION ALL""".format(a[1],d[1], a[0],a[1], d[1],d[0])
         query = query[0:-9]
         query += ' ORDER BY utc DESC LIMIT {}'.format(n)
 

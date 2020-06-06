@@ -245,6 +245,7 @@ def application_device_delete(appkey, devid):
         data.delete_table(appkey, devid)
         res = dd.delete(appkey, devid)
 
+        flash('Device removed.', 'success')
         return redirect(url_for('application', appkey=appkey))
     else:
         return redirect(utl_for('login'))
@@ -327,10 +328,13 @@ def chart_update():
 def recent_activity():
     if 'name' in session:
         recent_activity = md.get_recent_activity(session['name'])[1]
+
         ra = ''
         
         for r in recent_activity:
-            ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(r[3])+'</th></tr>'
+            print(r)
+            dev = dd.get(r[5], r[6])[1]
+            ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
 
         return ra, 200
     else:
@@ -355,11 +359,11 @@ def application_device_configuration_remove(appkey, devid):
 @app.route('/application/<appkey>/device/<devid>/variables')
 def application_device_variables(appkey, devid):
     if 'name' in session:
-        last = data.get_last_n(appkey, devid, 1)
-        if last[0]:
+        dmodel = dd.get(appkey, devid)
+        if dmodel[0]:
             select = '<select class="form-control" id="varname" name="varname" onchange="validate_form();" required>'
             select += '<option value="-">Select Variable</option>'
-            for k in last[1][0][2]:
+            for k in dmodel[1][3]['format']:
                 select += '<option>'+k+'</option>'
             select += '</select>'
             return select
