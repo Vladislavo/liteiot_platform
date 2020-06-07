@@ -58,7 +58,9 @@ CREATE TABLE public.pend_msgs (
     app_key character varying(30) NOT NULL,
     dev_id numeric(3,0) NOT NULL,
     msg character varying(150) NOT NULL,
-    ack boolean DEFAULT false NOT NULL
+    ack boolean DEFAULT false NOT NULL,
+    sent_at timestamp(6) DEFAULT now(),
+    confirmed_at timestamp(6)
 );
 
 
@@ -69,6 +71,8 @@ CREATE TABLE public.pend_msgs (
 --
 
 CREATE TABLE public.users (
+    first_name character varying(50),
+    last_name character varying(50),
     name character varying(30) NOT NULL,
     password character varying(100) NOT NULL,
     role character varying(10) NOT NULL
@@ -99,7 +103,7 @@ CREATE TABLE public.notifications_queue (
 	nf_id character varying(10) NOT NULL,
 	app_key character varying(30) NOT NULL,
 	dev_id numeric(3) NOT NULL,
-	fired_on timestamp(6) NOT NULL
+	fired_on timestamp(6) NOT NULL DEFAULT now()
 );
 
 
@@ -128,12 +132,21 @@ ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (name);
 
 
+
 --
 -- Name: applications applications_username_fkey; Type: FK CONSTRAINT; Schema: public; Owner: pi
 --
 
 ALTER TABLE ONLY public.applications
     ADD CONSTRAINT applications_username_fkey FOREIGN KEY (username) REFERENCES public.users(name);
+
+
+ALTER TABLE ONLY public.pend_msgs
+    ADD CONSTRAINT applications_pkey PRIMARY KEY (app_key, dev_id);
+
+
+ALTER TABLE ONLY public.pend_msgs
+    ADD CONSTRAINT pend_msgs_app_key_fkey FOREIGN KEY (app_key) REFERENCES public.applications(app_key);
 
 --
 -- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: pi
@@ -160,8 +173,5 @@ ALTER TABLE ONLY public.notifications_queue
 	ADD CONSTRAINT notifications_queue_app_key_fkey FOREIGN KEY (app_key, nf_id, dev_id) REFERENCES public.notifications(app_key, id, dev_id);
 
 
-INSERT INTO public.users VALUES('admin', '$2b$12$chdF4ji1maIRLd4ms4s4yugFv.2BTvOAwiaWi6iRlTJzlGKjpTcA.', 'admin')
---
--- PostgreSQL database dump complete
---
+INSERT INTO public.users VALUES('admin', '$2b$12$chdF4ji1maIRLd4ms4s4yugFv.2BTvOAwiaWi6iRlTJzlGKjpTcA.', 'superuser')
 
