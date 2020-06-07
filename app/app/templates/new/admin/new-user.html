@@ -22,8 +22,18 @@
 	      <form action="/administration/users/new-user" method="post">
 			<div class="form-group">
 				<label>Name:</label><br>
-				<input type="text" maxlength="30" class="form-control" id="username" name="username" required><br>
+				<input type="text" maxlength="30" class="form-control" id="username" name="username" required>
 			</div>
+			<br>
+			<div class="form-group">
+				<label for="role"> Role: </label>
+				<select class="form-control" id="role" name="role">
+					<option> interface </option>
+					<option> user </option>
+					<option> admin </option>
+				</select>
+			</div>
+			<br>
 			<div class="form-group">
 				<label>Password:</label><br>
                     		<input class="form-control" placeholder="Password" type="password" minlength="8" id="password" name="password" onkeyup="return validate_password();">
@@ -32,14 +42,6 @@
 			</div>
 			<div class="text-muted font-italic"><small>Required password strength: <span class="text-success font-weight-700">At least 8 characters.</span></small></div>
 			<div class="text-muted font-italic"><small id="passvalidation"></small></div>
-			<br>
-			<div class="form-group">
-				<label for="role"> Role: </label>
-				<select class="form-control" id="role" name="role">
-					<option> user </option>
-					<option> admin </option>
-				</select>
-			</div>
 			<br><br>
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">Create User</button>

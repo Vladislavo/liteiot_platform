@@ -13,7 +13,7 @@ import app.dao.notification_queue.notification_queue as nq
 import app.dao.misc.misc as md
 
 #import app.helpers.misc as misc
-from app.helpers.misc import restricted, required_privilege
+from app.helpers.misc import restricted
 import app.helpers.device_data_model as ddm
 import app.helpers.misc as misc
 
@@ -27,9 +27,8 @@ MAX_PG_ENTRIES_DATA = 10
 MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
 
-@required_privilege(40)
 @app.route('/administration', methods=['GET', 'POST'])
-@restricted(access_level='admin')
+@restricted('admin')
 def administration():
     if request.method == 'GET':
         user_cnt = ud.get_count()[1][0]
@@ -47,7 +46,6 @@ def administration():
         return redirect(request.url)
 
 
-@required_privilege(40)
 @app.route('/administration/users')
 @restricted(access_level='admin')
 def administration_users():
@@ -62,20 +60,22 @@ def administration_users():
     return render_template('new/admin/users.html', users=users, info=info)
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>')
 @restricted(access_level='admin')
 def administration_users_user(name):
-    created_apps = ad.get_count_by_user(name)[1][0]
-    active_devices = dd.get_count_by_user(name)
-    total_activity = md.get_user_data_count(name)[1][0]
-    last_activity = md.get_user_data_count_per_day(name)[1][0]
-    info = [created_apps, active_devices, total_activity, last_activity]
+    user = ud.get(name)
+    if user[0]:
+        created_apps = ad.get_count_by_user(name)[1][0]
+        active_devices = dd.get_count_by_user(name)
+        total_activity = md.get_user_data_count(name)[1][0]
+        last_activity = md.get_user_data_count_per_day(name)[1][0]
+        info = [created_apps, active_devices, total_activity, last_activity]
 
-    return render_template('new/admin/user-dashboard.html', info=info, user=name)
+        return render_template('new/admin/user-dashboard.html', info=info, user=name)
+    else:
+        flash('Access denied', 'danger')
+        return redirect(url_for('administration_users'))
 
-
-@required_privilege(40)
 @app.route('/administration/users/<name>/applications')
 @restricted(access_level='admin')
 def administration_users_user_applications(name):
@@ -83,7 +83,6 @@ def administration_users_user_applications(name):
     return render_template('new/admin/user-applications.html', apps=apps, user=name)
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/new-application', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_create(name):
@@ -117,7 +116,6 @@ def administration_users_user_application_create(name):
             return redirect(url_for('administration_users_user_applications', name=name))
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>')
 @restricted(access_level='admin')
 def administration_users_user_application(name, appkey):
@@ -128,7 +126,6 @@ def administration_users_user_application(name, appkey):
     return render_template('new/admin/user-application.html', app=ap, devs=devs, user=name)
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/add-device', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_add_device(name, appkey):
@@ -154,14 +151,13 @@ def administration_users_user_application_add_device(name, appkey):
                 return redirect(url_for('administration_users_user_application', name=name, appkey=appkey))
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>')
 @restricted(access_level='admin')
 def administration_users_user_application_device(name, appkey, devid):
     ap = ad.get(appkey)
     dev = dd.get(appkey, devid)
 
-    ld = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, 0])
+    ld = data.get_last_n(appkey, devid, 1)
     cnt = data.get_count(appkey, devid)
 
     ltup = 'Device has not any sent data yet'
@@ -169,13 +165,9 @@ def administration_users_user_application_device(name, appkey, devid):
     if ld[0] and ld[1][0] != []:
         ltup = ld[1][0][1]
 
-    if ld[0]: 
-        return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, data=ld[1], total=cnt[1][0], user=name)
-    else:
-        return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, data=[], total=cnt[1][0], user=name)
+    return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], user=name, table_max=MAX_PG_ENTRIES_DATA)
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_device_settings(name, appkey, devid):
@@ -195,7 +187,6 @@ def administration_users_user_application_device_settings(name, appkey, devid):
         return redirect(request.url)
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/delete')
 @restricted(access_level='admin')
 def administration_users_user_application_device_delete(name, appkey, devid):
@@ -212,7 +203,6 @@ def administration_users_user_application_device_delete(name, appkey, devid):
     return redirect(url_for('administration_users_user_application', name=name, appkey=appkey))
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/alerts')
 @restricted(access_level='admin')
 def administration_users_user_application_alerts(name, appkey):
@@ -221,7 +211,6 @@ def administration_users_user_application_alerts(name, appkey):
     return render_template('new/admin/user-application-alerts.html', alert_list=alerts[1], app=ap[1], user=name)
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/new-alert', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_new_alert(name, appkey):
@@ -252,7 +241,6 @@ def administration_users_user_application_new_alert(name, appkey):
             return redirect(request.url) 
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/automation')
 @restricted(access_level='admin')
 def administration_users_user_application_automation(name, appkey):
@@ -262,7 +250,6 @@ def administration_users_user_application_automation(name, appkey):
     return render_template('new/admin/user-application-automation.html', automations=ats[1], app=ap[1], user=name)
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/new-automation', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_new_automation(name, appkey):
@@ -296,7 +283,6 @@ def administration_users_user_application_new_automation(name, appkey):
             return redirect(request.url) 
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/delete')
 @restricted(access_level='admin')
 def administration_users_user_application_delete(name, appkey):
@@ -324,7 +310,6 @@ def administration_users_user_application_delete(name, appkey):
         return redirect(url_for('administration_users_user_applications', name=name))
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/settings', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_settings(name, appkey):
@@ -347,7 +332,6 @@ def administration_users_user_application_settings(name, appkey):
         return redirect(request.url)
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/delete-<ntype>')
 @restricted(access_level='admin')
 def administration_users_user_application_notification_remove(name, appkey, ntype):
@@ -364,29 +348,28 @@ def administration_users_user_application_notification_remove(name, appkey, ntyp
         return '', 500
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/variables')
 @restricted(access_level='admin')
 def administration_users_user_application_device_variables(name, appkey, devid):
-        last = data.get_last_n(appkey, devid, 1)
-        if last[0]:
-            select = '<select class="form-control" id="varname" name="varname" onchange="validate_form();" required>'
-            select += '<option value="-">Select Variable</option>'
-            for k in last[1][0][2]:
-                select += '<option>'+k+'</option>'
-            select += '</select>'
-            return select
+        dev = dd.get(appkey, devid)[1]
+        select = '<select class="form-control" id="varname" name="varname" onchange="validate_form();" required>'
+        select += '<option value="-">Select Variable</option>'
+        for k in dev[3]['format']:
+            select += '<option>'+k+'</option>'
+        select += '</select>'
+        return select
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
 @restricted(access_level='admin')
 def administration_users_user_application_device_data(name, appkey, devid, var, dest, page):
+    dev = dd.get(appkey, devid)[1]
     if dest == 'graph':
         last = data.get_last_hours(appkey, devid, MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
-        arr = '[["Time", "{}"],'.format(var)
         if last[0]:
-            for d in last[1]:
+            arr = '[["Time", "{}"],'.format(var)
+            last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
+            for d in last:
                 arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
             arr += ']'
         return arr
@@ -395,12 +378,12 @@ def administration_users_user_application_device_data(name, appkey, devid, var, 
         last = data.get_last_range(appkey, devid, [MAX_PG_ENTRIES_DATA, (int(page)-1)*MAX_PG_ENTRIES_DATA])
         t = ''
         if last[0]:
-            for d in last[1]:
+            last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
+            for d in last:
                 t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_application_device_configuration(name, appkey, devid):
@@ -427,7 +410,6 @@ def administration_users_user_application_device_configuration(name, appkey, dev
         return '', 201
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/remove-configuration')
 @restricted(access_level='admin')
 def administration_users_user_application_device_configuration_remove(name, appkey, devid):
@@ -441,7 +423,6 @@ def administration_users_user_application_device_configuration_remove(name, appk
     return '', 200
 
 
-@required_privilege(60)
 @app.route('/administration/users/<name>/application/<appkey>/device/<devid>/download-csv')
 @restricted(access_level='admin')
 def administration_users_user_application_device_download_csv(name, appkey, devid):
@@ -477,7 +458,6 @@ def administration_users_user_application_device_download_csv(name, appkey, devi
     return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/chart-update')
 @restricted(access_level='admin')
 def administration_users_user_chart_update(name):
@@ -494,23 +474,19 @@ def administration_users_user_chart_update(name):
     return "[{}, {}]".format(day_chart, week_chart)
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/recent-activity')
 @restricted(access_level='admin')
 def administration_users_user_recent_activity(name):
-    if 'name' in session:
-        recent_activity = md.get_recent_activity(name)[1]
-        ra = ''
-        
-        for r in recent_activity:
-            ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(r[3])+'</th></tr>'
+    recent_activity = md.get_recent_activity(name)[1]
+    ra = ''
+    
+    for r in recent_activity:
+        dev = dd.get(r[5], r[6])[1]
+        ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
 
-        return ra, 200
-    else:
-        return '', 401
+    return ra, 200
 
 
-@required_privilege(40)
 @app.route('/administration/users/table/<page>')
 @restricted(access_level='admin')
 def administration_users_table(page):
@@ -520,7 +496,6 @@ def administration_users_table(page):
     return str(users), 200
 
 
-@required_privilege(40)
 @app.route('/administration/users/new-user', methods=['POST', 'GET'])
 @restricted(access_level='admin')
 def administration_users_new_user():
@@ -543,37 +518,44 @@ def administration_users_new_user():
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
             else:
-                return redirect(url_for('administration/users', name=username))
+                return redirect(url_for('administration_users_user', name=username))
 
 
-@required_privilege(40)
 @app.route('/administration/users/<name>/settings', methods=['GET', 'POST'])
 @restricted(access_level='admin')
 def administration_users_user_settings(name):
-    if request.method == 'GET':
-        return render_template('new/admin/user-settings.html', user=name)
+    user = ud.get(name)
+    if user[0] and (misc.USER_LEVELS[user[1][2]] < misc.USER_LEVELS[session['role']]):
+        if request.method == 'GET':
+            return render_template('new/admin/user-settings.html', user=name, user_role=user[1][2])
+        else:
+            if request.form['name'] != name:
+                res = ud.update_name(name, request.form['name'])
+                if not res[0]:
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return redirect(request.url);
+            if request.form['password'] != '':
+                res = ud.update_password(name, request.form['password'].encode('utf-8'))
+                if not res[0]:
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return redirect(request.url)
+            if request.form['role'] != user[1][2]:
+                res = ud.update_role(name, request.form['role'])
+                if not res[0]:
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return redirect(request.url)
+            flash('Settings successfully saved.', 'success')
+            return redirect(request.url)
     else:
-        if request.form['name'] != name:
-            res = ud.update_name(name, request.form['name'])
-            if not res[0]:
-                flash('Error: {}'.format(res[1]), 'danger')
-                return redirect(request.url);
-        if request.form['password'] != '':
-            res = ud.update_password(name, request.form['password'].encode('utf-8'))
-            if not res[0]:
-                flash('Error: {}'.format(res[1]), 'danger')
-                return redirect(request.url)
-
-        flash('Settings successfully saved.', 'success')
-        return redirect(request.url)
+        flash('Access denied' ,'danger')
+        return redirect(url_for('administration_users_user', name=name))
 
 
-@required_privilege(80)
 @app.route('/administration/users/<name>/delete-account')
 @restricted(access_level='admin')
 def administration_users_user_delete_account(name):
     user = ud.get(name)
-    if user[0] and (user[1][2] != 'admin' or user[1][3] > 80):
+    if user[0] and (misc.USER_LEVELS[user[1][2]] < misc.USER_LEVELS[session['role']]):
         app_list = ad.get_list(user[1][0])
 
         res = (True,)

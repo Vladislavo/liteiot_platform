@@ -26,10 +26,25 @@
 		<form action="/administration/users/{{ user }}/settings" method="post" id="settings">
 			<div class="form-group">
 				<label>Name:</label><br>
-				<input type="text" maxlength="30" class="form-control" id="name" name="name" value="{{ user }}" style="pointer-events: none;"><br>
+				<input type="text" maxlength="30" class="form-control" id="name" name="name" value="{{ user }}" style="pointer-events: none;">
 			</div>
 			<br>
 			<div class="form-group">
+				<label for="role"> Role: </label>
+				<select class="form-control" id="role" name="role">
+					{% set roles = ['interface', 'user', 'admin'] %}
+					{% for r in roles %}
+						{% if r == user_role %}
+					<option selected="selected"> {{ r }} </option>
+						{% else %}
+					<option> {{ r }} </option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+			<br>
+			<div class="form-group">
+			  <label> Change password: </label>
 			  <div class="input-group input-group-alternative">
 			    <div class="input-group-prepend">
 			      <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>

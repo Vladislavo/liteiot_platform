@@ -107,7 +107,6 @@ def mpack_test(cur):
     query = """
         INSERT INTO dev_3b56f3d8_3 VALUES ({}, '{}', {})
     """.format(misc.get_utc(), datetime.now().strftime('%H:%M:%S'), Binary(m))
-    print (query)
     cur.execute(query)
     
     return (True,)

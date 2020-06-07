@@ -46,6 +46,18 @@ def update_password(cur, name, password):
     cur.execute(query, (bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8'), name))
     return (True,)
 
+
+@with_psql
+def update_role(cur, name, role):
+    query = """
+    UPDATE users SET
+        role = %s
+    WHERE
+        name = %s
+    """
+    cur.execute(query, (role,name))
+    return (True,)
+
 @with_psql
 def get(cur, name):
     query = """

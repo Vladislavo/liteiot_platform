@@ -82,19 +82,19 @@
 			<thead>
 				<th> Name </th>
 				<th> Role </th>
-				<th> Privilege Level </th>
 			</thead>
 			<tbody id="users_body">
 				{% for u in users %}
 				<tr onclick="window.location='/administration/users/{{ u[0] }}';">
 					<th> {{ u[0] }} </th>
 					<th> {{ u[2] }} </th>
-					<th> {{ u[3] }} </th>
 				</tr>
 				{% endfor %}
 			</tbody>
 		</table>
-		<center><a href="javascript:void(0);" onclick="return table_load_more();">Load more</a></center>
+		{% if users|length > 10 %}
+		<center><a href="javascript:void(0);" id="table_load_more" onclick="return table_load_more();">Load more</a></center>
+		{% endif %}
 		{% endif %}
             </div>
 	    <div class="card-body">
@@ -131,12 +131,16 @@
 			url:"/administration/users/table/"+next_page+"?name="+$("#filter_name").val(),
 			type:"get",
 			success: function(data) {
-				data = eval(data);
-				data.forEach(function (entry) {
-					str = "<tr onclick=window.location=\"/administration/users/"+entry[0]+"\"><th>"+entry[0]+"</th>"+"<th>"+entry[1]+"</th></tr>";
-					$("#users_body").append(unescape(str));
-				});
-				next_page++;
+				if (data.length == 0) {
+					$("#table_load_more").remove();
+				else {
+					data = eval(data);
+					data.forEach(function (entry) {
+						str = "<tr onclick=window.location=\"/administration/users/"+entry[0]+"\"><th>"+entry[0]+"</th>"+"<th>"+entry[1]+"</th></tr>";
+						$("#users_body").append(unescape(str));
+					});
+					next_page++;
+				}
 			}
 		});
 	}

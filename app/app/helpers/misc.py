@@ -11,6 +11,27 @@ import collections
 import json
 
 
+USER_LEVELS = {
+    # user can only see applications and devices as interface.
+    'interface' : 0,       
+    # user has the control over all user aspects. CRUD:applications+devices+alarms+automation + device configuration and data download
+    'user'      : 40, 
+    # + CRUD:user expect admins
+    'admin'     : 80,
+    # total control (1 superuser per platform)
+    'superuser' : 100
+}
+
+@app.context_processor
+def get_user_levels():
+    return dict(user_levels=USER_LEVELS)
+
+@app.context_processor
+def grant_view():
+    def check(require, wants):
+        return USER_LEVELS[require] <= USER_LEVELS[wants]
+    return dict(grant=check)
+
 def rand_str(length):
     if length % 2 == 0:
         return hexlify(os.urandom(length//2))
@@ -86,24 +107,15 @@ def restricted(access_level):
     def user_control(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if 'role' in session and session['role'] != access_level:
-                flash('Access denied.', 'danger')
-                return redirect(url_for('index'))
-            return f(*args, **kwargs)
+            if 'role' in session:
+                if USER_LEVELS[access_level] > USER_LEVELS[session['role']]:
+                    flash('Access denied.', 'danger')
+                    return redirect(url_for('index'))
+                return f(*args, **kwargs)
+            return redirect(url_for('login'))
         return decorated_function
     return user_control
 
-
-def required_privilege(privilege):
-    def privilege_control(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if 'privilege' in session and session['privilege'] < privilege:
-                flash('Access denied.', 'danger')
-                return redirect(url_for('index'))
-            return f(*args, **kwargs)
-        return decorated_function
-    return privilege_control
 
 def clean_data_folder():
     try:

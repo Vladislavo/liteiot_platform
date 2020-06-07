@@ -92,7 +92,7 @@
               <i class="ni ni-air-baloon text-yellow"></i> Applications
             </a>
           </li>
-	  {% if session['role'] == 'admin' %}
+	  {% if get_user_levels() %}
           <li class="nav-item">
             <a class="nav-link " href="/administration">
               <i class="ni ni-briefcase-24 text-pink"></i> Administration
