@@ -101,7 +101,7 @@ def administration_user_new_application(name):
                 flash('Error: {}'.format(res[1]), 'danger')
                 return render_template(request.url)
         
-            res = dd.create_table(appkey)
+            res = dd.create_table_ddm(appkey)
         
             if not res[0]:
                 ad.delete(appkey)
@@ -129,7 +129,7 @@ def administration_user_application_add_device(name, appkey):
         dev_list = dd.get_list(appkey)
         return render_template('new/admin/user-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, user=name)
     elif request.method == 'POST':
-        ddmin = misc.extract_ddm(request)
+        ddmin = ddm.extract(request)
         res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
 
         if not res[0]:
@@ -172,7 +172,7 @@ def administration_user_application_device_settings(name, appkey, devid):
 
         return render_template('new/admin/user-application-device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS, user=name)
     elif request.method == 'POST':
-        ddmin = misc.extract_ddm(request)
+        ddmin = ddm.extract(request)
         res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
     
         if not res[0]:
@@ -438,7 +438,7 @@ def administration_user_application_device_download_csv(name, appkey, devid):
 
     with open(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+fn, 'w+') as f: 
         f.write('utc,timestamp,')
-        for d in dumpd[1][0][2]:
+        for d in dev[3]['format']:
             f.write(d)
             f.write(',')
         f.write('\n')
