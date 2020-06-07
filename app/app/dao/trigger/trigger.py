@@ -78,14 +78,10 @@ def create_function_rt(cur, appkey, devid, nfid, expr, action_type, action):
     BEGIN
     """.format(appkey, devid, nfid)
     
-            #PERFORM pg_notify('nf_channel', '{{"appkey":"{}", "devid":{}, "nfid":"{}", "data": row_to_json(NEW.*) }}');
-            #PERFORM pg_notify('nf_channel', json_build_object('appkey','{}','devid',{},'nfid','{}','data',NEW.data));
+        #PERFORM pg_notify('nf_channel', '{{"appkey":"{}", "devid":{}, "nfid":"{}", "lvalue":"{}", "op":"{}", "rvalue":"{}", "action_type":"{}", "action":"{}", "message":' || row_to_json(NEW) || '}}');
     query += """
-        IF (NEW.data->>'{}')::{} {} {} THEN
-            PERFORM pg_notify('nf_channel', '{{"appkey":"{}", "devid":{}, "nfid":"{}", "action_type":"{}", "action":"{}", "message":' || row_to_json(NEW) || '}}');
-        END IF;
-    """.format( expr[0], get_type(expr[2]), expr[1], expr[2],
-                appkey, devid, nfid, action_type, action)
+        PERFORM pg_notify('nf_channel', '{{"appkey":"{}", "devid":{}, "nfid":"{}", "lvalue":"{}", "op":"{}", "rvalue":"{}", "action_type":"{}", "action":"{}", "message":' || row_to_json(NEW) || '}}');
+    """.format(appkey, devid, nfid, expr[0], expr[1], expr[2], action_type, action)
     
     query += """
         RETURN NEW;
@@ -95,7 +91,6 @@ def create_function_rt(cur, appkey, devid, nfid, expr, action_type, action):
     LANGUAGE plpgsql VOLATILE
     COST 100;
     """
-    print(query)
 
     cur.execute(query)
         

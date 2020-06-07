@@ -177,5 +177,3 @@ def extract(request):
 
     return ddmin
 
-print('mpack insert', mpack_test())
-print('raw insert', raw_test())

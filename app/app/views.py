@@ -475,7 +475,7 @@ def application_new_alert(appkey):
             if res[0]:
                 # create new function and trigger
                 t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'alert',request.form['alertemail'])
-                tr.create(appkey, request.form['devid'], nid)
+                t = tr.create(appkey, request.form['devid'], nid)
                 flash('Alert created', 'success')
                 return redirect(url_for('application_alerts', appkey=appkey))
             else:

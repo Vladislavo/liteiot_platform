@@ -19,7 +19,7 @@
               <h3 class="mb-0">New Alert</h3>
             </div>
             <div class="card-body">
-		<form action="/application/{{ app[1] }}/new-alert" method="post">
+		<form action="/application/{{ app[1] }}/new-alert" method="post" id="alertform">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="alertname" name="alertname" required><br>
@@ -37,28 +37,31 @@
 				<option value="-">Select variable</option>
 			</select>
 			<br>
-			<select class='form-control notifelem' name='operation' id='operation' required>
-				<option default>></option>
+			<select class='form-control notifelem' name='operation' id='operation' onchange="return onop();" required>
+				<option selected="selected">></option>
 				<option>>=</option>
 				<option><</option>
 				<option><=</option>
-				<option>=</option>
+				<option>==</option>
+				<option>ON UPDATE</option>
 			</select>
 			<br>
 			<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>
-			<p> Use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean. <br>
-			Keep types consistently for each variable for both, alerts and automations. </p>
+			<!--
+	   		<p> Use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean. <br>
+	   		Keep types consistently for each variable for both, alerts and automations. </p> 
+			-->
+		</form>
 
 			<br>
 			<h4> THEN </h4>
 			<h5> Send email to: </h5>
 
-			<input class="form-control" type="email" id="alertemail" name="alertemail" placeholder="Type email..." required>
+			<input class="form-control" type="email" form="alertform" id="alertemail" name="alertemail" placeholder="Type email..." required>
 			<br><br>
 			<div class="form-group">
-				<button type="submit" id="submit" class="btn btn-primary">Create Alert</button>
+				<button type="submit" id="submit" form="alertform" class="btn btn-primary">Create Alert</button>
 			</div>
-		</form>
 
             </div>
           </div>
@@ -92,6 +95,20 @@
 			fetch(window.origin+"/application/{{ app[1] }}/device/"+sel_op+"/variables").then(res => res.text()).then(data => $("#varname").html(data));
 		}
 		validate_form();
+	}
+
+	function onop() {
+		var dev_sel = document.getElementById("operation");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].text;
+		
+		var input = document.getElementById("avalue");
+		if (sel_op[0] == 'O') {
+			input.setAttribute("type", "hidden");
+			input.setAttribute("required", "false");
+		} else {
+			input.setAttribute("type", "text");
+			input.setAttribute("required", "true");
+		}
 	}
 </script>
 {% endblock %}
