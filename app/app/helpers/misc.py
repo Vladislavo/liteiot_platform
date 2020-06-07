@@ -5,7 +5,6 @@ import os
 import psycopg2
 import binascii
 from datetime import datetime
-from functools import wraps
 
 import collections
 import json
@@ -22,15 +21,9 @@ USER_LEVELS = {
     'superuser' : 100
 }
 
-@app.context_processor
-def get_user_levels():
-    return dict(user_levels=USER_LEVELS)
-
-@app.context_processor
-def grant_view():
-    def check(require, wants):
-        return USER_LEVELS[require] <= USER_LEVELS[wants]
-    return dict(grant=check)
+def grant_view(require, wants):
+    return USER_LEVELS[require] <= USER_LEVELS[wants]
+app.jinja_env.globals.update(grant_view=grant_view)
 
 def rand_str(length):
     if length % 2 == 0:
@@ -101,20 +94,6 @@ def with_psql(f):
     
         return res
     return _with_psql
-
-
-def restricted(access_level):
-    def user_control(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if 'role' in session:
-                if USER_LEVELS[access_level] > USER_LEVELS[session['role']]:
-                    flash('Access denied.', 'danger')
-                    return redirect(url_for('index'))
-                return f(*args, **kwargs)
-            return redirect(url_for('login'))
-        return decorated_function
-    return user_control
 
 
 def clean_data_folder():

@@ -17,6 +17,7 @@ import app.dao.misc.misc as md
 import app.helpers.misc as misc
 import app.helpers.mailer as mailer
 import app.helpers.device_data_model as ddm
+import app.helpers.decorators as decorators
 
 import os
 import binascii
@@ -28,8 +29,8 @@ MAX_PG_ENTRIES_DATA = 10
 MAX_PG_ENTRIES_GRAPH_HOURS = 24
 
 
-@misc.restricted('interface')
 @app.route('/')
+@decorators.restricted('interface')
 def index():
     created_apps = ad.get_count_by_user(session['name'])[1][0]
     active_devices = dd.get_count_by_user(session['name'])
@@ -97,16 +98,17 @@ def logout():
     return redirect(url_for('login'))
 
 
-@misc.restricted('interface')
 @app.route('/applications')
+@decorators.restricted('interface')
 def applications():
     apps = ad.get_list(session['name'])
    
     return render_template('new/public/applications.html', apps=apps[1])
 
 
-@misc.restricted('interface')
 @app.route('/application/<appkey>')
+@decorators.restricted('interface')
+@decorators.application_protected
 def application(appkey):
     ap = list(ad.get(appkey)[1])
     ap[5] = misc.skey_b64_to_hex(ap[5])
@@ -115,8 +117,8 @@ def application(appkey):
     return render_template('new/public/application.html', app=ap, devs=devs)
 
 
-@misc.restricted('user')
 @app.route('/new-application', methods=['GET', 'POST'])
+@decorators.restricted('user')
 def application_create():
     if request.method == 'GET':
         return render_template('new/public/new-application.html')
@@ -148,8 +150,9 @@ def application_create():
             return redirect(url_for('applications'))
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/delete')
+@decorators.restricted('user')
+@decorators.application_protected
 def application_delete(appkey):
     devs = dd.get_list(appkey)
 
@@ -175,8 +178,9 @@ def application_delete(appkey):
         return redirect(url_for('applications'))
 
 
-@misc.restricted('interface')
 @app.route('/application/<appkey>/device/<devid>')
+@decorators.restricted('interface')
+@decorators.application_protected
 def application_device(appkey, devid):
     ap = ad.get(appkey)
     if session['name'] == ap[1][2]:
@@ -193,8 +197,9 @@ def application_device(appkey, devid):
         return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], table_max=MAX_PG_ENTRIES_DATA)
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/add-device', methods=['GET', 'POST'])
+@decorators.restricted('user')
+@decorators.application_protected
 def application_add_device(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
@@ -217,8 +222,9 @@ def application_add_device(appkey):
                 return redirect(url_for('application', appkey=appkey))
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/device/<devid>/delete')
+@decorators.restricted('user')
+@decorators.application_protected
 def application_device_delete(appkey, devid):
     nq.delete_per_device(appkey, devid)
     nfss = nfs.get_per_device(appkey, devid)
@@ -234,8 +240,9 @@ def application_device_delete(appkey, devid):
     return redirect(url_for('application', appkey=appkey))
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
+@decorators.restricted('user')
+@decorators.application_protected
 def application_device_configuration(appkey, devid):
     if request.method == 'GET':
         pend_msgs = pend.get_list(appkey, devid)
@@ -260,9 +267,20 @@ def application_device_configuration(appkey, devid):
         return '', 201
 
 
-@misc.restricted('interface')
 @app.route('/application/<appkey>/device/<devid>/download-csv')
+@decorators.restricted('interface')
+@decorators.application_protected
 def application_device_download_csv(appkey, devid):
+    @after_this_request
+    def clean_data_folder(response):
+        try:
+            filelist = [f for f in os.listdir(app.config['DATA_DOWNLOAD_DIR_OS'])]
+            for f in filelist:
+                os.remove(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+f)
+        except OSError:
+            pass
+        return response
+
     dumpd = data.get_all(appkey, devid)
     ap = ad.get(appkey)[1]
     dev = dd.get(appkey, devid)[1]
@@ -286,8 +304,8 @@ def application_device_download_csv(appkey, devid):
     return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
 
 
-@misc.restricted('interface')
 @app.route('/chart-update')
+@decorators.restricted('interface')
 def chart_update():
     day_chart_values = md.get_user_data_count_per_hour_period(session['name'], 11)[1]
     day_chart_values = [x[0] for x in day_chart_values]
@@ -302,8 +320,8 @@ def chart_update():
     return "[{}, {}]".format(day_chart, week_chart), 200
 
 
-@misc.restricted('interface')
 @app.route('/recent-activity')
+@decorators.restricted('interface')
 def recent_activity():
     recent_activity = md.get_recent_activity(session['name'])[1]
 
@@ -316,8 +334,9 @@ def recent_activity():
     return ra, 200
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/device/<devid>/remove-configuration')
+@decorators.restricted('user')
+@decorators.application_protected
 def application_device_configuration_remove(appkey, devid):
     res = pend.delete(appkey, devid, request.args.get('conf')+'_')
 
@@ -329,8 +348,9 @@ def application_device_configuration_remove(appkey, devid):
     return '', 200
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/device/<devid>/variables')
+@decorators.restricted('user')
+@decorators.application_protected
 def application_device_variables(appkey, devid):
     dmodel = dd.get(appkey, devid)
     if dmodel[0]:
@@ -342,8 +362,8 @@ def application_device_variables(appkey, devid):
         return select
 
 
-@misc.restricted('user')
 @app.route('/delete-account')
+@decorators.restricted('user')
 def delete_account():
     user = ud.get(request.args.get('name'))
     app_list = ad.get_list(user[1][0])
@@ -377,8 +397,8 @@ def delete_account():
         return redirect(url_for('login'))
 
 
-@misc.restricted('user')
 @app.route('/settings', methods=['GET', 'POST'])
+@decorators.restricted('user')
 def settings():
     if request.method == 'GET':
         return render_template('new/public/settings.html', user=session['name'])
@@ -400,8 +420,9 @@ def settings():
         return redirect(request.url)
 
 
-@misc.restricted('interface')
 @app.route('/application/<appkey>/device/<devid>/data/<var>/<dest>/<page>')
+@decorators.restricted('interface')
+@decorators.application_protected
 def application_device_data(appkey, devid, var, dest, page):
     dev = dd.get(appkey, devid)[1]
     if dest == 'graph':
@@ -425,16 +446,18 @@ def application_device_data(appkey, devid, var, dest, page):
         return t
 
 
-@misc.restricted('interface')
 @app.route('/application/<appkey>/alerts')
+@decorators.restricted('interface')
+@decorators.application_protected
 def application_alerts(appkey):
     ap = ad.get(appkey)
     alerts = nfs.get_alerts_list(appkey)
     return render_template('new/public/alerts.html', alert_list=alerts[1], app=ap[1])
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/new-alert', methods=['GET', 'POST'])
+@decorators.restricted('user')
+@decorators.application_protected
 def application_new_alert(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
@@ -463,8 +486,9 @@ def application_new_alert(appkey):
             return redirect(request.url) 
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/delete-<ntype>')
+@decorators.restricted('user')
+@decorators.application_protected
 def application_notification_remove(appkey, ntype):
     nq.delete(appkey, request.args.get('devid'), request.args.get('id'))
     tr.delete(appkey, request.args.get('devid'), request.args.get('id'))
@@ -479,8 +503,9 @@ def application_notification_remove(appkey, ntype):
         return '', 500
 
 
-@misc.restricted('interface')
 @app.route('/application/<appkey>/automation')
+@decorators.restricted('interface')
+@decorators.application_protected
 def application_automation(appkey):
     ap = ad.get(appkey)
     ats = nfs.get_automation_list(appkey)
@@ -488,8 +513,9 @@ def application_automation(appkey):
     return render_template('new/public/automation.html', automations=ats[1], app=ap[1])
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/new-automation', methods=['GET', 'POST'])
+@decorators.restricted('user')
+@decorators.application_protected
 def application_new_automation(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
@@ -521,8 +547,9 @@ def application_new_automation(appkey):
             return redirect(request.url) 
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/settings', methods=['GET', 'POST'])
+@decorators.restricted('user')
+@decorators.application_protected
 def application_settings(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
@@ -543,8 +570,9 @@ def application_settings(appkey):
         return redirect(request.url)
 
 
-@misc.restricted('user')
 @app.route('/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
+@decorators.restricted('user')
+@decorators.application_protected
 def application_device_settings(appkey, devid):
     if request.method == 'GET':
         ap = ad.get(appkey)
