@@ -7,11 +7,11 @@
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/applications">Applications</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
 {% endblock %}
 
 {% block body %}
@@ -25,7 +25,7 @@
               <h3 class="mb-0">New Automation</h3>
             </div>
             <div class="card-body">
-		<form action="/administration/users/{{ user }}/application/{{ app[1] }}/new-automation" method="post">
+		<form action="/administration/{{ user }}/application/{{ app[1] }}/new-automation" method="post">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="automationname" name="automationname" required><br>
@@ -105,7 +105,7 @@
 		var dev_sel = document.getElementById("devid");
 		var sel_op = dev_sel.options[dev_sel.selectedIndex].value;
 		if (sel_op != "-") {
-			fetch("/administration/users/{{ user }}/application/{{ app[1] }}/device/"+sel_op+"/variables").then(res => res.text()).then(data => $("#varname").html(data));
+			fetch("/administration/{{ user }}/application/{{ app[1] }}/device/"+sel_op+"/variables").then(res => res.text()).then(data => $("#varname").html(data));
 		}
 		validate_form();
 	}

@@ -10,7 +10,7 @@ from app.helpers.misc import grant_view
 def restricted(access_level, user_protect=False):
     def user_control(f):
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def restricted_function(*args, **kwargs):
             if 'role' in session:
                 if not grant_view(access_level, session['role']):
                     flash('Access denied.', 'danger')
@@ -22,15 +22,15 @@ def restricted(access_level, user_protect=False):
                         return redirect(url_for('index'))
                 return f(*args, **kwargs)
             return redirect(url_for('login'))
-        return decorated_function
+        return restricted_function
     return user_control
 
 def application_protected(f):
-    def decorated_function(*args, **kwargs):
+    @wraps(f)
+    def protected_function(*args, **kwargs):
         ap = ad.get(kwargs['appkey'])
-        print(ap, session)
         if not ap[0] or ap[1][2] != session['name']:
             flash('Access denied.', 'danger')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
-    return decorated_function
+    return protected_function

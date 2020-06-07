@@ -1,6 +1,6 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} New User - HPC&amp;A IoT {% endblock %}
+{% block title %} Administration - New User - HPC&amp;A IoT {% endblock %}
 
 {% block location %} 
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/applications">Applications</a> 
@@ -19,7 +19,7 @@
               <h3 class="mb-0">New User</h3>
             </div>
             <div class="card-body">
-	      <form action="/administration/users/new-user" method="post">
+	      <form action="/administration/new-user" method="post">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="username" name="username" required>

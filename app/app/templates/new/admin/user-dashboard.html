@@ -1,13 +1,13 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} User Dashboard - HPC&amp;A IoT {% endblock %}
+{% block title %} Administration - {{ user }} - Dashboard - HPC&amp;A IoT {% endblock %}
 
 {% block location %} 
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="#">Dashboard</a> 
 {% endblock %}
@@ -166,14 +166,14 @@
     </div>
               <div class="row" style="margin-top: 30px;">
                   <div class="col-lg-3">
-		  <a href="/administration/users/{{ user }}/applications"><button type="submit" class="btn btn-primary btn-block">Applications</button></a>
+		  <a href="/administration/{{ user }}/applications"><button type="submit" class="btn btn-primary btn-block">Applications</button></a>
                </div>
                <div class="col-lg-3">
                </div>
                <div class="col-lg-3">
                </div>
                <div class="col-lg-3">
-		  <a href="/administration/users/{{ user }}/settings"><button type="submit" class="btn btn-primary btn-block">Settings</button></a>
+		  <a href="/administration/{{ user }}/settings"><button type="submit" class="btn btn-primary btn-block">Settings</button></a>
                </div>
 {% endblock %}
 
@@ -182,7 +182,7 @@
 	(function worker() {
 		var e = $("#chart-sales");
 		var e1 = $("#chart-orders");
-		$.get('/administration/users/{{ user }}/chart-update', function(cdata) {
+		$.get('/administration/{{ user }}/chart-update', function(cdata) {
 			cdata = eval(cdata);
 			var a = new Chart(e,
 			{
@@ -281,7 +281,7 @@
 		});
 	})();
 	
-	$.get("/administration/users/{{ user }}/recent-activity", function(cdata) {
+	$.get("/administration/{{ user }}/recent-activity", function(cdata) {
 		$("#recent_activity_body").html(cdata);
 	});
 	

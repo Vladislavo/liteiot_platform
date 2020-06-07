@@ -1,15 +1,15 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} New Application - HPC&amp;A IoT {% endblock %}
+{% block title %} Administration - {{ user }} - New Application - HPC&amp;A IoT {% endblock %}
 
 {% block location %} 
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/applications">Applications</a> 
 {% endblock %}
 
 {% block body %}
@@ -23,7 +23,7 @@
               <h3 class="mb-0">New Application</h3>
             </div>
             <div class="card-body">
-	      <form action="new-application" method="post">
+		<form action="/administration/{{ user }}/new-application" method="post">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="appname" name="appname" required><br>
@@ -44,7 +44,7 @@
 			
 			<br>
 			<div class="form-group">
-				<button type="submit" class="btn btn-primary">Create Application</button>
+				<button type="submit" class="btn btn-primary">Create Application for {{ user }}</button>
 			</div>
 		</form>
 

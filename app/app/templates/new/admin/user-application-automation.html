@@ -12,11 +12,11 @@
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/applications">Applications</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
 {% endblock %}
 
 {% block body %}
@@ -52,7 +52,7 @@
 		{% endif %}
 		<br>
                 <div class="col-lg-4">
-			<a href="/administration/users/{{ user }}/application/{{ app[1] }}/new-automation"><button class="btn btn-primary" type="submit">New Automation</button></a>
+			<a href="/administration/{{ user }}/application/{{ app[1] }}/new-automation"><button class="btn btn-primary" type="submit">New Automation</button></a>
 		</div>
             </div>
           </div>
@@ -64,7 +64,7 @@
 <script type="text/javascript">
 	function remove_automation(id, devid) {
 		$.ajax({
-			url:"/administration/users/{{ user }}/application/{{ app[1] }}/delete-automation?id="+id+"&devid="+devid,
+			url:"/administration/{{ user }}/application/{{ app[1] }}/delete-automation?id="+id+"&devid="+devid,
 			type:"get",
 			success: function() {
 				location.reload();

@@ -11,13 +11,13 @@
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/applications">Applications</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
 {% endblock %}
 
 {% block body %}
@@ -31,7 +31,7 @@
               <h3 class="mb-0">Device Settings</h3>
             </div>
             <div class="card-body">
-		<form action="/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/settings" method="post" id="devsettings">
+		<form action="/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/settings" method="post" id="devsettings">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="devname" name="devname" value="{{ dev[0] }}" required><br>
@@ -77,7 +77,7 @@
                       			</div>
                       		<div class="modal-footer">
                         	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<a href="/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/delete"><button type="button" class="btn btn-danger">Delete Device</button></a>
+				<a href="/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/delete"><button type="button" class="btn btn-danger">Delete Device</button></a>
                       	</div>
 		</div>
                   </div>

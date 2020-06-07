@@ -7,9 +7,9 @@
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/settings">Settings</a>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/settings">Settings</a>
 {% endblock %}
 
 {% block body %}
@@ -23,7 +23,7 @@
               <h3 class="mb-0">User Settings</h3>
             </div>
             <div class="card-body">
-		<form action="/administration/users/{{ user }}/settings" method="post" id="settings">
+		<form action="/administration/{{ user }}/settings" method="post" id="settings">
 			<div class="form-group">
 				<label>Name:</label><br>
 				<input type="text" maxlength="30" class="form-control" id="name" name="name" value="{{ user }}" style="pointer-events: none;">
@@ -89,7 +89,7 @@
                       			</div>
                       		<div class="modal-footer">
                         	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<a href="/administration/users/{{ user }}/delete-account"><button type="button" class="btn btn-danger">Delete Account</button></a>
+				<a href="/administration/{{ user }}/delete-account"><button type="button" class="btn btn-danger">Delete Account</button></a>
                       	</div>
 		</div>
                   </div>

@@ -1,6 +1,6 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} HPC&amp;A IoT - Device Configuration {% endblock %}
+{% block title %} Administration - {{ user }} - {{ app[0] }} - Device Configuration - HPC&amp;A IoT {% endblock %}
 
 {% block header %} 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> 
@@ -12,13 +12,13 @@
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/applications">Applications</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
 {% endblock %}
 
 {% block body %}
@@ -92,7 +92,7 @@
 <script type="text/javascript">
 	function onsub() {
 		$.ajax({
-			url:"/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/configure",
+			url:"/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/configure",
 			type:"post",
 			data:$("#confform").serialize(),
 			success: function() {
@@ -102,7 +102,7 @@
 	}
 	function remove_configuration(b64) {
 		$.ajax({
-			url:"/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/remove-configuration?conf="+b64,
+			url:"/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/remove-configuration?conf="+b64,
 			type:"get",
 			success: function() {
 				location.reload();

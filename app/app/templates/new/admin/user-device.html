@@ -1,6 +1,6 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} User Device - HPC&amp;A IoT {% endblock %}
+{% block title %} Administration - {{ user }} - {{ app[0] }} - {{ dev[0] }} - HPC&amp;A IoT {% endblock %}
 
 {% block header %} 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -11,13 +11,13 @@
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
 <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users">Users</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}">{{ user }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}">{{ user }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/applications">Applications</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/applications">Applications</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}">{{ app[0] }}</a> 
 <p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
-<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}">{{ dev[0] }}</a>
 {% endblock %}
 
 {% block stats %}
@@ -190,8 +190,8 @@
 
 		tscroll = init_scroll();
 
-		fetch('/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/graph/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
-		fetch('/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').html(data));
+		fetch('/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/graph/1').then(res => res.text()).then(data => drawChart(dname, eval(data)));
+		fetch('/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(data => $('#table_'+dname+'_body').html(data));
 	}
 	
 	function show_first_page() {
@@ -200,7 +200,7 @@
 	
 	function table_load_more(dname) {
 		tscroll[dname] += 1;
-		fetch('/administration/users/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(function(data) 
+		fetch('/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/data/'+dname+'/table/'+tscroll[dname]).then(res => res.text()).then(function(data) 
 			{ 
 				if (data.length > 0) {
 					$("#table_"+dname+"_body").append(data);

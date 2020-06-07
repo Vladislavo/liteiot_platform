@@ -1,6 +1,6 @@
 {% extends 'logged_layout.html' %}
 
-{% block title %} Users - HPC&amp;A IoT {% endblock %}
+{% block title %} Administration - Users - HPC&amp;A IoT {% endblock %}
 
 {% block header %} 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
@@ -85,7 +85,7 @@
 			</thead>
 			<tbody id="users_body">
 				{% for u in users %}
-				<tr onclick="window.location='/administration/users/{{ u[0] }}';">
+				<tr onclick="window.location='/administration/{{ u[0] }}';">
 					<th> {{ u[0] }} </th>
 					<th> {{ u[2] }} </th>
 				</tr>
@@ -99,7 +99,7 @@
             </div>
 	    <div class="card-body">
                 <div class="col-lg-4">
-			<a href="/administration/users/new-user"><button class="btn btn-primary" type="submit">New User</button></a>
+			<a href="/administration/new-user"><button class="btn btn-primary" type="submit">New User</button></a>
 		</div>
             </div>
 
@@ -120,7 +120,7 @@
 				data = eval(data);
 				$("#users_body").empty();
 				data.forEach(function (entry) {
-					str = "<tr onclick=window.location=\"/administration/users/"+entry[0]+"\"><th>"+entry[0]+"</th>"+"<th>"+entry[1]+"</th></tr>";
+					str = "<tr onclick=window.location=\"/administration/"+entry[0]+"\"><th>"+entry[0]+"</th>"+"<th>"+entry[1]+"</th></tr>";
 					$("#users_body").append(unescape(str));
 				});
 			}
@@ -136,7 +136,7 @@
 				else {
 					data = eval(data);
 					data.forEach(function (entry) {
-						str = "<tr onclick=window.location=\"/administration/users/"+entry[0]+"\"><th>"+entry[0]+"</th>"+"<th>"+entry[1]+"</th></tr>";
+						str = "<tr onclick=window.location=\"/administration/"+entry[0]+"\"><th>"+entry[0]+"</th>"+"<th>"+entry[1]+"</th></tr>";
 						$("#users_body").append(unescape(str));
 					});
 					next_page++;
