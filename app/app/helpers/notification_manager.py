@@ -27,7 +27,7 @@ def listening():
                 d = json.loads(e.payload)
                 dev = dd.get(d['appkey'], d['devid'])[1]
                 d['message']['data'] = ddm.read_data(unhexlify(d['message']['data'][2:]), dev[3])
-                if (d['op'][0] == 'O' and d['lvalue'] in d['message']['data']) or eval(str(d['message']['data'][d['lvalue']]) + d['op'] + d['rvalue']):
+                if d['lvalue'] in d['message']['data'] and (d['op'][0] == 'O' or eval(str(d['message']['data'][d['lvalue']]) + d['op'] + d['rvalue'])):
                     if d['action_type'] == 'alert':
                         # send mail
                         n = nf.get(d['appkey'], d['devid'], d['nfid'])[1]
