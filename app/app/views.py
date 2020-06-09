@@ -125,7 +125,7 @@ def application_create():
     elif request.method == 'POST':
         if request.form['appname'] == '':
             flash('Application name cannot be empty.', 'danger')
-            return render_template(request.url)
+            return redirect(request.url)
         elif request.method == 'POST':
             appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
             secure_key = misc.gen_skey_b64(16)
@@ -138,14 +138,14 @@ def application_create():
         
             if not res[0]:
                 flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
+                return redirect(request.url)
         
             res = dd.create_table_ddm(appkey)
         
             if not res[0]:
                 ad.delete(appkey)
                 flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
+                return redirect(request.url)
         
             return redirect(url_for('applications'))
 
@@ -211,13 +211,13 @@ def application_add_device(appkey):
         res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
-            return render_template(request.url)
+            return redirect(request.url)
         else:
             res = data.create_table_ddm(appkey, request.form['devid'])
             if not res[0]:
                 dd.delete(session['appkey'], request.form['devid'])
                 flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
+                return redirect(request.url)
             else:
                 return redirect(url_for('application', appkey=appkey))
 
@@ -565,7 +565,7 @@ def application_settings(appkey):
     
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
-            return render_template(request.url)
+            return redirect(request.url)
     
         return redirect(request.url)
 

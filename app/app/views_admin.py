@@ -86,7 +86,7 @@ def administration_user_new_application(name):
     elif request.method == 'POST':
         if request.form['appname'] == '':
             flash('Application name cannot be empty.', 'danger')
-            return render_template(request.url)
+            return redirect(request.url)
         elif request.method == 'POST':
             appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
             secure_key = misc.gen_skey_b64(16)
@@ -99,14 +99,14 @@ def administration_user_new_application(name):
         
             if not res[0]:
                 flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
+                return redirect(request.url)
         
             res = dd.create_table_ddm(appkey)
         
             if not res[0]:
                 ad.delete(appkey)
                 flash('Error: {}'.format(res[1]), 'danger')
-                return render_template(request.url)
+                return redirect(request.url)
         
             return redirect(url_for('administration_user_applications', name=name))
 
@@ -322,7 +322,7 @@ def administration_user_application_settings(name, appkey):
     
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
-            return render_template(request.url)
+            return redirect(request.url)
     
         return redirect(request.url)
 
