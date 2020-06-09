@@ -154,6 +154,9 @@
 {% if total > 0 %}
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 <script type="text/javascript">
+	// used to represent nans sent from the platform
+	var nan = null;
+
 	google.charts.load('current', {'packages':['corechart']});
 	google.charts.setOnLoadCallback(show_first_page);	
 
@@ -169,7 +172,10 @@
 	var tscroll = init_scroll();
      
 	function drawChart(dname, ddata) {
-		var data = google.visualization.arrayToDataTable(ddata);
+		var data = new google.visualization.DataTable();
+		data.addColumn('datetime', 'Time');
+		data.addColumn('number', 'Data');
+		data.addRows(ddata);
 
 		var options = {
 			title: '{{ dev[0] }} > '+dname,
@@ -185,7 +191,7 @@
 			legend: { position: 'none' },
 			height: 600,
 			/* width: 900, */
-			// interpolateNulls: true,
+			interpolateNulls: true,
 			chartArea: { left: '5%', width: '90%', height: '80%' }
         	};
 
