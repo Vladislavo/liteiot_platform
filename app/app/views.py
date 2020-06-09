@@ -432,7 +432,8 @@ def application_device_data(appkey, devid, var, dest, page):
             arr = '['
             last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
             for d in last:
-                arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
+                if var in d[2]:
+                    arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
             arr += ']'
         return arr
     elif dest == 'table':
@@ -442,7 +443,8 @@ def application_device_data(appkey, devid, var, dest, page):
         if last[0]:
             last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
             for d in last:
-                t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
+                if var in d[2]:
+                    t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
 
 
