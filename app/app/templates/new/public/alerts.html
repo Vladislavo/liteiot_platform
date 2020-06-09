@@ -62,7 +62,7 @@
 	function remove_alert(id, devid) {
 		$.ajax({
 			url:"/application/{{ app[1] }}/delete-alert?id="+id+"&devid="+devid,
-			type:"get",
+			type:"GET",
 			success: function() {
 				location.reload();
 			}

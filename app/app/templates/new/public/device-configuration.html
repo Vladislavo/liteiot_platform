@@ -86,7 +86,7 @@
 	function onsub() {
 		$.ajax({
 			url:"/application/{{ app[1] }}/device/{{ dev[1] }}/configure",
-			type:"post",
+			type:"POST",
 			data:$("#confform").serialize(),
 			success: function() {
 				location.reload();
@@ -96,7 +96,7 @@
 	function remove_configuration(b64) {
 		$.ajax({
 			url:"/application/{{ app[1] }}/device/{{ dev[1] }}/remove-configuration?conf="+b64,
-			type:"get",
+			type:"GET",
 			success: function() {
 				location.reload();
 			}

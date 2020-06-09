@@ -59,7 +59,7 @@
 	function remove_automation(id, devid) {
 		$.ajax({
 			url:"/application/{{ app[1] }}/delete-automation?id="+id+"&devid="+devid,
-			type:"get",
+			type:"GET",
 			success: function() {
 				location.reload();
 			}
