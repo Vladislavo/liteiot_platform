@@ -362,10 +362,11 @@ def administration_user_application_device_data(name, appkey, devid, var, dest, 
     if dest == 'graph':
         last = data.get_last_hours(appkey, devid, MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
         if last[0]:
-            arr = '[["Time", "{}"],'.format(var)
+            arr = '['
             last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
             for d in last:
-                arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
+                if var in d[2]:
+                    arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
             arr += ']'
         return arr
     elif dest == 'table':
@@ -375,7 +376,8 @@ def administration_user_application_device_data(name, appkey, devid, var, dest, 
         if last[0]:
             last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
             for d in last:
-                t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
+                if var in d[2]:
+                    t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
 
 
