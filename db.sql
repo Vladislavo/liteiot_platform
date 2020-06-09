@@ -43,8 +43,8 @@ CREATE TABLE public.applications (
     app_key character varying(30) NOT NULL,
     username character varying(30) NOT NULL,
     description character varying(200),
-    secure_key character varying(100) NOT NULL,
     secure boolean DEFAULT false NOT NULL,
+    secure_key character varying(100) NOT NULL
 );
 
 
@@ -71,8 +71,8 @@ CREATE TABLE public.pend_msgs (
 --
 
 CREATE TABLE public.users (
-    first_name character varying(50),
-    last_name character varying(50),
+--    first_name character varying(50),
+--    last_name character varying(50),
     name character varying(30) NOT NULL,
     password character varying(100) NOT NULL,
     role character varying(10) NOT NULL
