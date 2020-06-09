@@ -141,13 +141,6 @@ ALTER TABLE ONLY public.applications
     ADD CONSTRAINT applications_username_fkey FOREIGN KEY (username) REFERENCES public.users(name);
 
 
-ALTER TABLE ONLY public.pend_msgs
-    ADD CONSTRAINT applications_pkey PRIMARY KEY (app_key, dev_id);
-
-
-ALTER TABLE ONLY public.pend_msgs
-    ADD CONSTRAINT pend_msgs_app_key_fkey FOREIGN KEY (app_key) REFERENCES public.applications(app_key);
-
 --
 -- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: pi
 --
