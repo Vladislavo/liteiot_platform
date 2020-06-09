@@ -429,7 +429,7 @@ def application_device_data(appkey, devid, var, dest, page):
         last = data.get_last_hours(appkey, devid, MAX_PG_ENTRIES_GRAPH_HOURS, int(page))
         arr = ''
         if last[0]:
-            arr = '[["Time", "{}"],'.format(var)
+            arr = '['
             last = [ddm.decode_datum(d, dev[3]) for d in last[1]]
             for d in last:
                 arr += '[new Date('+str(d[0])+'*1000),'+str(d[2][var])+'],'
