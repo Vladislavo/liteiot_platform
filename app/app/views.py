@@ -22,6 +22,7 @@ import app.helpers.decorators as decorators
 import os
 import binascii
 
+import logging
 
 MAX_PG = 5
 MAX_PG_ENTRIES_USERS = 10
@@ -64,6 +65,7 @@ def register():
                 else:
                     session['name'] = username
                     session['role'] = 'user'
+
                     return redirect(url_for('index'))
     else:
         return redirect(url_for('login'))
