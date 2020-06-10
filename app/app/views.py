@@ -1,7 +1,7 @@
 from app import app, mail
 from flask_mail import Message
 
-from flask import render_template, request, redirect, url_for, session, send_from_directory, flash
+from flask import render_template, request, redirect, url_for, session, send_from_directory, flash, after_this_request
 import psycopg2
 
 import app.dao.user.user as ud
@@ -293,7 +293,7 @@ def application_device_configuration(appkey, devid):
         flash('Failed to enqueue message: {}'.format(res[1]), 'danger')
         redirect(url_for('application_device_settings', appkey=appkey, devid=devid))
     else:
-        app.logger.info('User %s deleted device %s for application %s', session['name'], devid, appkey)
+        app.logger.info('User %s enqueued config message %s for the app %s device %s', session['name'], base64_args, appkey, devid)
         flash('Message enqueued', 'success')
         return '', 201
 
@@ -321,7 +321,8 @@ def application_device_download_csv(appkey, devid):
 
     with open(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+fn, 'w+') as f: 
         f.write('utc,timestamp,')
-        for d in dumpd[1][0][2]:
+        print(dev)
+        for d in dev[3]['format']:
             f.write(d)
             f.write(',')
         f.write('\n')

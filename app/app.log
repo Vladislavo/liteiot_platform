@@ -1,3 +1,13 @@
-[2020-06-10 17:46:11,097] INFO in __init__: loading views
-[2020-06-10 17:48:13,702] INFO in __init__: loading views
-[2020-06-10 17:48:32,080] WARNING in __init__: loading views
+[2020-06-10 19:17:46,564] INFO in views: Logged out user admin
+[2020-06-10 19:18:00,168] INFO in views: Logged in user admin
+[2020-06-10 19:18:19,269] INFO in views: User admin created new application - test
+[2020-06-10 19:18:47,866] INFO in views: User admin added new device dev1 test for application 0513d8d9
+[2020-06-10 19:19:21,955] INFO in views: User admin created alert 7d6c9e - dev1 test.a > 0 for application 0513d8d9
+[2020-06-10 19:19:32,734] INFO in views: User admin deleted alert 7d6c9e for application 0513d8d9
+[2020-06-10 19:20:04,752] INFO in views: User admin created automation 14f87d - IF dev1 test.a > 0 THEN dev1 test.confID_1 = 1 for application 0513d8d9
+[2020-06-10 19:20:12,716] INFO in views: User admin deleted automation 14f87d for application 0513d8d9
+[2020-06-10 19:20:35,490] INFO in views: User admin deleted device 1 for application 0513d8d9
+[2020-06-10 19:22:26,286] INFO in views: User admin deleted config messsage AQIxAA== for application 0513d8d9 device 1
+[2020-06-10 19:26:21,369] INFO in views: User admin downloaded data for application 0513d8d9 device 1
+[2020-06-10 19:26:44,083] INFO in views: User admin deleted for application 0513d8d9 device 1
+[2020-06-10 19:26:58,457] INFO in views: User admin deleted application - 0513d8d9
