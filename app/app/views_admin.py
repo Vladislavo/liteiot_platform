@@ -191,7 +191,8 @@ def administration_user_application_device_settings(name, appkey, devid):
             return redirect(request.url)
     
         app.logger.warning('Administrator %s changed settings for device %s application %s for %s', session['name'], devid, appkey, name)
-        
+       
+        flash('Settings saved', 'success')
         return redirect(request.url)
 
 
@@ -347,9 +348,10 @@ def administration_user_application_settings(name, appkey):
             app.logger.error('Administrator %s failed to change settings for application %s for %s - %s', session['name'], appkey, name, res[1])
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
-    
+   
         app.logger.warning('Administrator %s changed settings for application %s for %s', session['name'], appkey, name)
         
+        flash('Settings saved', 'success')
         return redirect(request.url)
 
 
@@ -362,7 +364,7 @@ def administration_user_application_notification_remove(name, appkey, ntype):
     res = nfs.delete(appkey, request.args.get('devid'), request.args.get('id'))
 
     if res[0]:
-        app.logger.warning('Administrator %s deleted %s %s for application for %s', session['name'], ntype, request.args.get('id'), appkey, name)
+        app.logger.warning('Administrator %s deleted %s %s for application %s for %s', session['name'], ntype, request.args.get('id'), appkey, name)
         flash('{} removed'.format(ntype.capitalize()), 'success')
         return '', 200
     else:
@@ -444,7 +446,7 @@ def administration_user_application_device_configuration_remove(name, appkey, de
 
     if res[0]:
         app.logger.warning('Administrator %s deleted config message %s for device %s application %s for %s', session['name'], request.args.get('conf'), devid, appkey, name)
-        flash('Configuration message successfully removed.','success')
+        flash('Configuration message removed.','success')
     else:
         app.logger.error('Administrator %s failed to delete config message %s for device %s application for %s - %s', session['name'], request.args.get('conf'), devid, appkey, name, res[1])
         flash('Error removing configuration message: {}'.format(res[1]), 'danger')
@@ -598,18 +600,18 @@ def administration_user_delete_account(name):
 
         res = (True,)
         if app_list[0]:
-            for app in app_list[1]:
-                devs = dd.get_list(app[1])
+            for a in app_list[1]:
+                devs = dd.get_list(a[1])
                 for dev in devs[1]:
-                    res = data.delete_table(app[1], dev[1])
+                    res = data.delete_table(a[1], dev[1])
                     if not res[0]:
                         break
     
                 if res[0]:
-                    res = dd.delete_table(app[1])
+                    res = dd.delete_table(a[1])
                     
                 if res[0]:
-                    res = ad.delete(app[1])
+                    res = ad.delete(a[1])
 
                 if not res[0]:
                     break

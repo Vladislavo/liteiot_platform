@@ -377,7 +377,7 @@ def application_device_configuration_remove(appkey, devid):
 
     if res[0]:
         app.logger.info('User %s deleted config messsage %s for application %s device %s', session['name'], request.args.get('conf'), appkey, devid)
-        flash('Configuration message successfully removed.','success')
+        flash('Configuration message removed.','success')
     else:
         app.logger.error('User %s failed to delet config messsage %s for application %s device %s - %s', session['name'], request.args.get('conf'), appkey, devid, res[1])
         flash('Error removing configuration message: {}'.format(res[1]), 'danger')
@@ -432,7 +432,7 @@ def delete_account():
         return render_template('new/public/settings.html', user=session['name'])
     else:
         app.logger.warning('User %s deleted the account', session['name'])
-        flash('User {} was successfully deleted'.format(request.args.get('name')), 'success')
+        flash('User {} was deleted'.format(request.args.get('name')), 'success')
         return redirect(url_for('login'))
 
 
@@ -455,7 +455,7 @@ def settings():
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
 
-        flash('Settings successfully saved.', 'success')
+        flash('Settings saved.', 'success')
         return redirect(request.url)
 
 
@@ -615,7 +615,8 @@ def application_settings(appkey):
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
-    
+   
+        flash('Settings saved', 'success')
         return redirect(request.url)
 
 
@@ -635,7 +636,8 @@ def application_device_settings(appkey, devid):
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
-    
+   
+        flash('Settings saved', 'success')
         return redirect(request.url)
 
 

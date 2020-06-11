@@ -113,7 +113,6 @@ def delete_function(cur, appkey, devid, nfid):
 #  bool  -> bool
 #  str   -> text
 def get_type(tstr):
-    print('before get_type', tstr)
     tstr = tstr.strip()
     if tstr == 'true':
         tstr = 'True'
@@ -123,7 +122,6 @@ def get_type(tstr):
         # int, float, bool
         t = type(ast.literal_eval(tstr)).__name__
     except Exception as e:
-        print ('expection', e, ' -> ', ' from ', tstr)
         t = 'text'
 
     if t == 'float':

@@ -11,3 +11,26 @@
 [2020-06-10 19:26:21,369] INFO in views: User admin downloaded data for application 0513d8d9 device 1
 [2020-06-10 19:26:44,083] INFO in views: User admin deleted for application 0513d8d9 device 1
 [2020-06-10 19:26:58,457] INFO in views: User admin deleted application - 0513d8d9
+[2020-06-11 09:29:26,446] WARNING in views_admin: Administrator admin created new user lolo
+[2020-06-11 09:39:23,858] WARNING in views_admin: Administrator admin created new user lolo
+[2020-06-11 09:39:39,600] WARNING in views_admin: Administrator admin deleted user lolo
+[2020-06-11 09:40:02,339] WARNING in views_admin: Administrator admin created new application 598bee34 for user-user
+[2020-06-11 09:40:34,846] ERROR in views_admin: Administrator admin failed to add device application e38dc490 for user-user - INSERT has more expressions than target columns
+LINE 5:         ('asd', '1', 'asd', '\x7b226d6f64656c223a20226a736f6...
+                                    ^
+
+[2020-06-11 09:41:26,391] ERROR in views_admin: Administrator admin failed to add device application e38dc490 for user-user - INSERT has more expressions than target columns
+LINE 5:         ('dev1 test', '1', 'dsds', '\x7b226d6f64656c223a2022...
+                                           ^
+
+[2020-06-11 09:50:18,424] WARNING in views_admin: Administrator admin created new application 5e4932cc for user-user
+[2020-06-11 09:50:36,442] WARNING in views_admin: Administrator admin added new device 1 application 5e4932cc for user-user
+[2020-06-11 09:50:59,309] WARNING in views_admin: Administrator admin created alert 7d7a6d for application 5e4932cc for user-user
+[2020-06-11 09:53:15,478] WARNING in views_admin: Administrator admin created alert 8b867b for application 5e4932cc for user-user
+[2020-06-11 09:53:19,487] WARNING in views_admin: Administrator admin deleted alert 8b867b for application 5e4932cc for user-user
+[2020-06-11 09:53:52,334] WARNING in views_admin: Administrator admin created automation 72249b for application 5e4932cc for user-user
+[2020-06-11 09:54:00,999] WARNING in views_admin: Administrator admin deleted automation 72249b for application 5e4932cc for user-user
+[2020-06-11 09:54:21,228] WARNING in views_admin: Administrator admin changed settings for application 5e4932cc for user-user
+[2020-06-11 09:54:28,518] WARNING in views_admin: Administrator admin deleted application 5e4932cc for user-user
+[2020-06-11 09:55:16,026] INFO in views: User admin created new application - test
+[2020-06-11 10:01:02,029] INFO in views: User admin deleted application - 649fd3ab
