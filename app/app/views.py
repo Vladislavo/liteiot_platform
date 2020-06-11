@@ -93,14 +93,14 @@ def login():
                 session['name'] = username
                 session['role'] = res[1][2]
                     
-                app.logger.info('Logged in user %s', username)
+                app.logger.info('Logged in %s %s', session['role'], username)
         
                 return redirect(url_for('index'))
 
 
 @app.route('/logout')
 def logout():
-    app.logger.info('Logged out user %s', session['name'])
+    app.logger.info('Logged out %s %s', session['role'], session['name'])
 
     session.clear()
     return redirect(url_for('login'))
@@ -154,10 +154,10 @@ def application_create():
                 ad.delete(appkey)
                 flash('Error: {}'.format(res[1]), 'danger')
                 
-                app.logger.error('User %s failed to create new application - %s', session['name'], res[1])
+                app.logger.error('%s %s failed to create new application %s', session['role'], session['name'], res[1])
                 return redirect(request.url)
             else:
-                app.logger.info('User %s created new application - %s', session['name'], request.form['appname'])
+                app.logger.info('%s %s created new application %s %s', session['role'], session['name'], request.form['appname'], appkey)
 
             return redirect(url_for('applications'))
 
@@ -184,10 +184,10 @@ def application_delete(appkey):
 
     if not res[0]:
         flash('Error deleting application: {}'.format(res[1]), 'danger')
-        app.logger.error('User %s failed to delete application - %s', session['name'], res[1])
+        app.logger.error('%s %s failed to delete application - %s', session['role'], session['name'], res[1])
         return redirect(url_for('application', appkey=appkey))
     else:
-        app.logger.info('User %s deleted application - %s', session['name'], appkey)
+        app.logger.info('%s %s deleted application %s', session['role'], session['name'], appkey)
         flash('Application deleted.', 'success')
         return redirect(url_for('applications'))
 
@@ -224,18 +224,18 @@ def application_add_device(appkey):
        
         res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
         if not res[0]:
-            app.logger.error('User %s failed to add device for application %s - %s', session['name'], appkey, res[1])
+            app.logger.error('%s %s failed to add device for application %s - %s', session['role'], session['name'], appkey, res[1])
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
         else:
             res = data.create_table_ddm(appkey, request.form['devid'])
             if not res[0]:
-                app.logger.error('User %s failed to add device for application %s - %s', session['name'], appkey, res[1])
+                app.logger.error('%s %s failed to add device for application %s - %s', session['role'], session['name'], appkey, res[1])
                 dd.delete(session['appkey'], request.form['devid'])
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
             else:
-                app.logger.info('User %s added new device %s for application %s', session['name'], request.form['devname'], appkey)
+                app.logger.info('%s %s added new device %s for application %s', session['role'], session['name'], request.form['devname'], appkey)
                 flash('Device added', 'success')
                 return redirect(url_for('application', appkey=appkey))
 
@@ -255,11 +255,11 @@ def application_device_delete(appkey, devid):
     res = dd.delete(appkey, devid)
 
     if not res[0]:
-        app.logger.error('User %s failed to delete device %s for application %s - %s', session['name'], devid, appkey, res[1])
+        app.logger.error('%s %s failed to delete device %s for application %s - %s', session['role'], session['name'], devid, appkey, res[1])
         flash('Failed to delete device: {}'.format(res[1]), 'danger')
         redirect(url_for('application_device_settings', appkey=appkey, devid=devid))
     else:
-        app.logger.info('User %s deleted for application %s device %s', session['name'], appkey, devid)
+        app.logger.info('%s %s deleted for application %s device %s', session['role'], session['name'], appkey, devid)
         flash('Device removed.', 'success')
         return redirect(url_for('application', appkey=appkey))
 
@@ -289,14 +289,13 @@ def application_device_configuration(appkey, devid):
         
 
     if not res[0]:
-        app.logger.error('User %s failed to queue config message %s for the app %s device %s - %s', session['name'], base64_args, appkey, devid, res[1])
+        app.logger.error('%s %s failed to queue config message %s for the app %s device %s - %s', session['role'], session['name'], base64_args, appkey, devid, res[1])
         flash('Failed to enqueue message: {}'.format(res[1]), 'danger')
         redirect(url_for('application_device_settings', appkey=appkey, devid=devid))
     else:
-        app.logger.info('User %s enqueued config message %s for the app %s device %s', session['name'], base64_args, appkey, devid)
+        app.logger.info('%s %s enqueued config message %s for the app %s device %s', session['role'], session['name'], base64_args, appkey, devid)
         flash('Message enqueued', 'success')
         return '', 201
-
 
 
 @app.route('/application/<appkey>/device/<devid>/download-csv')
@@ -334,7 +333,7 @@ def application_device_download_csv(appkey, devid):
                 f.write(',')
             f.write('\n')
 
-    app.logger.info('User %s downloaded data for application %s device %s', session['name'], appkey, devid)
+    app.logger.info('%s %s downloaded data for application %s device %s', session['role'], session['name'], appkey, devid)
 
     return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
 
@@ -376,10 +375,10 @@ def application_device_configuration_remove(appkey, devid):
     res = pend.delete(appkey, devid, request.args.get('conf')+'_')
 
     if res[0]:
-        app.logger.info('User %s deleted config messsage %s for application %s device %s', session['name'], request.args.get('conf'), appkey, devid)
+        app.logger.info('%s %s deleted config messsage %s for application %s device %s', session['role'], session['name'], request.args.get('conf'), appkey, devid)
         flash('Configuration message removed.','success')
     else:
-        app.logger.error('User %s failed to delet config messsage %s for application %s device %s - %s', session['name'], request.args.get('conf'), appkey, devid, res[1])
+        app.logger.error('%s %s failed to delet config messsage %s for application %s device %s - %s', session['role'], session['name'], request.args.get('conf'), appkey, devid, res[1])
         flash('Error removing configuration message: {}'.format(res[1]), 'danger')
     
     return '', 200
@@ -427,11 +426,11 @@ def delete_account():
         res = ud.delete(user[1][0])
 
     if not res[0]:
-        app.logger.error('User %s failed to delete the account - %s', session['name'], res[1])
+        app.logger.error('%s %s failed to delete the account - %s', session['role'], session['name'], res[1])
         flash('Error: {}'.format(res[1]), 'danger')
         return render_template('new/public/settings.html', user=session['name'])
     else:
-        app.logger.warning('User %s deleted the account', session['name'])
+        app.logger.warning('%s %s deleted the account', session['role'], session['name'])
         flash('User {} was deleted'.format(request.args.get('name')), 'success')
         return redirect(url_for('login'))
 
@@ -518,14 +517,14 @@ def application_new_alert(appkey):
                 t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'alert',request.form['alertemail'])
                 t = tr.create(appkey, request.form['devid'], nid)
                 flash('Alert created', 'success')
-                app.logger.info('User %s created alert %s - %s for application %s', session['name'], nid, desc, appkey)
+                app.logger.info('%s %s created alert %s - %s for application %s', session['alert'], session['name'], nid, desc, appkey)
                 return redirect(url_for('application_alerts', appkey=appkey))
             else:
-                app.logger.error('User %s failed to create alert for application %s - %s', session['name'], appkey, res[1])
+                app.logger.error('%s %s failed to create alert for application %s - %s', session['role'], session['name'], appkey, res[1])
                 flash('Error creating new alert: {}'.format(res[1]), 'danger')
                 return redirect(request.url) 
         except Exception as e:
-            app.logger.error('User %s failed to create alert for application %s - %s', session['name'], appkey, e)
+            app.logger.error('%s %s failed to create alert for application %s - %s', session['role'], session['name'], appkey, e)
             flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
             return redirect(request.url) 
 
@@ -540,11 +539,11 @@ def application_notification_remove(appkey, ntype):
     res = nfs.delete(appkey, request.args.get('devid'), request.args.get('id'))
 
     if res[0]:
-        app.logger.info('User %s deleted %s %s for application %s', session['name'], ntype, request.args.get('id'), appkey)
+        app.logger.info('%s %s deleted %s %s for application %s', session['role'], session['name'], ntype, request.args.get('id'), appkey)
         flash('{} removed'.format(ntype.capitalize()), 'success')
         return '', 200
     else:
-        app.logger.error('User %s failed to delete %s %s for application %s - %s', session['name'], ntype, request.args.get('id'), appkey, res[1])
+        app.logger.error('%s %s failed to delete %s %s for application %s - %s', session['role'], session['name'], ntype, request.args.get('id'), appkey, res[1])
         flash('{} cannot be removed : {}'.format(ntype.capitalize(), res[1]), 'danger')
         return '', 500
 
@@ -583,15 +582,15 @@ def application_new_automation(appkey):
                 # create new function and trigger
                 t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'automation', action)
                 tr.create(appkey, request.form['devid'], nid)
-                app.logger.info('User %s created automation %s - %s for application %s', session['name'], nid, desc, appkey)
+                app.logger.info('%s %s created automation %s - %s for application %s', session['role'], session['name'], nid, desc, appkey)
                 flash('Automation created', 'success')
                 return redirect(url_for('application_automation', appkey=appkey))
             else:
-                app.logger.error('User %s failed to create automation for application %s - %s', session['name'], appkey, res[1])
+                app.logger.error('%s %s failed to create automation for application %s - %s', session['role'], session['name'], appkey, res[1])
                 flash('Error creating new alert: {}'.format(res[1]), 'danger')
                 return redirect(request.url) 
         except Exception as e:
-            app.logger.error('User %s failed to create automation for application %s - %s', session['name'], appkey, e)
+            app.logger.error('%s %s failed to create automation for application %s - %s', session['role'], session['name'], appkey, e)
             flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
             return redirect(request.url) 
 
