@@ -43,6 +43,8 @@ def administration():
         else:
             app.config['USERS_SIGNUP'] = False
         
+        app.logger.warning('Users signup changed to %s by %s', app.config['USERS_SIGNUP'], session['name'])
+
         return redirect(request.url)
 
 
@@ -87,7 +89,7 @@ def administration_user_new_application(name):
         if request.form['appname'] == '':
             flash('Application name cannot be empty.', 'danger')
             return redirect(request.url)
-        elif request.method == 'POST':
+        else:
             appkey = misc.rand_str(app.config['APPKEY_LENGTH']).decode('utf-8')
             secure_key = misc.gen_skey_b64(16)
             secure = False
@@ -98,6 +100,7 @@ def administration_user_new_application(name):
             res = ad.create(request.form['appname'], appkey, name, request.form['appdesc'], secure, secure_key)
         
             if not res[0]:
+                app.logger.error('Administrator %s failed to create new application for %s - %s', session['name'], name, res[1])
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
         
@@ -105,9 +108,12 @@ def administration_user_new_application(name):
         
             if not res[0]:
                 ad.delete(appkey)
+                app.logger.error('Administrator %s failed to create new application for %s - %s', session['name'], name, res[1])
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
-        
+            else:
+                app.logger.warning('Administrator %s created new application %s for %s', session['name'], appkey, name)
+
             return redirect(url_for('administration_user_applications', name=name))
 
 
@@ -133,17 +139,21 @@ def administration_user_application_add_device(name, appkey):
         res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
 
         if not res[0]:
+            app.logger.error('Administrator %s failed to add device application %s for %s - %s', session['name'], appkey, name, res[1])
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
-        else:
-            res = data.create_table_ddm(appkey, request.form['devid'])
         
-            if not res[0]:
-                dd.delete(appkey, request.form['devid'])
-                flash('Error: {}'.format(res[1]), 'danger')
-                return rendirect(request.url)
-            else:
-                return redirect(url_for('administration_user_application', name=name, appkey=appkey))
+        res = data.create_table_ddm(appkey, request.form['devid'])
+    
+        if not res[0]:
+            dd.delete(appkey, request.form['devid'])
+            app.logger.error('Administrator %s failed to add device application %s for %s - %s', session['name'], appkey, name, res[1])
+            flash('Error: {}'.format(res[1]), 'danger')
+            return rendirect(request.url)
+        
+        app.logger.warning('Administrator %s added new device %s application %s for %s', session['name'], request.form['devid'], appkey, name)
+        
+        return redirect(url_for('administration_user_application', name=name, appkey=appkey))
 
 
 @app.route('/administration/<name>/application/<appkey>/device/<devid>')
@@ -176,9 +186,12 @@ def administration_user_application_device_settings(name, appkey, devid):
         res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
     
         if not res[0]:
+            app.logger.error('Administrator %s failed to change settings for device %s application %s for %s - %s', session['name'], devid, appkey, name, res[1])
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
     
+        app.logger.warning('Administrator %s changed settings for device %s application %s for %s', session['name'], devid, appkey, name)
+        
         return redirect(request.url)
 
 
@@ -194,6 +207,8 @@ def administration_user_application_device_delete(name, appkey, devid):
 
     data.delete_table(appkey, devid)
     res = dd.delete(appkey, devid)
+
+    app.logger.warning('Administrator %s deleted device %s application %s for %s', session['name'], devid, appkey, name)
 
     return redirect(url_for('administration_user_application', name=name, appkey=appkey))
 
@@ -226,12 +241,15 @@ def administration_user_application_new_alert(name, appkey):
                     # create new function and trigger
                     tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
                     tr.create(appkey, request.form['devid'], nid)
+                    app.logger.warning('Administrator %s created alert %s for application %s for %s', session['name'], nid, appkey, name)
                     flash('Alert created', 'success')
                     return redirect(url_for('administration_user_application_alerts', name=name, appkey=appkey))
                 else:
+                    app.logger.error('Administrator %s failed to create alert for application %s for %s - %s', session['name'], appkey, name, res[1])
                     flash('Error creating new alert: {}'.format(res[1]), 'danger')
                     return redirect(request.url) 
             except Exception as e:
+                app.logger.error('Administrator %s failed to create alert for application %s for %s - %s', session['name'], appkey, name, e)
                 flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
                 return redirect(request.url) 
 
@@ -268,12 +286,15 @@ def administration_user_application_new_automation(name, appkey):
                 # create new function and trigger
                 tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
                 tr.create(appkey, request.form['devid'], nid)
+                app.logger.warning('Administrator %s created automation %s for application %s for %s', session['name'], nid, appkey, name)
                 flash('Automation created', 'success')
                 return redirect(url_for('administration_user_application_automation', name=name, appkey=appkey))
             else:
+                app.logger.error('Administrator %s failed to create automation for application %s for %s - %s', session['name'], appkey, name, res[1])
                 flash('Error creating new alert: {}'.format(res[1]), 'danger')
                 return redirect(request.url) 
         except Exception as e:
+            app.logger.error('Administrator %s failed to create automation for application %s for %s - %s', session['name'], appkey, name, e)
             flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
             return redirect(request.url) 
 
@@ -298,9 +319,11 @@ def administration_user_application_delete(name, appkey):
     res = ad.delete(appkey)
 
     if not res[0]:
+        app.logger.error('Administrator %s failed to delete application %s for %s - %s', session['name'], appkey, name, res[1])
         flash('Error deleting application: {}'.format(res[1]), 'danger')
         return redirect(url_for('administration_user_application_settings', name=name, appkey=appkey))
     else:
+        app.logger.warning('Administrator %s deleted application %s for %s', session['name'], appkey, name)
         flash('Application deleted.', 'success')
         return redirect(url_for('administration_user_applications', name=name))
 
@@ -321,9 +344,12 @@ def administration_user_application_settings(name, appkey):
         res = ad.update(appkey, request.form['appname'], request.form['appdesc'], secure)
     
         if not res[0]:
+            app.logger.error('Administrator %s failed to change settings for application %s for %s - %s', session['name'], appkey, name, res[1])
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
     
+        app.logger.warning('Administrator %s changed settings for application %s for %s', session['name'], appkey, name)
+        
         return redirect(request.url)
 
 
@@ -336,9 +362,11 @@ def administration_user_application_notification_remove(name, appkey, ntype):
     res = nfs.delete(appkey, request.args.get('devid'), request.args.get('id'))
 
     if res[0]:
+        app.logger.warning('Administrator %s deleted %s %s for application for %s', session['name'], ntype, request.args.get('id'), appkey, name)
         flash('{} removed'.format(ntype.capitalize()), 'success')
         return '', 200
     else:
+        app.logger.error('Administrator %s failed to delete %s %s for application %s for %s - %s', session['name'], ntype, request.args.get('id'), appkey, name, res[1])
         flash('{} cannot be removed : {}'.format(ntype.capitalize(), res[1]), 'danger')
         return '', 500
 
@@ -402,7 +430,9 @@ def administration_user_application_device_configuration(name, appkey, devid):
     elif request.method == 'POST':
         base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
         pend.create(appkey, devid, base64_args)
-        
+       
+        app.logger.warning('Administrator %s sent config message %s for device %s application %s for %s', session['name'], base64_args, devid, appkey, name)
+
         flash('Message enqueued', 'success')
         return '', 201
 
@@ -413,8 +443,10 @@ def administration_user_application_device_configuration_remove(name, appkey, de
     res = pend.delete(appkey, devid, request.args.get('conf')+'_')
 
     if res[0]:
+        app.logger.warning('Administrator %s deleted config message %s for device %s application %s for %s', session['name'], request.args.get('conf'), devid, appkey, name)
         flash('Configuration message successfully removed.','success')
     else:
+        app.logger.error('Administrator %s failed to delete config message %s for device %s application for %s - %s', session['name'], request.args.get('conf'), devid, appkey, name, res[1])
         flash('Error removing configuration message: {}'.format(res[1]), 'danger')
     
     return '', 200
@@ -451,6 +483,8 @@ def administration_user_application_device_download_csv(name, appkey, devid):
                 f.write(str(row[2][v]))
                 f.write(',')
             f.write('\n')
+    
+    app.logger.warning('Administrator %s downloaded csv data for device %s application %s for %s', session['name'], devid, appkey, name)
 
     return send_from_directory(app.config['DATA_DOWNLOAD_DIR'], fn, as_attachment=True)
 
@@ -511,10 +545,13 @@ def administration_new_user():
             return redirect(request.url)
         else:
             res = ud.create(username, password, role)
-            if (not res[0]):
+            if not res[0]:
+                app.logger.error('Administrator %s failed to create new user %s - %s', session['name'], username, res[1])
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
             else:
+                app.logger.warning('Administrator %s created new user %s', session['name'], username)
+                flash('User {} created.'.format(username), 'success')
                 return redirect(url_for('administration_user', name=username))
 
 
@@ -535,13 +572,17 @@ def administration_user_settings(name):
                 res = ud.update_password(name, request.form['password'].encode('utf-8'))
                 if not res[0]:
                     flash('Error: {}'.format(res[1]), 'danger')
+                    app.logger.error('Administrator %s failed to update password for user %s - %s', session['name'], name, res[1])
                     return redirect(request.url)
             if request.form['role'] != user[1][2]:
                 res = ud.update_role(name, request.form['role'])
                 if not res[0]:
+                    app.logger.error('Administrator %s failed to update role for user %s - %s', session['name'], name, res[1])
                     flash('Error: {}'.format(res[1]), 'danger')
                     return redirect(request.url)
-            flash('Settings successfully saved.', 'success')
+                
+            app.logger.warning('Administrator %s changed settings for user %s', session['name'], name)
+            flash('Settings saved.', 'success')
             return redirect(request.url)
     else:
         flash('Access denied' ,'danger')
@@ -578,10 +619,13 @@ def administration_user_delete_account(name):
 
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
+            app.logger.error('Administrator %s failed to delete user %s - %s', session['name'], name, res[1])
             return render_template('new/admin/user-settings.html', user=name)
         else:
-            flash('User {} was successfully deleted'.format(name), 'success')
+            app.logger.warning('Administrator %s deleted user %s', session['name'], name)
+            flash('User {} was deleted'.format(name), 'success')
             return redirect(url_for('administration_users'))
     else:
+        app.logger.critical('Administrator %s with role attempted to delete user %s with role %s', session['name'], session['role'], name, user[1][2])
         flash('Warning: the user is admin or does not exist.' ,'danger')
         return redirect(url_for('administration_user_settings', name=name))
