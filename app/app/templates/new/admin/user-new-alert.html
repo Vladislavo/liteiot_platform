@@ -52,14 +52,20 @@
 			</select>
 			<br>
 			<input type='text' class='form-control notifelem' name='avalue' id='avalue' placeholder='Value' title='use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean' required>
-			<p> Use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean. <br>
-			Keep types consistently for each variable for both, alerts and automations. </p>
 
 			<br>
 			<h4> THEN </h4>
 			<h5> Send email to: </h5>
+			
+			<select class='form-control notifelem' name='alerttype' id='alerttype' onchange="return onalerttype();" required>
+				<option selected="selected" value="email">Email</option>
+				<option value="telegram">Telegram Message</option>
+				<option value="sms">SMS Message</option>
+			</select>
+			<br>
 
-			<input class="form-control" type="email" id="alertemail" name="alertemail" placeholder="Type email..." required>
+			<input class="form-control" type="text" id="alertemail" name="alertemail" placeholder="Type email..." required>
+			<p id="hint"></p>
 			<br><br>
 			<div class="form-group">
 				<button type="submit" id="submit" class="btn btn-primary">Create Alert</button>
@@ -98,6 +104,22 @@
 			fetch("/administration/{{ user }}/application/{{ app[1] }}/device/"+sel_op+"/variables").then(res => res.text()).then(data => $("#varname").html(data));
 		}
 		validate_form();
+	}
+
+	function onalerttype() {
+		var dev_sel = document.getElementById("alerttype");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].text;
+		
+		var input = document.getElementById("alertemail");
+		$("#hint").text("");
+		if (sel_op[0] == "E") {
+			input.setAttribute("placeholder", "Type email...");
+		} else if (sel_op[0] == "T") {
+			input.setAttribute("placeholder", "Type chat id...");
+			$("#hint").text("Hint: send /start to @userinfobot bot.");
+		} else if (sel_op[0] == "S") {
+			input.setAttribute("placeholder", "Type telephone number...");
+		}
 	}
 </script>
 {% endblock %}

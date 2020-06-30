@@ -237,10 +237,10 @@ def administration_user_application_new_alert(name, appkey):
             
             try:
                 desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
-                res = nfs.create(nid, appkey, request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
+                res = nfs.create(nid, appkey, request.form['devid'], request.form['alertname'], desc, 'alert_'+request.form['alerttype'], request.form['alertemail'])
                 if res[0]:
                     # create new function and trigger
-                    tr.create_function(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']])
+                    tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'alert_'+request.form['alerttype'], request.form['alertemail'])
                     tr.create(appkey, request.form['devid'], nid)
                     app.logger.warning('Administrator %s created alert %s for application %s for %s', session['name'], nid, appkey, name)
                     flash('Alert created', 'success')

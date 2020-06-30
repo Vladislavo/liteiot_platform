@@ -49,7 +49,6 @@ def listening():
                         app.logger.info('Automation for application {} with format {} was fired.'.format(d['appkey'], d['action']))
             except Exception as e:
                 app.logger.error('Notification manager thread error: {}'.format(e))
-                logger.
                 pass
             
 
