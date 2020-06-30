@@ -34,18 +34,22 @@ def listening():
                         # send mail
                         n = nf.get(d['appkey'], d['devid'], d['nfid'])[1]
                         mailer.send_mail(app, n, d)
+                        app.logger.info('Alert {} was fired.')
                     elif d['action_type'] == 'alert_telegram':
                         # send telegram message
                         n = nf.get(d['appkey'], d['devid'], d['nfid'])[1]
                         ts.send_message(app, n, d)
+                        app.logger.info('Alert {} was fired.')
                     elif d['action_type'] == 'automation':
                         # enqueue confid
                         # action format: '<devid>#<confid>#<arg>'
                         action = d['action'].split('#')
                         base64_args = misc.pend_base64_encode(action[2], action[1])
                         pend.create(d['appkey'], action[0], base64_args)
+                        app.logger.info('Automation for application {} with format {} was fired.'.format(d['appkey'], d['action']))
             except Exception as e:
-                print ('Notification manager thread error:', e)
+                app.logger.error('Notification manager thread error: {}'.format(e))
+                logger.
                 pass
             
 
