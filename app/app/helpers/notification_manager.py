@@ -9,6 +9,8 @@ import app.helpers.misc as misc
 import app.dao.device.device as dd
 import app.helpers.device_data_model as ddm
 
+import app.helpers.telegram_sender as ts
+
 from binascii import unhexlify
 
 @thread
@@ -28,10 +30,14 @@ def listening():
                 dev = dd.get(d['appkey'], d['devid'])[1]
                 d['message']['data'] = ddm.read_data(unhexlify(d['message']['data'][2:]), dev[3])
                 if d['lvalue'] in d['message']['data'] and (d['op'][0] == 'O' or eval(str(d['message']['data'][d['lvalue']]) + d['op'] + d['rvalue'])):
-                    if d['action_type'] == 'alert':
+                    if d['action_type'] == 'alert_email':
                         # send mail
                         n = nf.get(d['appkey'], d['devid'], d['nfid'])[1]
                         mailer.send_mail(app, n, d)
+                    elif d['action_type'] == 'alert_telegram':
+                        # send telegram message
+                        n = nf.get(d['appkey'], d['devid'], d['nfid'])[1]
+                        ts.send_message(app, n, d)
                     elif d['action_type'] == 'automation':
                         # enqueue confid
                         # action format: '<devid>#<confid>#<arg>'

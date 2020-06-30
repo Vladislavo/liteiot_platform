@@ -32,6 +32,8 @@ class Config(object):
     MAIL_PASSWORD = 'HPC&A10T.'
     MAIL_DEFAULT_SENDER = 'hpcaiotserver@gmail.com'
 
+    TELEGRAM_BOT_TOKEN = '1240239295:AAE-RLGTRmUxds_yzk5l5mtl-hLhOaC_-50'
+
     # in minutes
     FIRE_NOTIFICATIONS_INTERVAL = 1
 

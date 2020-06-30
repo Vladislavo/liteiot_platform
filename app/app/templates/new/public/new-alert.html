@@ -51,17 +51,25 @@
 	   		<p> Use n (e.g. 5) for integer notation, n.n (e.g. 5.0) for float, and true or false for boolean. <br>
 	   		Keep types consistently for each variable for both, alerts and automations. </p> 
 			-->
-		</form>
 
 			<br>
 			<h4> THEN </h4>
-			<h5> Send email to: </h5>
+			<h5> Select alert type: </h5>
 
-			<input class="form-control" type="email" form="alertform" id="alertemail" name="alertemail" placeholder="Type email..." required>
+			<select class='form-control notifelem' name='alerttype' id='alerttype' onchange="return onalerttype();" required>
+				<option selected="selected" value="email">Email</option>
+				<option value="telegram">Telegram Message</option>
+				<option value="sms">SMS Message</option>
+			</select>
+			<br>
+			
+			<input class="form-control" type="text" id="alertemail" name="alertemail" placeholder="Type email..." required>
+			<p id="hint"></p>
 			<br><br>
 			<div class="form-group">
-				<button type="submit" id="submit" form="alertform" class="btn btn-primary">Create Alert</button>
+				<button type="submit" id="submit" class="btn btn-primary">Create Alert</button>
 			</div>
+		</form>
 
             </div>
           </div>
@@ -108,6 +116,22 @@
 		} else {
 			input.setAttribute("type", "text");
 			input.setAttribute("required", "true");
+		}
+	}
+
+	function onalerttype() {
+		var dev_sel = document.getElementById("alerttype");
+		var sel_op = dev_sel.options[dev_sel.selectedIndex].text;
+		
+		var input = document.getElementById("alertemail");
+		$("#hint").text("");
+		if (sel_op[0] == "E") {
+			input.setAttribute("placeholder", "Type email...");
+		} else if (sel_op[0] == "T") {
+			input.setAttribute("placeholder", "Type chat id...");
+			$("#hint").text("Hint: send /start to @userinfobot bot.");
+		} else if (sel_op[0] == "S") {
+			input.setAttribute("placeholder", "Type telephone number...");
 		}
 	}
 </script>

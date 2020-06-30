@@ -83,10 +83,10 @@ def get_alerts_list(cur, appkey):
     WHERE
         app_key = %s
     AND
-        action_type = 'alert'
+        action_type LIKE 'alert_%%'
     """
     cur.execute(query, (appkey,))
-
+    
     return (True, cur.fetchall())
 
 

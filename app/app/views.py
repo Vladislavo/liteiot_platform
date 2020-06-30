@@ -511,20 +511,20 @@ def application_new_alert(appkey):
         
         try:
             desc = dev[1][0]+'.'+request.form['varname']+' '+request.form['operation']+' '+request.form['avalue']
-            res = nfs.create(nid, appkey, request.form['devid'], request.form['alertname'], desc, 'alert', request.form['alertemail'])
+            res = nfs.create(nid, appkey, request.form['devid'], request.form['alertname'], desc, 'alert_'+request.form['alerttype'], request.form['alertemail'])
             if res[0]:
                 # create new function and trigger
-                t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'alert',request.form['alertemail'])
+                t = tr.create_function_rt(appkey, request.form['devid'], nid, [request.form['varname'],request.form['operation'],request.form['avalue']],'alert_'+request.form['alerttype'], request.form['alertemail'])
                 t = tr.create(appkey, request.form['devid'], nid)
                 flash('Alert created', 'success')
-                app.logger.info('%s %s created alert %s - %s for application %s', session['alert'], session['name'], nid, desc, appkey)
+                app.logger.info('%s %s created alert %s - %s for application %s', session['role'], session['name'], nid, desc, appkey)
                 return redirect(url_for('application_alerts', appkey=appkey))
             else:
                 app.logger.error('%s %s failed to create alert for application %s - %s', session['role'], session['name'], appkey, res[1])
                 flash('Error creating new alert: {}'.format(res[1]), 'danger')
                 return redirect(request.url) 
         except Exception as e:
-            app.logger.error('%s %s failed to create alert for application %s - %s', session['role'], session['name'], appkey, e)
+            app.logger.error('%s %s failed to create alert for application %s - Exception: %s', session['role'], session['name'], appkey, e)
             flash('Error creating new alert: {}. Make sure you have filled all form fields.'.format(e), 'danger')
             return redirect(request.url) 
 

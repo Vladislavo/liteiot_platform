@@ -29,7 +29,8 @@
 			<thead>
 				<th> Name </th>
 				<th> Condition </th>
-				<th> Email </th>
+				<th> Alert Type </th>
+				<th> Receiver </th>
 				<th> </th>
 			</thead>
 			<tbody>
@@ -37,6 +38,7 @@
 				<tr>
 					<th> {{ a[3] }} </th>
 					<th> {{ a[4] }} </th>
+					<th> {{ a[5].split('_')[1] }} </th>
 					<th> {{ a[6] }} </th>
 					<th> <a href="javascript:void(0)" onclick="return remove_alert('{{ a[0] }}', '{{ a[2] }}');"> <span class="fa fa-remove"</span> </a> </th>
 				</tr>
