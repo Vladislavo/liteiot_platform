@@ -133,7 +133,7 @@ def administration_user_application_add_device(name, appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
         dev_list = dd.get_list(appkey)
-        return render_template('views/admin/user-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, user=name)
+        return render_template('views/admin/user-application-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, user=name)
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
         res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
@@ -170,7 +170,7 @@ def administration_user_application_device(name, appkey, devid):
     if ld[0] and ld[1][0] != []:
         ltup = ld[1][0][1]
 
-    return render_template('views/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], user=name, table_max=MAX_PG_ENTRIES_DATA)
+    return render_template('views/admin/user-application-device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], user=name, table_max=MAX_PG_ENTRIES_DATA)
 
 
 @app.route('/administration/<name>/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
@@ -229,7 +229,7 @@ def administration_user_application_new_alert(name, appkey):
             ap = ad.get(appkey)
             devs = dd.get_list(appkey)
             
-            return render_template('views/admin/user-new-alert.html', devs=devs[1], app=ap[1], user=name)
+            return render_template('views/admin/user-application-new-alert.html', devs=devs[1], app=ap[1], user=name)
         elif request.method == 'POST':
             # create new notification
             nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
