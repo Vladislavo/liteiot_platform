@@ -1,8 +1,5 @@
-from app import app, mail
-from flask_mail import Message
-
+from app import app
 from flask import render_template, request, redirect, url_for, session, send_from_directory, flash, after_this_request
-import psycopg2
 
 import app.dao.user.user as ud
 import app.dao.application.application as ad
@@ -100,7 +97,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-    app.logger.info('Logged out %s %s', session['role'], session['name'])
+    app.logger.info('%s %s logged out.', session['role'], session['name'])
 
     session.clear()
     return redirect(url_for('login'))
@@ -325,11 +322,12 @@ def application_device_download_csv(appkey, devid):
             f.write(d)
             f.write(',')
         f.write('\n')
-    
+        
         for row in dumpd[1]:
             f.write('{},{},'.format(row[0],row[1]))
-            for v in row[2]:
-                f.write(str(row[2][v]))
+            decoded = ddm.read_data(row[2].tobytes(), dev[3])
+            for k, v in decoded.items():
+                f.write(str(v))
                 f.write(',')
             f.write('\n')
 

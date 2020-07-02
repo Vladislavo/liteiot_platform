@@ -437,3 +437,216 @@ Traceback (most recent call last):
   File "./app/helpers/device_data_model.py", line 147, in read_data
     return json.loads(data.decode('utf-8'))
 AttributeError: 'memoryview' object has no attribute 'decode'
+[2020-07-02 08:41:27,514] ERROR in app: Exception on /recent-activity [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 366, in recent_activity
+    ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
+  File "./app/helpers/device_data_model.py", line 147, in read_data
+    return json.loads(data.decode('utf-8'))
+AttributeError: 'memoryview' object has no attribute 'decode'
+[2020-07-02 08:46:12,330] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 329, in application_device_download_csv
+    f.write(str(row[2][v]))
+TypeError: memoryview: invalid slice key
+[2020-07-02 08:48:37,151] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 330, in application_device_download_csv
+    f.write(str(row[2][v]))
+TypeError: memoryview: invalid slice key
+[2020-07-02 08:49:03,582] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 329, in application_device_download_csv
+    f.write(str(row[2][v]))
+TypeError: memoryview: invalid slice key
+[2020-07-02 08:49:49,243] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 330, in application_device_download_csv
+    f.write(str(row[2][v]))
+TypeError: memoryview: invalid slice key
+[2020-07-02 08:53:44,833] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 330, in application_device_download_csv
+    row[2] = ddm.read_data(v[3], dev[3])
+IndexError: index out of range
+[2020-07-02 08:57:52,129] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 329, in application_device_download_csv
+    decoded = ddm.read_data(v[3], dev[3])
+UnboundLocalError: local variable 'v' referenced before assignment
+[2020-07-02 08:58:29,761] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 329, in application_device_download_csv
+    decoded = ddm.read_data(row[3], dev[3])
+IndexError: tuple index out of range
+[2020-07-02 08:59:00,026] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 329, in application_device_download_csv
+    decoded = ddm.read_data(row[3], dev[3])
+IndexError: tuple index out of range
+[2020-07-02 08:59:34,338] ERROR in app: Exception on /application/3b56f3d8/device/1/download-csv [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 329, in application_device_download_csv
+    decoded = ddm.read_data(row[2], dev[3])
+  File "./app/helpers/device_data_model.py", line 147, in read_data
+    return json.loads(data.decode('utf-8'))
+AttributeError: 'memoryview' object has no attribute 'decode'
+[2020-07-02 09:00:07,675] INFO in views: superuser admin downloaded data for application 3b56f3d8 device 1
