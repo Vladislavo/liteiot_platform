@@ -395,3 +395,45 @@ AttributeError: 'memoryview' object has no attribute 'decode'
 [2020-06-30 17:44:34,584] WARNING in views_admin: Administrator admin created alert 7ab5c9 for application 3b56f3d8 for admin
 [2020-06-30 17:52:07,946] WARNING in views_admin: Administrator admin created alert 3235b2 for application 3b56f3d8 for admin
 [2020-06-30 17:52:27,874] WARNING in views_admin: Administrator admin deleted alert 3235b2 for application 3b56f3d8 for admin
+[2020-07-02 08:31:28,405] ERROR in app: Exception on /recent-activity [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 366, in recent_activity
+    ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
+  File "./app/helpers/device_data_model.py", line 147, in read_data
+    return json.loads(data.decode('utf-8'))
+AttributeError: 'memoryview' object has no attribute 'decode'
+[2020-07-02 08:31:37,913] ERROR in app: Exception on /recent-activity [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 366, in recent_activity
+    ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
+  File "./app/helpers/device_data_model.py", line 147, in read_data
+    return json.loads(data.decode('utf-8'))
+AttributeError: 'memoryview' object has no attribute 'decode'

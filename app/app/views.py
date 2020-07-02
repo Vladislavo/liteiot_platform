@@ -39,14 +39,14 @@ def index():
     last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
     info = [created_apps, active_devices, total_activity, last_activity]
 
-    return render_template('new/public/dashboard.html', info=info)
+    return render_template('views/public/dashboard.html', info=info)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if app.config['USERS_SIGNUP']:
         if request.method == 'GET':
-            return render_template('new/public/register.html')
+            return render_template('views/public/register.html')
         elif request.method == 'POST':
             username = request.form['username']
             password = request.form['password'].encode('utf-8')
@@ -76,7 +76,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template('new/public/login.html')
+        return render_template('views/public/login.html')
     else: 
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
@@ -111,7 +111,7 @@ def logout():
 def applications():
     apps = ad.get_list(session['name'])
    
-    return render_template('new/public/applications.html', apps=apps[1])
+    return render_template('views/public/applications.html', apps=apps[1])
 
 
 @app.route('/application/<appkey>')
@@ -122,14 +122,14 @@ def application(appkey):
     ap[5] = misc.skey_b64_to_hex(ap[5])
     devs = dd.get_list(ap[1])[1]
 
-    return render_template('new/public/application.html', app=ap, devs=devs)
+    return render_template('views/public/application.html', app=ap, devs=devs)
 
 
 @app.route('/new-application', methods=['GET', 'POST'])
 @decorators.restricted('user')
 def application_create():
     if request.method == 'GET':
-        return render_template('new/public/new-application.html')
+        return render_template('views/public/new-application.html')
     elif request.method == 'POST':
         if request.form['appname'] == '':
             flash('Application name cannot be empty.', 'danger')
@@ -208,7 +208,7 @@ def application_device(appkey, devid):
         if ld[0] and ld[1][0] != []:
             ltup = ld[1][0][1]
 
-        return render_template('new/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], table_max=MAX_PG_ENTRIES_DATA)
+        return render_template('views/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], table_max=MAX_PG_ENTRIES_DATA)
 
 
 @app.route('/application/<appkey>/add-device', methods=['GET', 'POST'])
@@ -218,7 +218,7 @@ def application_add_device(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
         dev_list = dd.get_list(appkey)
-        return render_template('new/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS)
+        return render_template('views/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS)
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
        
@@ -282,7 +282,7 @@ def application_device_configuration(appkey, devid):
                 ack = pm[3]
                 config_list.append((config_id, config_args, ack, pm[2]))
         
-        return render_template('new/public/device-configuration.html', dev=dev, app=ap, config_list=config_list)
+        return render_template('views/public/device-configuration.html', dev=dev, app=ap, config_list=config_list)
     elif request.method == 'POST':
         base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
         res = pend.create(appkey, devid, base64_args)
@@ -428,7 +428,7 @@ def delete_account():
     if not res[0]:
         app.logger.error('%s %s failed to delete the account - %s', session['role'], session['name'], res[1])
         flash('Error: {}'.format(res[1]), 'danger')
-        return render_template('new/public/settings.html', user=session['name'])
+        return render_template('views/public/settings.html', user=session['name'])
     else:
         app.logger.warning('%s %s deleted the account', session['role'], session['name'])
         flash('User {} was deleted'.format(request.args.get('name')), 'success')
@@ -439,7 +439,7 @@ def delete_account():
 @decorators.restricted('user')
 def settings():
     if request.method == 'GET':
-        return render_template('new/public/settings.html', user=session['name'])
+        return render_template('views/public/settings.html', user=session['name'])
     else:
         if request.form['name'] != session['name']:
             res = ud.update_name(session['name'], request.form['name'])
@@ -492,7 +492,7 @@ def application_device_data(appkey, devid, var, dest, page):
 def application_alerts(appkey):
     ap = ad.get(appkey)
     alerts = nfs.get_alerts_list(appkey)
-    return render_template('new/public/alerts.html', alert_list=alerts[1], app=ap[1])
+    return render_template('views/public/alerts.html', alert_list=alerts[1], app=ap[1])
 
 
 @app.route('/application/<appkey>/new-alert', methods=['GET', 'POST'])
@@ -503,7 +503,7 @@ def application_new_alert(appkey):
         ap = ad.get(appkey)
         devs = dd.get_list(appkey)
         
-        return render_template('new/public/new-alert.html', devs=devs[1], app=ap[1])
+        return render_template('views/public/new-alert.html', devs=devs[1], app=ap[1])
     elif request.method == 'POST':
         # create new notification
         nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
@@ -555,7 +555,7 @@ def application_automation(appkey):
     ap = ad.get(appkey)
     ats = nfs.get_automation_list(appkey)
     
-    return render_template('new/public/automation.html', automations=ats[1], app=ap[1])
+    return render_template('views/public/automation.html', automations=ats[1], app=ap[1])
 
 
 @app.route('/application/<appkey>/new-automation', methods=['GET', 'POST'])
@@ -566,7 +566,7 @@ def application_new_automation(appkey):
         ap = ad.get(appkey)
         devs = dd.get_list(appkey)
         
-        return render_template('new/public/new-automation.html', devs=devs[1], app=ap[1])
+        return render_template('views/public/new-automation.html', devs=devs[1], app=ap[1])
     elif request.method == 'POST':
         # create new notification
         nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
@@ -602,7 +602,7 @@ def application_settings(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
 
-        return render_template('new/public/application-settings.html', app=ap[1])
+        return render_template('views/public/application-settings.html', app=ap[1])
     elif request.method == 'POST':
         if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'on':
             secure = True
@@ -627,7 +627,7 @@ def application_device_settings(appkey, devid):
         ap = ad.get(appkey)
         dev = dd.get(appkey, devid)
 
-        return render_template('new/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS)
+        return render_template('views/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS)
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
         res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
@@ -639,23 +639,3 @@ def application_device_settings(appkey, devid):
         flash('Settings saved', 'success')
         return redirect(request.url)
 
-
-
-def pend_delete_all_ack():
-    pend.delete_all_ack()
-
-def fire_notifications(app):
-    fnfs = nq.get_all()
-    if fnfs[0]:
-        for fnf in fnfs[1]:
-            nf = nfs.get(fnf[1], fnf[2], fnf[0])
-            if nf[1][5] == 'alert':
-                # send mail
-                mailer.send_mail(app, nf[1], fnf)
-            elif nf[1][5] == 'automation':
-                # enqueue confid
-                # action format: '<devid>#<confid>#<arg>'
-                action = nf[1][6].split('#')
-                base64_args = misc.pend_base64_encode(action[2], action[1])
-                pend.create(nf[1][1], action[0], base64_args)
-            nq.delete(fnf[1], fnf[2], fnf[0])

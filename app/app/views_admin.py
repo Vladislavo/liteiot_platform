@@ -36,7 +36,7 @@ def administration():
         devs_cnt = dd.get_count_all()[1][0]
         info = [user_cnt, apps_cnt, devs_cnt]
 
-        return render_template('new/admin/administration.html', info=info)
+        return render_template('views/admin/administration.html', info=info)
     elif request.method == 'POST':
         if request.form.getlist('signup') and request.form.getlist('signup')[0] == 'on':
             app.config['USERS_SIGNUP'] = True
@@ -59,7 +59,7 @@ def administration_users():
     cur_pg = 1
     users = ud.get_range([MAX_PG_ENTRIES_USERS, (cur_pg-1)*MAX_PG_ENTRIES_USERS])[1]
 
-    return render_template('new/admin/users.html', users=users, info=info)
+    return render_template('views/admin/users.html', users=users, info=info)
 
 
 @app.route('/administration/<name>')
@@ -71,20 +71,20 @@ def administration_user(name):
     last_activity = md.get_user_data_count_per_day(name)[1][0]
     info = [created_apps, active_devices, total_activity, last_activity]
 
-    return render_template('new/admin/user-dashboard.html', info=info, user=name)
+    return render_template('views/admin/user-dashboard.html', info=info, user=name)
 
 @app.route('/administration/<name>/applications')
 @restricted('admin', True)
 def administration_user_applications(name):
     apps = ad.get_list(name)[1]
-    return render_template('new/admin/user-applications.html', apps=apps, user=name)
+    return render_template('views/admin/user-applications.html', apps=apps, user=name)
 
 
 @app.route('/administration/<name>/new-application', methods=['GET', 'POST'])
 @restricted('admin', True)
 def administration_user_new_application(name):
     if request.method == 'GET':
-        return render_template('new/admin/user-new-application.html', user=name)
+        return render_template('views/admin/user-new-application.html', user=name)
     elif request.method == 'POST':
         if request.form['appname'] == '':
             flash('Application name cannot be empty.', 'danger')
@@ -124,7 +124,7 @@ def administration_user_application(name, appkey):
     ap[5] = misc.skey_b64_to_hex(ap[5])
     devs = dd.get_list(ap[1])[1]
 
-    return render_template('new/admin/user-application.html', app=ap, devs=devs, user=name)
+    return render_template('views/admin/user-application.html', app=ap, devs=devs, user=name)
 
 
 @app.route('/administration/<name>/application/<appkey>/add-device', methods=['GET', 'POST'])
@@ -133,7 +133,7 @@ def administration_user_application_add_device(name, appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
         dev_list = dd.get_list(appkey)
-        return render_template('new/admin/user-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, user=name)
+        return render_template('views/admin/user-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, user=name)
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
         res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
@@ -170,7 +170,7 @@ def administration_user_application_device(name, appkey, devid):
     if ld[0] and ld[1][0] != []:
         ltup = ld[1][0][1]
 
-    return render_template('new/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], user=name, table_max=MAX_PG_ENTRIES_DATA)
+    return render_template('views/admin/user-device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], user=name, table_max=MAX_PG_ENTRIES_DATA)
 
 
 @app.route('/administration/<name>/application/<appkey>/device/<devid>/settings', methods=['GET', 'POST'])
@@ -180,7 +180,7 @@ def administration_user_application_device_settings(name, appkey, devid):
         ap = ad.get(appkey)
         dev = dd.get(appkey, devid)
 
-        return render_template('new/admin/user-application-device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS, user=name)
+        return render_template('views/admin/user-application-device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS, user=name)
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
         res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
@@ -219,7 +219,7 @@ def administration_user_application_device_delete(name, appkey, devid):
 def administration_user_application_alerts(name, appkey):
     ap = ad.get(appkey)
     alerts = nfs.get_alerts_list(appkey)
-    return render_template('new/admin/user-application-alerts.html', alert_list=alerts[1], app=ap[1], user=name)
+    return render_template('views/admin/user-application-alerts.html', alert_list=alerts[1], app=ap[1], user=name)
 
 
 @app.route('/administration/<name>/application/<appkey>/new-alert', methods=['GET', 'POST'])
@@ -229,7 +229,7 @@ def administration_user_application_new_alert(name, appkey):
             ap = ad.get(appkey)
             devs = dd.get_list(appkey)
             
-            return render_template('new/admin/user-new-alert.html', devs=devs[1], app=ap[1], user=name)
+            return render_template('views/admin/user-new-alert.html', devs=devs[1], app=ap[1], user=name)
         elif request.method == 'POST':
             # create new notification
             nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
@@ -261,7 +261,7 @@ def administration_user_application_automation(name, appkey):
     ap = ad.get(appkey)
     ats = nfs.get_automation_list(appkey)
     
-    return render_template('new/admin/user-application-automation.html', automations=ats[1], app=ap[1], user=name)
+    return render_template('views/admin/user-application-automation.html', automations=ats[1], app=ap[1], user=name)
 
 
 @app.route('/administration/<name>/application/<appkey>/new-automation', methods=['GET', 'POST'])
@@ -271,7 +271,7 @@ def administration_user_application_new_automation(name, appkey):
         ap = ad.get(appkey)
         devs = dd.get_list(appkey)
         
-        return render_template('new/admin/user-application-new-automation.html', devs=devs[1], app=ap[1], user=name)
+        return render_template('views/admin/user-application-new-automation.html', devs=devs[1], app=ap[1], user=name)
     elif request.method == 'POST':
         # create new notification
         nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
@@ -335,7 +335,7 @@ def administration_user_application_settings(name, appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
 
-        return render_template('new/admin/user-application-settings.html', app=ap[1], user=name)
+        return render_template('views/admin/user-application-settings.html', app=ap[1], user=name)
     elif request.method == 'POST':
         if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'on':
             secure = True
@@ -428,7 +428,7 @@ def administration_user_application_device_configuration(name, appkey, devid):
                 ack = pm[3]
                 config_list.append((config_id, config_args, ack, pm[2]))
         
-        return render_template('new/admin/user-application-device-configuration.html', dev=dev, app=ap, config_list=config_list, user=name)
+        return render_template('views/admin/user-application-device-configuration.html', dev=dev, app=ap, config_list=config_list, user=name)
     elif request.method == 'POST':
         base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
         pend.create(appkey, devid, base64_args)
@@ -533,7 +533,7 @@ def administration_users_table(page):
 @restricted('admin')
 def administration_new_user():
     if request.method == 'GET':
-        return render_template('new/admin/new-user.html')
+        return render_template('views/admin/new-user.html')
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
@@ -563,7 +563,7 @@ def administration_user_settings(name):
     user = ud.get(name)
     if user[0] and misc.grant_view(user[1][2], session['role']):
         if request.method == 'GET':
-            return render_template('new/admin/user-settings.html', user=name, user_role=user[1][2])
+            return render_template('views/admin/user-settings.html', user=name, user_role=user[1][2])
         else:
             if request.form['name'] != name:
                 res = ud.update_name(name, request.form['name'])
@@ -622,7 +622,7 @@ def administration_user_delete_account(name):
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
             app.logger.error('Administrator %s failed to delete user %s - %s', session['name'], name, res[1])
-            return render_template('new/admin/user-settings.html', user=name)
+            return render_template('views/admin/user-settings.html', user=name)
         else:
             app.logger.warning('Administrator %s deleted user %s', session['name'], name)
             flash('User {} was deleted'.format(name), 'success')
