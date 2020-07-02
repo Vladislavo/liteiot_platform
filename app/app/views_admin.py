@@ -474,15 +474,17 @@ def administration_user_application_device_download_csv(name, appkey, devid):
 
     with open(app.config['DATA_DOWNLOAD_DIR_OS']+'/'+fn, 'w+') as f: 
         f.write('utc,timestamp,')
+        print(dev)
         for d in dev[3]['format']:
             f.write(d)
             f.write(',')
         f.write('\n')
-    
+        
         for row in dumpd[1]:
             f.write('{},{},'.format(row[0],row[1]))
-            for v in row[2]:
-                f.write(str(row[2][v]))
+            decoded = ddm.read_data(row[2].tobytes(), dev[3])
+            for k, v in decoded.items():
+                f.write(str(v))
                 f.write(',')
             f.write('\n')
     
