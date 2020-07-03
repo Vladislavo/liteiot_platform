@@ -650,3 +650,106 @@ Traceback (most recent call last):
     return json.loads(data.decode('utf-8'))
 AttributeError: 'memoryview' object has no attribute 'decode'
 [2020-07-02 09:00:07,675] INFO in views: superuser admin downloaded data for application 3b56f3d8 device 1
+[2020-07-04 00:16:20,078] ERROR in app: Exception on /recent-activity [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 364, in recent_activity
+    ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
+  File "./app/helpers/device_data_model.py", line 147, in read_data
+    return json.loads(data.decode('utf-8'))
+AttributeError: 'memoryview' object has no attribute 'decode'
+[2020-07-04 00:18:34,018] ERROR in app: Exception on /application/3b56f3d8 [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 122, in application
+    return render_template('views/public/application.html', app=ap, devs=devs)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/templating.py", line 140, in render_template
+    ctx.app,
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/templating.py", line 120, in _render
+    rv = template.render(context)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 1090, in render
+    self.environment.handle_exception()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 832, in handle_exception
+    reraise(*rewrite_traceback_stack(source=source))
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/_compat.py", line 28, in reraise
+    raise value.with_traceback(tb)
+  File "/home/pi/thso.server/app/app/templates/views/public/application.html", line 1, in top-level template code
+    {% extends 'logged_layout.html' %}
+  File "/home/pi/thso.server/app/app/templates/logged_layout.html", line 1, in top-level template code
+    {% extends 'general_layout.html' %}
+  File "/home/pi/thso.server/app/app/templates/general_layout.html", line 35, in top-level template code
+    {% block content %} {% endblock %}
+  File "/home/pi/thso.server/app/app/templates/logged_layout.html", line 196, in block "content"
+    {% block body %} {% endblock %}
+  File "/home/pi/thso.server/app/app/templates/views/public/application.html", line 97, in block "body"
+    <p class="card-text">{{ app[5].encode('UTF-8') }}</p>
+jinja2.exceptions.UndefinedError: 'bytes object' has no attribute 'encode'
+[2020-07-04 00:18:43,044] ERROR in app: Exception on /application/3b56f3d8 [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 122, in application
+    return render_template('views/public/application.html', app=ap, devs=devs)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/templating.py", line 140, in render_template
+    ctx.app,
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/templating.py", line 120, in _render
+    rv = template.render(context)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 1090, in render
+    self.environment.handle_exception()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 832, in handle_exception
+    reraise(*rewrite_traceback_stack(source=source))
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/_compat.py", line 28, in reraise
+    raise value.with_traceback(tb)
+  File "/home/pi/thso.server/app/app/templates/views/public/application.html", line 1, in top-level template code
+    {% extends 'logged_layout.html' %}
+  File "/home/pi/thso.server/app/app/templates/logged_layout.html", line 1, in top-level template code
+    {% extends 'general_layout.html' %}
+  File "/home/pi/thso.server/app/app/templates/general_layout.html", line 35, in top-level template code
+    {% block content %} {% endblock %}
+  File "/home/pi/thso.server/app/app/templates/logged_layout.html", line 196, in block "content"
+    {% block body %} {% endblock %}
+  File "/home/pi/thso.server/app/app/templates/views/public/application.html", line 97, in block "body"
+    <p class="card-text">{{ app[5].encode('UTF-8') }}</p>
+jinja2.exceptions.UndefinedError: 'bytes object' has no attribute 'encode'
