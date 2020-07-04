@@ -148,7 +148,7 @@
 			success: function(data) {
 				if (data.length == 0) {
 					$("#table_load_more").remove();
-				else {
+				} else {
 					data = eval(data);
 					data.forEach(function (entry) {
 						str = "<tr onclick=window.location=\"/administration/"+entry[0]+"\"><th>"+entry[0]+"</th>"+"<th>"+entry[1]+"</th></tr>";

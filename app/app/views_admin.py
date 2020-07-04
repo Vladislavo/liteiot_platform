@@ -527,7 +527,7 @@ def administration_user_recent_activity(name):
     
     for r in recent_activity:
         dev = dd.get(r[5], r[6])[1]
-        ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
+        ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3].tobytes(), dev[3]))+'</th></tr>'
 
     return ra, 200
 
