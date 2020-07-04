@@ -21,7 +21,6 @@ def get_user_data_count(cur, username):
             i += 1
         query = query[0:-9]
         query += ') SELECT SUM(count) FROM t'
-        print(query)
         cur.execute(query, ())
         
         return (True,cur.fetchone())
@@ -49,7 +48,6 @@ def get_user_data_count_per_hour(cur, username, hour):
         query = query[0:-10]
         query += ') SELECT COUNT(*) FROM t WHERE utc > {} AND utc < {}'.format(utc_hour, utc_hour+60*60)
 
-        #print(query)
         cur.execute(query, ())
         
         return (True,cur.fetchone())

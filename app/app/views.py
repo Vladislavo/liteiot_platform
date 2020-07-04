@@ -646,3 +646,15 @@ def application_device_settings(appkey, devid):
         flash('Settings saved', 'success')
         return redirect(request.url)
 
+
+@app.route('/map')
+@decorators.restricted('interface')
+def map():
+    created_apps = ad.get_count_by_user(session['name'])[1][0]
+    active_devices = dd.get_count_by_user(session['name'])
+    total_activity = md.get_user_data_count(session['name'])[1][0]
+    last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
+    info = [created_apps, active_devices, total_activity, last_activity]
+    
+    print('render')
+    return render_template('views/public/map.html', info=info)
