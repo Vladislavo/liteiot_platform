@@ -753,3 +753,246 @@ Traceback (most recent call last):
   File "/home/pi/thso.server/app/app/templates/views/public/application.html", line 97, in block "body"
     <p class="card-text">{{ app[5].encode('UTF-8') }}</p>
 jinja2.exceptions.UndefinedError: 'bytes object' has no attribute 'encode'
+[2020-07-04 03:22:52,681] ERROR in app: Exception on /recent-activity [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 364, in recent_activity
+    ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
+  File "./app/helpers/device_data_model.py", line 147, in read_data
+    return json.loads(data.decode('utf-8'))
+AttributeError: 'memoryview' object has no attribute 'decode'
+[2020-07-04 03:23:51,755] INFO in views: superuser admin deleted alert ddb142 for application 3b56f3d8
+[2020-07-04 03:23:56,835] INFO in views: superuser admin deleted alert 8bbd83 for application 3b56f3d8
+[2020-07-04 03:23:58,716] INFO in views: superuser admin deleted alert 2d1c54 for application 3b56f3d8
+[2020-07-04 03:36:38,353] ERROR in app: Exception on /application/3b56f3d8/device/1 [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 208, in application_device
+    return render_template('views/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], table_max=MAX_PG_ENTRIES_DATA)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/templating.py", line 138, in render_template
+    ctx.app.jinja_env.get_or_select_template(template_name_or_list),
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 930, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 883, in get_template
+    return self._load_template(name, self.make_globals(globals))
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 857, in _load_template
+    template = self.loader.load(self, name, globals)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/loaders.py", line 127, in load
+    code = environment.compile(source, name, filename)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 638, in compile
+    self.handle_exception(source=source_hint)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/environment.py", line 832, in handle_exception
+    reraise(*rewrite_traceback_stack(source=source))
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/jinja2/_compat.py", line 28, in reraise
+    raise value.with_traceback(tb)
+  File "/home/pi/thso.server/app/app/templates/views/public/device.html", line 250, in template
+    devmarker.bindPopup({% dev[0] %}).openPopup();
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'dev'. Jinja was looking for the following tags: 'elif' or 'else' or 'endif'. The innermost block that needs to be closed is 'if'.
+[2020-07-04 04:25:37,770] INFO in views: superuser admin added new device ddmgeo for application 3b56f3d8
+[2020-07-04 04:43:27,669] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 492, in application_device_geo
+    d = ddm.read_data(ld[3], dev[3])
+IndexError: list index out of range
+[2020-07-04 04:43:46,583] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 492, in application_device_geo
+    d = ddm.read_data(ld[3], dev[3])
+IndexError: list index out of range
+[2020-07-04 04:44:19,012] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 492, in application_device_geo
+    d = ddm.read_data(ld[3], dev[3])
+IndexError: list index out of range
+[2020-07-04 04:45:07,692] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 492, in application_device_geo
+    d = ddm.read_data(ld[3], dev[3])
+IndexError: list index out of range
+[2020-07-04 04:46:24,506] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 492, in application_device_geo
+    d = ddm.read_data(ld[2], dev[3])
+IndexError: list index out of range
+[2020-07-04 04:47:03,097] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 493, in application_device_geo
+    d = ddm.read_data(ld[2], dev[3])
+IndexError: list index out of range
+[2020-07-04 04:48:55,598] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 492, in application_device_geo
+    d = ddm.read_data(ld[2].tobytes(), dev[3])
+IndexError: list index out of range
+[2020-07-04 04:50:39,893] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "./app/helpers/decorators.py", line 23, in restricted_function
+    return f(*args, **kwargs)
+  File "./app/helpers/decorators.py", line 35, in protected_function
+    return f(*args, **kwargs)
+  File "./app/views.py", line 493, in application_device_geo
+    d = ddm.read_data(ld[2].tobytes(), dev[3])
+IndexError: list index out of range
+[2020-07-04 04:51:16,907] ERROR in app: Exception on /application/3b56f3d8/device/4/geo [GET]
+Traceback (most recent call last):
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1953, in full_dispatch_request
+    return self.finalize_request(rv)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 1968, in finalize_request
+    response = self.make_response(rv)
+  File "/home/pi/thso.server/env/lib/python3.7/site-packages/flask/app.py", line 2131, in make_response
+    " {rv.__class__.__name__}.".format(rv=rv)
+TypeError: The view function did not return a valid response. The return type must be a string, dict, tuple, Response instance, or WSGI callable, but it was a list.

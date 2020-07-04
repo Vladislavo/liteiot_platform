@@ -358,7 +358,6 @@ def recent_activity():
     recent_activity = md.get_recent_activity(session['name'])[1]
 
     ra = ''
-    
     for r in recent_activity:
         dev = dd.get(r[5], r[6])[1]
         ra += '<tr><th scope="row">'+r[1]+'</th><th>'+r[2]+'</th><th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3], dev[3]))+'</th></tr>'
@@ -483,6 +482,16 @@ def application_device_data(appkey, devid, var, dest, page):
                     t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
 
+@app.route('/application/<appkey>/device/<devid>/geo')
+@decorators.restricted('interface')
+@decorators.application_protected
+def application_device_geo(appkey, devid):
+    dev = dd.get(appkey, devid)[1]
+    if 'lat' in dev[3]['format'] and 'lon' in dev[3]['format']:
+        ld = data.get_last_n(appkey, devid, 1)[1]
+        d = ddm.read_data(ld[0][2].tobytes(), dev[3])
+        return str([d['lat'],d['lon']]), 200
+    return '', 404
 
 @app.route('/application/<appkey>/alerts')
 @decorators.restricted('interface')
