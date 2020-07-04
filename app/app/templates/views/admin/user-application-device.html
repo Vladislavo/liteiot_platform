@@ -4,6 +4,9 @@
 
 {% block header %} 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
 {% endblock %}
 
 {% block location %}
@@ -80,19 +83,27 @@
 			<p class="card-text">{{ dev[2] }}</p>
                       </div>
                     </div>
+		    {% if total > 0 and 'lat' in dev[3]['format'] and 'lon' in dev[3]['format'] %}
+		    <div class="card shadow border-0">
+		      <div id="map" class="map" style="height: 200px;"></div>
+		    </div>
+		    {% endif %}
                 </div>
 		{% if total > 0 %}
                 <div>
                   <ul class="nav nav-pills" id="pills-tab" role="tablist">
 		  {% for k in dev[3]['format'] %}
+		  	{% if k != 'lat' and k != 'lon' %}
                       <li class="nav-item col-lg-3 col-md-6" role="presentation">
 			      <a class="nav-link" id="tab_{{ k }}" data-toggle="pill" href="#{{ k }}" role="tab" aria-controls="{{ k }}" aria-selected="true" onclick="display_data('{{ k }}')">{{ k }}</a>
                       </li>
+		      	{% endif %}
 		  {% endfor %}
                   </ul>
 
                   <div class="tab-content" id="pills-tabContent">
 		      {% for k in dev[3]['format'] %}
+		  	{% if k != 'lat' and k != 'lon' %}
 		      <div class="tab-pane fade card" id="{{ k }}" style="margin-top: 30px;" role="tabpanel" aria-labelledby="tab_{{ k }}">
 			<div class="card-body">
               		      <h3 class="mb-0 card-header">Last 24 hours data</h3>
@@ -113,6 +124,7 @@
 			      {% endif %}
 		        </div>
 		      </div>
+		      	{% endif %}
 		      {% endfor %}
                   </div>
                 </div>
@@ -211,5 +223,27 @@
 		);
 	}
 </script>
+{% if 'lat' in dev[3]['format'] and 'lon' in dev[3]['format'] %}
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin="">
+</script>
+<script type="text/javascript">
+	fetch('/administration/{{ user }}/application/{{ app[1] }}/device/{{ dev[1] }}/geo').then(res => res.text()).then(function (data) 
+		{
+			var coord = eval(data);
+			var devmap = L.map('map').setView(coord, 15);
+			
+			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			    maxZoom: 18
+			}).addTo(devmap);
+			
+			var devmarker = L.marker(coord).addTo(devmap);
+			devmarker.bindPopup("{{ dev[0] }}").openPopup();
+		}
+	);
+</script>
+{% endif %}
 {% endif %}
 {% endblock %}

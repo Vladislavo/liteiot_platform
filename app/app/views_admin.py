@@ -410,6 +410,16 @@ def administration_user_application_device_data(name, appkey, devid, var, dest, 
                     t += '<tr><th>'+d[1]+'</th><th>'+str(d[2][var])+'</th></tr>'
         return t
 
+@app.route('/administration/<name>/application/<appkey>/device/<devid>/geo')
+@restricted('admin')
+def administration_user_application_device_geo(name, appkey, devid):
+    dev = dd.get(appkey, devid)[1]
+    if 'lat' in dev[3]['format'] and 'lon' in dev[3]['format']:
+        ld = data.get_last_n(appkey, devid, 1)[1]
+        d = ddm.read_data(ld[0][2].tobytes(), dev[3])
+        return str([d['lat'],d['lon']]), 200
+    return '', 404
+
 
 @app.route('/administration/<name>/application/<appkey>/device/<devid>/configure', methods=['GET', 'POST'])
 @restricted('admin', True)
