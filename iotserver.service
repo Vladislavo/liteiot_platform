@@ -1,0 +1,14 @@
+[Unit]
+Description=uWSGI IoT Server
+
+[Service]
+User=<user>
+Type=simple
+ExecStart=/home/<user>/<path-to-directory>/env/bin/uwsgi /home/<user>/<path-to-directory>/app/server.ini
+WorkingDirectory=/home/<user>/<path-to-directory>/app
+Restart=on-Failure
+KillSignal=SIGQUIT
+Environment="FLASK_ENV=development"
+
+[Install]
+WantedBy=multi-user.target
