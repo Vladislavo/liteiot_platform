@@ -1,6 +1,9 @@
 <p> Hello {{ username }}, </p>
 
-<p> The alert {{ alert[3] }} from your {{ appname }} application has been fired at {{ message['timedate'] }} with the next message: {{ message['data'] }}. </p>
+<p> The alert {{ alert[3] }} from your {{ appname }} application has been fired at {{ message['timedate'] }} with the next message: </p>
+
+<p> {{ message['data'] }} </p>
+
 <p> Remember the condition of the alert was {{ alert[4] }}. </p>
 
 <p>Take care,<br>HPC&amp;A IoT Server </p>
