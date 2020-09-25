@@ -75,7 +75,8 @@ CREATE TABLE public.users (
 --    last_name character varying(50),
     name character varying(30) NOT NULL,
     password character varying(100) NOT NULL,
-    role character varying(10) NOT NULL
+    role character varying(10) NOT NULL,
+    telegram_chat_id character varying(12)
 );
 
 
