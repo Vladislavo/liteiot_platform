@@ -217,24 +217,29 @@ def application_add_device(appkey):
         dev_list = dd.get_list(appkey)
         return render_template('views/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS)
     elif request.method == 'POST':
-        ddmin = ddm.extract(request)
-       
-        res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
-        if not res[0]:
-            app.logger.error('%s %s failed to add device for application %s - %s', session['role'], session['name'], appkey, res[1])
-            flash('Error: {}'.format(res[1]), 'danger')
-            return redirect(request.url)
-        else:
-            res = data.create_table_ddm(appkey, request.form['devid'])
+        if dd.check_devid(appkey, request.form['devid']):
+            ddmin = ddm.extract(request)
+           
+            res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
             if not res[0]:
                 app.logger.error('%s %s failed to add device for application %s - %s', session['role'], session['name'], appkey, res[1])
-                dd.delete(session['appkey'], request.form['devid'])
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
             else:
-                app.logger.info('%s %s added new device %s for application %s', session['role'], session['name'], request.form['devname'], appkey)
-                flash('Device added', 'success')
-                return redirect(url_for('application', appkey=appkey))
+                res = data.create_table_ddm(appkey, request.form['devid'])
+                if not res[0]:
+                    app.logger.error('%s %s failed to add device for application %s - %s', session['role'], session['name'], appkey, res[1])
+                    dd.delete(session['appkey'], request.form['devid'])
+                    flash('Error: {}'.format(res[1]), 'danger')
+                    return redirect(request.url)
+                else:
+                    app.logger.info('%s %s added new device %s for application %s', session['role'], session['name'], request.form['devname'], appkey)
+                    flash('Device added', 'success')
+                    return redirect(url_for('application', appkey=appkey))
+        else:
+            app.logger.info('%s %s failed to add new device %s for application %s. Cause: existing devid', session['role'], session['name'], request.form['devname'], appkey)
+            flash('Error: Selected Device ID already used, pick another one.', 'danger')
+            return redirect(request.url)
 
 
 @app.route('/application/<appkey>/device/<devid>/delete')

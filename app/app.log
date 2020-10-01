@@ -1,3 +1,9 @@
 [2020-09-13 17:53:00,310] INFO in views: Logged in superuser admin
 [2020-09-13 17:55:00,520] INFO in views: superuser admin created new application THSO 49f4d289
 [2020-09-13 17:58:38,291] INFO in views: superuser admin added new device ESP32 for application 49f4d289
+[2020-10-01 15:08:14,780] INFO in views: Logged in superuser admin
+[2020-10-01 15:08:37,331] INFO in views: Logged in superuser admin
+[2020-10-01 15:10:09,547] INFO in views: superuser admin failed to add new device tricky for application 8cc6f4b1. Cause: existing devid
+[2020-10-01 15:11:29,771] INFO in views: superuser admin failed to add new device tricky for application 8cc6f4b1. Cause: existing devid
+[2020-10-01 15:11:42,083] INFO in views: superuser admin added new device tricky for application 8cc6f4b1
+[2020-10-01 15:11:55,695] INFO in views: superuser admin deleted for application 8cc6f4b1 device 2

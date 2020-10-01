@@ -136,6 +136,7 @@ def get(cur, appkey, dev_id):
         dev[3] = json.loads(dev[3].tobytes())
         return (True, dev)
 
+
 @with_psql
 def update(cur, appkey, devid, name, desc):
     tn = 'devices_'+appkey
@@ -221,3 +222,20 @@ def get_count_by_user(cur, username):
         count += cur.fetchone()[0]
 
     return count
+
+
+@with_psql
+def check_devid(cur, appkey, dev_id):
+    tn = 'devices_' +str(appkey)
+    query = """
+    SELECT dev_id FROM 
+        {}
+    WHERE
+        dev_id = %s
+    """
+    cur.execute(
+        sql.SQL(query).format(sql.Identifier(tn)), [dev_id])
+    dev = cur.fetchone()
+   
+    return dev is None
+

@@ -135,25 +135,30 @@ def administration_user_application_add_device(name, appkey):
         dev_list = dd.get_list(appkey)
         return render_template('views/admin/user-application-add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, user=name)
     elif request.method == 'POST':
-        ddmin = ddm.extract(request)
-        res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
+        if dd.check_devid(appkey, request.form['devid']):
+            ddmin = ddm.extract(request)
+            res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
 
-        if not res[0]:
-            app.logger.error('Administrator %s failed to add device application %s for %s - %s', session['name'], appkey, name, res[1])
-            flash('Error: {}'.format(res[1]), 'danger')
+            if not res[0]:
+                app.logger.error('Administrator %s failed to add device application %s for %s - %s', session['name'], appkey, name, res[1])
+                flash('Error: {}'.format(res[1]), 'danger')
+                return redirect(request.url)
+            
+            res = data.create_table_ddm(appkey, request.form['devid'])
+        
+            if not res[0]:
+                dd.delete(appkey, request.form['devid'])
+                app.logger.error('Administrator %s failed to add device application %s for %s - %s', session['name'], appkey, name, res[1])
+                flash('Error: {}'.format(res[1]), 'danger')
+                return rendirect(request.url)
+            
+            app.logger.warning('Administrator %s added new device %s application %s for %s', session['name'], request.form['devid'], appkey, name)
+            
+            return redirect(url_for('administration_user_application', name=name, appkey=appkey))
+        else:
+            app.logger.info('%s %s failed to add new device %s for application %s. Cause: existing devid', session['role'], session['name'], request.form['devname'], appkey)
+            flash('Error: Selected Device ID already used, pick another one.', 'danger')
             return redirect(request.url)
-        
-        res = data.create_table_ddm(appkey, request.form['devid'])
-    
-        if not res[0]:
-            dd.delete(appkey, request.form['devid'])
-            app.logger.error('Administrator %s failed to add device application %s for %s - %s', session['name'], appkey, name, res[1])
-            flash('Error: {}'.format(res[1]), 'danger')
-            return rendirect(request.url)
-        
-        app.logger.warning('Administrator %s added new device %s application %s for %s', session['name'], request.form['devid'], appkey, name)
-        
-        return redirect(url_for('administration_user_application', name=name, appkey=appkey))
 
 
 @app.route('/administration/<name>/application/<appkey>/device/<devid>')
