@@ -100,7 +100,7 @@
                     <div class="card">
                       <div class="card-body">
                         <h5 class="card-title">Security key (HEX)</h5>
-			<p class="card-text">{{ app[5] }}</p>
+			<p class="card-text" id="secure_key">{{ app[5].decode('UTF-8') }}</p>
                       </div>
                     </div>
                 </div>
@@ -146,4 +146,18 @@
           </div>
         </div>
       </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	var skey = document.getElementById("secure_key").innerHTML;
+	var fskey = "{ ";
+
+	for (var i = 0; i < skey.length-2; i+=2) {
+		fskey += "0x" + (skey[i] + skey[i+1]) + ", ";
+	}
+	fskey += "0x" + skey[skey.length-2]+skey[skey.length-1] + " }";
+	
+	$("#secure_key").text(fskey);
+</script>
 {% endblock %}
