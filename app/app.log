@@ -9,3 +9,4 @@
 [2020-10-01 15:11:55,695] INFO in views: superuser admin deleted for application 8cc6f4b1 device 2
 [2020-10-07 17:18:50,561] INFO in views: Logged in superuser admin
 [2020-10-07 17:19:21,368] INFO in views: Logged in superuser admin
+[2020-10-07 19:11:04,501] INFO in views: superuser admin added new device testgeo for application 8cc6f4b1

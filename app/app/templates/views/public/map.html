@@ -105,12 +105,26 @@
    crossorigin="">
 </script>
 <script type="text/javascript">
+	var devslocs = JSON.parse('{{ devslocs | safe }}');
 	var devmap = L.map('map').setView([50, 50], 2);
-	
+
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 	    maxZoom: 18
 	}).addTo(devmap);
+
+	Object.entries(devslocs).forEach(([appkey, devdata]) => {
+		applink = "/application/" + appkey;
+		Object.entries(devdata).forEach(([devid, data]) => {
+			devlink = applink + "/device/" + devid;
+			var devmarker = L.marker([data["lat"],data["lon"]]).addTo(devmap);
+			var popuptxt = "<b> Application: <a href='"+applink+"'>"+data["appname"] + "</a></b><br>";
+			popuptxt += "<b> Device: <a href='"+devlink+"'>"+data["devname"] + "</a></b><br>";
+			var dateutc = new Date(data["utc"]*1000);
+			popuptxt += "<b>Timestamp: </b>"+dateutc.toString();
+			devmarker.bindPopup(popuptxt).openPopup();
+		});
+	});
 	
 </script>
 {% endblock %}

@@ -128,7 +128,13 @@ def get_list(cur, appkey):
     """
     cur.execute(
         sql.SQL(query).format(sql.Identifier(tn)))
-    return (True, cur.fetchall())
+    
+    devlist = cur.fetchall()
+    for i in range(len(devlist)):
+        devlist[i] = [d for d in devlist[i]]
+        devlist[i][3] = json.loads(devlist[i][3].tobytes())
+
+    return (True, devlist)
 
 
 @with_psql

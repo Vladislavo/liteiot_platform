@@ -1,7 +1,10 @@
 from psycopg2 import sql
+import app.helpers.device_data_model as ddm
 from app.helpers.misc import with_psql, utc_roundhour, utc_roundday, utc_local_diff
 import app.dao.application.application as ad
 import app.dao.device.device as dd
+import app.dao.data.data as data
+import json
 
 # appkeys is a list of tuples [(app1), (app2), ..., (appn)]
 # devids is a list of lists of tuples [[(dev1),...],[(dev1),...]]
@@ -174,13 +177,21 @@ def get_recent_activity(cur, username, n=5):
     else:
         return (True, [])
 
-@with_psql
-def get_devices_locations(cur, username):
+def get_devices_locations(username):
     devlocs = {}
     apps = ad.get_list(username)[1]
     
     for a in apps:
         devs = dd.get_list(a[1])[1]
-        print(devs)
-    
+        devs = [d for d in devs if all (k in d[3]['format'] for k in ('lat', 'lon'))]
+        if devs != []:
+            for d in devs:
+                ddata = data.get_last_n(a[1], d[1], 1)
+                if ddata[0]:
+                    devlocs[a[1]] = {int(d[1]) : {}}
+                    ddata = ddm.decode_datum(ddata[1][0], d[3])
+                    #decodify the data and put it into the dict
+                    devlocs[a[1]][int(d[1])].update({'appname' : a[0], 'devname' : d[0], 'utc' : int(ddata[0]), 'lat' : ddata[2]['lat'], 'lon': ddata[2]['lon']})
+    return devlocs
+
 

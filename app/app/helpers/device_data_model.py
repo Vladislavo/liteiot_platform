@@ -2,9 +2,6 @@ import msgpack
 import struct
 from collections import OrderedDict
 import json
-import app.helpers.misc as misc
-from psycopg2 import Binary
-from datetime import datetime
 
 MODELS = {
     'json' : 'JSON',
@@ -94,36 +91,6 @@ def test_done():
         'format' : OrderedDict([('some_int', 'H'), ('some_float', 'f'), ('some_bool', '?'), ('some_str', '7s')])
     }
     print(read_data_ddm(rdata, ddm))
-
-@misc.with_psql
-def mpack_test(cur):
-    import random
-    
-    m = {
-            "temperature" : random.randint(0, 100),
-            "lever": random.randint(0,1)
-        }
-    m = msgpack.packb(m)
-    query = """
-        INSERT INTO dev_3b56f3d8_3 VALUES ({}, '{}', {})
-    """.format(misc.get_utc(), datetime.now().strftime('%H:%M:%S'), Binary(m))
-    cur.execute(query)
-    
-    return (True,)
-
-
-@misc.with_psql
-def raw_test(cur):
-    import random
-    
-    upstr = '<fQ20s?h'
-    m = struct.pack(upstr, random.random()*1000, random.randint(10000,10000000), 'hello'.encode('utf-8'), random.randint(0,2), random.randint(0, 30000))
-    query = """
-        INSERT INTO dev_3b56f3d8_2 VALUES ({}, '{}', {})
-    """.format(misc.get_utc(), datetime.now().strftime('%H:%M:%S'), Binary(m))
-    cur.execute(query)
-    
-    return (True,)
 
 
 def decode_datum(data, ddm):

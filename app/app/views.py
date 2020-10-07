@@ -659,6 +659,6 @@ def map():
     last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
     info = [created_apps, active_devices, total_activity, last_activity]
     
-    
-
-    return render_template('views/public/map.html', info=info)
+    devslocs = md.get_devices_locations(session['name'])
+    import json 
+    return render_template('views/public/map.html', info=info, devslocs=json.dumps(devslocs))
