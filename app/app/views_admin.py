@@ -104,7 +104,7 @@ def administration_user_new_application(name):
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
         
-            res = dd.create_table_ddm(appkey)
+            res = dd.create_table(appkey)
         
             if not res[0]:
                 ad.delete(appkey)
@@ -137,14 +137,14 @@ def administration_user_application_add_device(name, appkey):
     elif request.method == 'POST':
         if dd.check_devid(appkey, request.form['devid']):
             ddmin = ddm.extract(request)
-            res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
+            res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
 
             if not res[0]:
                 app.logger.error('Administrator %s failed to add device application %s for %s - %s', session['name'], appkey, name, res[1])
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
             
-            res = data.create_table_ddm(appkey, request.form['devid'])
+            res = data.create_table(appkey, request.form['devid'])
         
             if not res[0]:
                 dd.delete(appkey, request.form['devid'])
@@ -188,7 +188,7 @@ def administration_user_application_device_settings(name, appkey, devid):
         return render_template('views/admin/user-application-device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS, user=name)
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
-        res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
+        res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
     
         if not res[0]:
             app.logger.error('Administrator %s failed to change settings for device %s application %s for %s - %s', session['name'], devid, appkey, name, res[1])
