@@ -174,4 +174,13 @@ def get_recent_activity(cur, username, n=5):
     else:
         return (True, [])
 
+@with_psql
+def get_devices_locations(cur, username):
+    devlocs = {}
+    apps = ad.get_list(username)[1]
+    
+    for a in apps:
+        devs = dd.get_list(a[1])[1]
+        print(devs)
+    
 

@@ -8,7 +8,6 @@ import app.dao.pend.pend as pend
 import app.dao.data.data as data
 import app.dao.notification.notification as nfs
 import app.dao.trigger.trigger as tr
-import app.dao.notification_queue.notification_queue as nq
 import app.dao.misc.misc as md
 
 import app.helpers.misc as misc
@@ -168,7 +167,6 @@ def application_delete(appkey):
     for dev in devs[1]:
         data.delete_table(appkey, dev[1])
         # delete notifications
-        nq.delete_per_device(appkey, dev[1])
         nfss = nfs.get_per_device(appkey, dev[1])
         for nf in nfss[1]:
             tr.delete(appkey, dev[1], nf[0])
@@ -246,7 +244,6 @@ def application_add_device(appkey):
 @decorators.restricted('user')
 @decorators.application_protected
 def application_device_delete(appkey, devid):
-    nq.delete_per_device(appkey, devid)
     nfss = nfs.get_per_device(appkey, devid)
     for nf in nfss[1]:
         tr.delete(appkey, devid, nf[0])
@@ -547,7 +544,6 @@ def application_new_alert(appkey):
 @decorators.restricted('user')
 @decorators.application_protected
 def application_notification_remove(appkey, ntype):
-    nq.delete(appkey, request.args.get('devid'), request.args.get('id'))
     tr.delete(appkey, request.args.get('devid'), request.args.get('id'))
     tr.delete_function(appkey, request.args.get('devid'), request.args.get('id'))
     res = nfs.delete(appkey, request.args.get('devid'), request.args.get('id'))
