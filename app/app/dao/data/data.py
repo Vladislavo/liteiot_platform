@@ -2,21 +2,9 @@ from psycopg2 import sql
 from app.helpers.misc import with_psql
 from datetime import datetime
 
-@with_psql
-def create_table(cur, appkey, devid):
-    tn = 'dev_' +str(appkey)+ '_' +str(devid)
-    cur.execute(
-        sql.SQL(
-            """CREATE TABLE {} (
-                utc NUMERIC(10) NOT NULL,
-                timedate VARCHAR(100) NOT NULL,
-                data json NOT NULL
-            )"""
-        ).format(sql.Identifier(tn)))
-    return (True,)
 
 @with_psql
-def create_table_ddm(cur, appkey, devid):
+def create_table(cur, appkey, devid):
     tn = 'dev_' +str(appkey)+ '_' +str(devid)
     cur.execute(
         sql.SQL(
@@ -28,6 +16,7 @@ def create_table_ddm(cur, appkey, devid):
         ).format(sql.Identifier(tn)))
     return (True,)
     
+
 @with_psql
 def delete_table(cur, appkey, devid):
     tn = 'dev_' +str(appkey)+ '_' +str(devid)

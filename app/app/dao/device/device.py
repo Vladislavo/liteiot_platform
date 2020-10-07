@@ -3,21 +3,9 @@ from app.helpers.misc import with_psql
 import app.dao.application.application as ad
 import json
 
-@with_psql
-def create_datatable(cur, appkey, dev_id):
-    tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
-    cur.execute(
-        sql.SQL(
-            """CREATE TABLE {} (
-                utc NUMERIC(10) DEFAULT EXTRACT(EPOCH FROM now())::int NOT NULL,
-                timedate VARCHAR(100) NOT NULL,
-                data json NOT NULL
-            )"""
-        ).format(sql.Identifier(tn)))
-    return (True,)
 
 @with_psql
-def create_datatable_ddm(cur, appkey, dev_id, model):
+def create_datatable(cur, appkey, dev_id, model):
     tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
     cur.execute(
         sql.SQL(
@@ -29,7 +17,8 @@ def create_datatable_ddm(cur, appkey, dev_id, model):
         ).format(sql.Identifier(tn)))
     
     return (True,)
-    
+
+
 @with_psql
 def delete_datatable(cur, appkey, dev_id):
     tn = 'dev_' +str(appkey)+ '_' +str(dev_id)
@@ -39,21 +28,9 @@ def delete_datatable(cur, appkey, dev_id):
         ).format(sql.Identifier(tn)))
     return (True,)
 
-@with_psql
-def create_table(cur, appkey):
-    tn = 'devices_' +str(appkey)
-    cur.execute(
-        sql.SQL(
-            """CREATE TABLE {} (
-                name VARCHAR(30) NOT NULL,
-                dev_id NUMERIC(3) PRIMARY KEY,
-                description VARCHAR(200)
-            )"""
-        ).format(sql.Identifier(tn)))
-    return (True,)
 
 @with_psql
-def create_table_ddm(cur, appkey):
+def create_table(cur, appkey):
     tn = 'devices_' +str(appkey)
     cur.execute(
         sql.SQL(
@@ -75,21 +52,9 @@ def delete_table(cur, appkey):
         ).format(sql.Identifier(tn)))
     return (True,)
 
-@with_psql
-def create(cur, name, dev_id, appkey, desc):
-    tn = 'devices_' +str(appkey)
-    query = """
-    INSERT INTO 
-        {}
-    VALUES
-        (%s, %s, %s)
-    """
-    cur.execute(
-        sql.SQL(query).format(sql.Identifier(tn)), [name, dev_id, desc])
-    return (True,)
 
 @with_psql
-def create_ddm(cur, name, dev_id, appkey, desc, ddm):
+def create(cur, name, dev_id, appkey, desc, ddm):
     tn = 'devices_' +str(appkey)
     query = """
     INSERT INTO 
@@ -138,23 +103,7 @@ def get(cur, appkey, dev_id):
 
 
 @with_psql
-def update(cur, appkey, devid, name, desc):
-    tn = 'devices_'+appkey
-    query = """
-        UPDATE
-            {}
-        SET
-            name = %s,
-            description = %s
-        WHERE
-            dev_id = %s
-    """.format(tn)
-    cur.execute(query, (name, desc, devid))
-
-    return (True,)
-
-@with_psql
-def update_ddm(cur, appkey, devid, name, desc, ddm):
+def update(cur, appkey, devid, name, desc, ddm):
     tn = 'devices_'+appkey
     query = """
         UPDATE

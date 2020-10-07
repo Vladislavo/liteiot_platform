@@ -145,7 +145,7 @@ def application_create():
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
         
-            res = dd.create_table_ddm(appkey)
+            res = dd.create_table(appkey)
             
             if not res[0]:
                 ad.delete(appkey)
@@ -220,13 +220,13 @@ def application_add_device(appkey):
         if dd.check_devid(appkey, request.form['devid']):
             ddmin = ddm.extract(request)
            
-            res = dd.create_ddm(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
+            res = dd.create(request.form['devname'], request.form['devid'], appkey, request.form['devdesc'], ddmin)
             if not res[0]:
                 app.logger.error('%s %s failed to add device for application %s - %s', session['role'], session['name'], appkey, res[1])
                 flash('Error: {}'.format(res[1]), 'danger')
                 return redirect(request.url)
             else:
-                res = data.create_table_ddm(appkey, request.form['devid'])
+                res = data.create_table(appkey, request.form['devid'])
                 if not res[0]:
                     app.logger.error('%s %s failed to add device for application %s - %s', session['role'], session['name'], appkey, res[1])
                     dd.delete(session['appkey'], request.form['devid'])
@@ -644,7 +644,7 @@ def application_device_settings(appkey, devid):
         return render_template('views/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS)
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
-        res = dd.update_ddm(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
+        res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
         
         if not res[0]:
             flash('Error: {}'.format(res[1]), 'danger')
@@ -663,5 +663,6 @@ def map():
     last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
     info = [created_apps, active_devices, total_activity, last_activity]
     
-    print('render')
+    
+
     return render_template('views/public/map.html', info=info)
