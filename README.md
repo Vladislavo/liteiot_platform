@@ -10,7 +10,7 @@ $ cd hpca_iot
 ``` 
 2. Clone the project 
 ``` 
-$ git clone https://lorca.act.uji.es/gitlab/vrykov/thso.server/-/tree/dev 
+$ git clone https://lorca.act.uji.es/gitlab/vrykov/thso.server 
 $ cd thso.server 
 ```
 3. Run preinstallation script which will create virtual envoronment, install all necessary C libs and python dependencies, and export environment variables. 
@@ -40,9 +40,16 @@ the server or on which port it will be listening. For more information refer to 
 
 ## Running
 
-To run the server execute next command 
+Ideally, the server will be configured as a deamon including iotserver.service file into /etc/systemd/system folder and enabling it.
 ``` 
-thso.server/app $ uwsgi aserver.ini 
+thso.server $ sudo systemctl enable iotserver.service
+thso.server $ sudo systemctl start iotserver.service
+``` 
+
+Alternatively, the server can be launched as a regular application executing next commands
+``` 
+thso.server/app $ source ../env/bin/activate 
+thso.server/app $ uwsgi server.ini 
 ``` 
 
 [flask]: <https://flask.palletsprojects.com/en/1.1.x/> 
