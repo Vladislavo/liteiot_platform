@@ -503,7 +503,7 @@ def application_device_geo(appkey, devid):
 def application_alerts(appkey):
     ap = ad.get(appkey)
     alerts = nfs.get_alerts_list(appkey)
-    return render_template('views/public/alerts.html', alert_list=alerts[1], app=ap[1])
+    return render_template('views/public/alerts.html', alert_list=alerts[1], app=ap[1], applications="active")
 
 
 @app.route('/application/<appkey>/new-alert', methods=['GET', 'POST'])
@@ -514,7 +514,7 @@ def application_new_alert(appkey):
         ap = ad.get(appkey)
         devs = dd.get_list(appkey)
         
-        return render_template('views/public/new-alert.html', devs=devs[1], app=ap[1])
+        return render_template('views/public/new-alert.html', devs=devs[1], app=ap[1], applications="active")
     elif request.method == 'POST':
         # create new notification
         nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
@@ -565,7 +565,7 @@ def application_automation(appkey):
     ap = ad.get(appkey)
     ats = nfs.get_automation_list(appkey)
     
-    return render_template('views/public/automation.html', automations=ats[1], app=ap[1])
+    return render_template('views/public/automation.html', automations=ats[1], app=ap[1], applications="active")
 
 
 @app.route('/application/<appkey>/new-automation', methods=['GET', 'POST'])
@@ -576,7 +576,7 @@ def application_new_automation(appkey):
         ap = ad.get(appkey)
         devs = dd.get_list(appkey)
         
-        return render_template('views/public/new-automation.html', devs=devs[1], app=ap[1])
+        return render_template('views/public/new-automation.html', devs=devs[1], app=ap[1], applications="active")
     elif request.method == 'POST':
         # create new notification
         nid = misc.rand_str(app.config['NID_LENGTH']).decode('utf-8')
@@ -612,7 +612,7 @@ def application_settings(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
 
-        return render_template('views/public/application-settings.html', app=ap[1])
+        return render_template('views/public/application-settings.html', app=ap[1], applications="active")
     elif request.method == 'POST':
         if request.form.getlist('secure') and request.form.getlist('secure')[0] == 'on':
             secure = True
@@ -637,7 +637,7 @@ def application_device_settings(appkey, devid):
         ap = ad.get(appkey)
         dev = dd.get(appkey, devid)
 
-        return render_template('views/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS)
+        return render_template('views/public/device-settings.html', app=ap[1], dev=dev[1], models=ddm.MODELS, applications="active")
     elif request.method == 'POST':
         ddmin = ddm.extract(request)
         res = dd.update(appkey, devid, request.form['devname'], request.form['devdesc'], ddmin)
@@ -661,4 +661,4 @@ def map():
     
     devslocs = md.get_devices_locations(session['name'])
     import json 
-    return render_template('views/public/map.html', info=info, devslocs=json.dumps(devslocs))
+    return render_template('views/public/map.html', info=info, devslocs=json.dumps(devslocs), map="active")
