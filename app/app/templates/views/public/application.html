@@ -105,13 +105,13 @@
 		{% if devs %}
 		{% for d in devs %}
                 <div class="col-lg-3 col-md-6">
-		    <button type="button" class="btn-icon-clipboard" data-clipboard-text="atom" title="{{ d[0] }}">
+		    <button type="button" class="btn-icon-clipboard" onclick="window.location.href='./{{ app[1] }}/device/{{ d[1] }}';" title="{{ d[0] }}">
                     <div>
                       <i class="ni ni-atom"></i>
-		      <span><a href="./{{ app[1] }}/device/{{ d[1] }}">{{ d[0] }}</a></span>
-                    </div>
+		      <span>{{ d[0] }}</span>
+		    </div>
                   </button>
-                </div>
+		</div>
 		{% endfor %}
 		{% else %}
                 <div class="col-lg-12 col-md-12">

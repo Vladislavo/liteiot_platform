@@ -35,7 +35,7 @@ def index():
     last_activity = md.get_user_data_count_per_day(session['name'])[1][0]
     info = [created_apps, active_devices, total_activity, last_activity]
 
-    return render_template('views/public/dashboard.html', info=info)
+    return render_template('views/public/dashboard.html', info=info, dashboard="active")
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -107,7 +107,7 @@ def logout():
 def applications():
     apps = ad.get_list(session['name'])
    
-    return render_template('views/public/applications.html', apps=apps[1])
+    return render_template('views/public/applications.html', apps=apps[1], applications="active")
 
 
 @app.route('/application/<appkey>')
@@ -118,14 +118,14 @@ def application(appkey):
     ap[5] = misc.skey_b64_to_hex(ap[5])
     devs = dd.get_list(ap[1])[1]
 
-    return render_template('views/public/application.html', app=ap, devs=devs)
+    return render_template('views/public/application.html', app=ap, devs=devs, applications="active")
 
 
 @app.route('/new-application', methods=['GET', 'POST'])
 @decorators.restricted('user')
 def application_create():
     if request.method == 'GET':
-        return render_template('views/public/new-application.html')
+        return render_template('views/public/new-application.html', applications="active")
     elif request.method == 'POST':
         if request.form['appname'] == '':
             flash('Application name cannot be empty.', 'danger')
@@ -203,7 +203,7 @@ def application_device(appkey, devid):
         if ld[0] and ld[1][0] != []:
             ltup = ld[1][0][1]
 
-        return render_template('views/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], table_max=MAX_PG_ENTRIES_DATA)
+        return render_template('views/public/device.html', dev=dev[1], app=ap[1], ltup=ltup, total=cnt[1][0], table_max=MAX_PG_ENTRIES_DATA, applications="active")
 
 
 @app.route('/application/<appkey>/add-device', methods=['GET', 'POST'])
@@ -213,7 +213,7 @@ def application_add_device(appkey):
     if request.method == 'GET':
         ap = ad.get(appkey)
         dev_list = dd.get_list(appkey)
-        return render_template('views/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS)
+        return render_template('views/public/add-device.html', app=ap[1], free_ids=misc.prep_id_range(dev_list[1]), models=ddm.MODELS, applications="active")
     elif request.method == 'POST':
         if dd.check_devid(appkey, request.form['devid']):
             ddmin = ddm.extract(request)
@@ -281,7 +281,7 @@ def application_device_configuration(appkey, devid):
                 ack = pm[3]
                 config_list.append((config_id, config_args, ack, pm[2]))
         
-        return render_template('views/public/device-configuration.html', dev=dev, app=ap, config_list=config_list)
+        return render_template('views/public/device-configuration.html', dev=dev, app=ap, config_list=config_list, applications="active")
     elif request.method == 'POST':
         base64_args = misc.pend_base64_encode(request.form['arg'], request.form['confid'])
         res = pend.create(appkey, devid, base64_args)
@@ -429,7 +429,7 @@ def delete_account():
     if not res[0]:
         app.logger.error('%s %s failed to delete the account - %s', session['role'], session['name'], res[1])
         flash('Error: {}'.format(res[1]), 'danger')
-        return render_template('views/public/settings.html', user=session['name'])
+        return render_template('views/public/settings.html', user=session['name'], settings="active")
     else:
         app.logger.warning('%s %s deleted the account', session['role'], session['name'])
         flash('User {} was deleted'.format(request.args.get('name')), 'success')
@@ -440,7 +440,7 @@ def delete_account():
 @decorators.restricted('user')
 def settings():
     if request.method == 'GET':
-        return render_template('views/public/settings.html', user=session['name'])
+        return render_template('views/public/settings.html', user=session['name'], settings="active")
     else:
         if request.form['name'] != session['name']:
             res = ud.update_name(session['name'], request.form['name'])
