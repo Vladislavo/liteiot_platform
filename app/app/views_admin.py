@@ -5,6 +5,7 @@ from flask import render_template, request, redirect, url_for, session, flash, a
 import app.dao.user.user as ud
 import app.dao.application.application as ad
 import app.dao.device.device as dd
+import app.dao.gateway.gateway as gd
 import app.dao.pend.pend as pend
 import app.dao.data.data as data
 import app.dao.notification.notification as nfs
@@ -646,3 +647,30 @@ def administration_user_delete_account(name):
         app.logger.critical('Administrator %s with role attempted to delete user %s with role %s', session['name'], session['role'], name, user[1][2])
         flash('Warning: the user is admin or does not exist.' ,'danger')
         return redirect(url_for('administration_user_settings', name=name))
+
+
+@app.route('/administration/gateways')
+@restricted('admin')
+def administration_gateways():
+    user_cnt = ud.get_count()[1][0]
+    apps_cnt = ad.get_count()[1][0]
+    devs_cnt = dd.get_count_all()[1][0]
+    info = [user_cnt, apps_cnt, devs_cnt]
+    
+    gws = gd.get_all()[1]
+
+    return render_template('views/admin/gateways.html', utcnow=misc.get_utc(), info=info, gws=gws)
+
+
+@app.route('/administration/gateway/<gwid>')
+@restricted('admin')
+def administration_gateway(gwid):
+    user_cnt = ud.get_count()[1][0]
+    apps_cnt = ad.get_count()[1][0]
+    devs_cnt = dd.get_count_all()[1][0]
+    info = [user_cnt, apps_cnt, devs_cnt]
+    
+    gws = gd.get(gwid)[1]
+
+    return render_template('views/admin/gateway.html', utcnow=misc.get_utc(), info=info, gw=gw)
+

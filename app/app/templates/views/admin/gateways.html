@@ -1,0 +1,120 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} Administration - Gateways - HPC&amp;A IoT {% endblock %}
+
+{% block header %} 
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+{% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/gateways">Gateways</a> 
+{% endblock %}
+
+{% block stats %}
+<!-- Header -->
+          <div class="row">
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Gateways</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ gws|length }}</span>
+                    </div>
+		    <div class="col-auto">
+		      <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
+			<i class="fas fa-users"></i>
+		      </div>
+		    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Applications</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ info[1] }}</span>
+                    </div>
+		    <div class="col-auto">
+		      <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+			<i class="fas fa-cubes"></i>
+		      </div>
+		    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Devices</h5>
+		      <span class="h2 font-weight-bold mb-0">{{ info[2] }}</span>
+                    </div>
+		    <div class="col-auto">
+		      <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+			<i class="fas fa-microchip"></i>
+		      </div>
+		    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+	  {% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Gateways</h3>
+            </div>
+            <div class="card-body">
+		{% if gws %}
+		<div class="table-responsive">
+			<table class="table align-items-center table-flush table-hover">
+				<thead>
+					<th scope="col"> Name </th>
+					<th scope="col"> Protocol </th>
+					<th scope="col"> Status </th>
+				</thead>
+				<tbody>
+					{% for gw in gws %}
+					<tr onclick="window.location='/administration/gateway/{{ gw["id"] }}';">
+						<th> {{ gw['name'] }} </th>
+						<th> {{ gw['protocol'] }} </th>
+						<th> <span class="badge badge-dot">
+							{% if (utcnow - gw['last_keep_alive']) > gw['telemetry_send_freq'] %} 
+							<i class="bg-danger"></i> connection-lost
+							{% else %}
+							<i class="bg-success"></i> online
+							{% endif %}
+						</span> </th>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		{% endif %}
+            </div>
+	    <div class="card-body">
+                <div class="col-lg-4">
+			<a href="/administration/new-gateway"><button class="btn btn-primary" type="submit">New Gateway</button></a>
+		</div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+{% endblock %}
