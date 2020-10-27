@@ -1,0 +1,108 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} Administration - Gateways - {{ gw['id'] }} - HPC&amp;A IoT {% endblock %}
+
+{% block location %}
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/gateways">Gateways</a> 
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/gateway/{{ gw['id'] }}">{{ gw['name'] }}</a> 
+{% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="col-lg-12 col-md-6" style="margin-bottom : 30px;">
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Name</h5>
+			<p class="card-text">{{ gw['name'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">ID</h5>
+			<p class="card-text">{{ gw['id'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Protocol</h5>
+			<p class="card-text">{{ gw['protocol'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Description</h5>
+			<p class="card-text">{{ gw['description'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Secure Key</h5>
+			<p class="card-text" id="secure_key">{{ gw['secure_key'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Telemetry Send Period</h5>
+			<p class="card-text">{{ gw['telemetry_send_freq'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Last Keep Alive</h5>
+			<p class="card-text">{{ gw['last_keep_alive'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Errors Count</h5>
+			<p class="card-text">{{ gw['num_errors'] }}</p>
+                      </div>
+                    </div>
+                    <div class="card" style="margin-bottom : 15px;">
+                      <div class="card-body">
+                        <h5 class="card-title">Last Report</h5>
+			<p class="card-text">{{ gw['last_report'] }}</p>
+                      </div>
+                    </div>
+                </div>
+
+              <div class="row" style="margin-top: 30px;">
+               <div class="col-lg-4">
+               </div>
+               <div class="col-lg-4">
+               </div>
+               <div class="col-lg-4">
+		       <a href="/administration/gateway/{{ gw['id'] }}/settings"<button type="submit" class="btn btn-primary btn-block">Settings</button></a>
+               </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	var skey = document.getElementById("secure_key").innerHTML;
+	var fskey = "{ ";
+
+	for (var i = 2; i < skey.length-2; i+=2) {
+		fskey += "0x" + (skey[i] + skey[i+1]) + ", ";
+	}
+	fskey += "0x" + skey[skey.length-2]+skey[skey.length-1] + " }";
+	
+	$("#secure_key").text(fskey);
+</script>
+{% endblock %}

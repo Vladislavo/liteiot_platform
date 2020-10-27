@@ -670,7 +670,7 @@ def administration_gateway(gwid):
     devs_cnt = dd.get_count_all()[1][0]
     info = [user_cnt, apps_cnt, devs_cnt]
     
-    gws = gd.get(gwid)[1]
+    gw = gd.get(gwid)[1]
 
     return render_template('views/admin/gateway.html', utcnow=misc.get_utc(), info=info, gw=gw)
 

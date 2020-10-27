@@ -13,9 +13,9 @@ def create(cur, name, gwid, protocol, desc, secure_key, telemetry_send_freq):
 
 @with_psql
 def get(cur, gwid):
-    cur.execute('SELECT row_to_json(r) FROM (SELECT * FROM gateways WHERE id = %s) r', gwid)
+    cur.execute('SELECT row_to_json(r) FROM (SELECT * FROM gateways WHERE id = %s) r', (gwid,))
 
-    return (True, cur.fetchone()[0][0])
+    return (True, cur.fetchone()[0])
 
 
 @with_psql
