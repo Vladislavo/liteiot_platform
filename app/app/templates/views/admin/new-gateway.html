@@ -1,0 +1,58 @@
+{% extends 'logged_layout.html' %}
+
+{% block title %} Administration - New Gateway - HPC&amp;A IoT {% endblock %}
+
+{% block location %} 
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration">Administration</a>
+<p class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"> &nbsp;-&nbsp; </p>
+<a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/administration/gateways">Gateways</a> 
+{% endblock %}
+
+{% block body %}
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <!-- Table -->
+      <div class="row">
+        <div class="col">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <h3 class="mb-0">New Gateway</h3>
+            </div>
+            <div class="card-body">
+		<form action="/administration/new-gateway" method="post">
+			<div class="form-group">
+				<label>Name:</label><br>
+				<input type="text" maxlength="30" class="form-control" id="gwname" name="gwname" required><br>
+			</div>
+			<div class="form-group">
+				<label>ID:</label><br>
+				<input type="text" maxlength="20" class="form-control" id="gwid" name="gwid" required><br>
+			</div>
+			<div class="form-group">
+				<label>Protocol:</label><br>
+				<select class="form-control" id="gwprotocol" name="gwprotocol">
+					<option value="liteiot">LightIoT</option>
+					<option value="mqtt">MQTT</option>
+					<option value="rest">HTTP REST</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label>Description:</label><br>
+				<textarea id="gwdesc" maxlength="200" class="form-control" name="gwdesc" rows="5"></textarea>
+			</div>
+			<div class="form-group">
+				<label>Telemetry Send Frequency (seconds):</label><br>
+				<input type="number" min="1" class="form-control" id="gwtelemetry" name="gwtelemetry" required><br>
+			</div>
+
+			<br>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary">Create Gateway</button>
+			</div>
+		</form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

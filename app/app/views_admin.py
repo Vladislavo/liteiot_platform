@@ -674,3 +674,19 @@ def administration_gateway(gwid):
 
     return render_template('views/admin/gateway.html', utcnow=misc.get_utc(), info=info, gw=gw)
 
+
+@app.route('/administration/new-gateway', methods=['GET', 'POST'])
+@restricted('admin')
+def administration_new_gateway():
+    if request.method == 'GET':
+        return render_template('views/admin/new-gateway.html', administration="active")
+    elif request.method == 'POST':
+        secure_key = misc.gen_skey_b64(16)
+
+        res = gd.create(request.form['gwname'], request.form['gwid'], request.form['gwprotocol'], request.form['gwdesc'], secure_key, request.form['gwtelemetry'])
+        if not res[0]:
+            app.logger.error('Administrator %s failed to create new gateway - %s', res[1])
+            flash('Error: {}'.format(res[1]), 'danger')
+            return redirect(request.url)
+    
+        return redirect(url_for('administration_gateways'))
