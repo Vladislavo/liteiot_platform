@@ -177,6 +177,36 @@ def get_recent_activity(cur, username, n=5):
     else:
         return (True, [])
 
+@with_psql
+def get_recent_activity_json(cur, username, n=5):
+    apps = ad.get_list(username)[1]
+    devs = []
+    
+    for a in apps:
+        devs.append(dd.get_list(a[1])[1])
+    
+    if apps != [] and devs != [[]]:
+        query = 'SELECT row_to_json(r) FROM ('
+        for a in apps:
+            devs = dd.get_list(a[1])
+            for d in devs[1]:
+                query += """
+                (SELECT timedate, appname, devname, data, utc, appkey, devid from 
+                    (SELECT utc, timedate, data from dev_{}_{} ORDER BY utc DESC limit {}) AS utc, 
+                    (SELECT text '{}' as appname) AS appname,
+                    (SELECT text '{}' as appkey) AS appkey,
+                    (SELECT text '{}' as devid) AS devid,
+                    (SELECT text '{}' as devname) AS devname)
+                UNION ALL""".format(a[1],d[1], n, a[0],a[1], d[1],d[0])
+        query = query[0:-9]
+        query += ' ORDER BY utc DESC LIMIT {}) r'.format(n)
+
+        cur.execute(query, ())
+    
+        return (True, cur.fetchall())
+    else:
+        return (True, {})
+
 def get_devices_locations(username):
     devlocs = {}
     apps = ad.get_list(username)[1]

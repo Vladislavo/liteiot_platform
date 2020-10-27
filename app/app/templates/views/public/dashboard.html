@@ -144,7 +144,7 @@
             </div>
             <div class="table-responsive">
               <!-- Projects table -->
-              <table class="table align-items-center table-flush">
+              <table class="table align-items-center table-flush" id="ra_id">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">App name</th>
@@ -269,6 +269,45 @@
 	$.get("./recent-activity", function(cdata) {
 		$("#recent_activity_body").html(cdata);
 	});
+	
+	/* recent activity in JSON
+	$.get("./recent-activity-json", function(cdata) {
+		var data = eval(cdata);
+		console.log(data);
+		var table = document.getElementById("ra_id");
+
+		for (var dct in data) {
+			var tr = document.createElement("tr");
+			tr.appendChild(create_ra_entry("appname", "app", data[dct]));
+			tr.appendChild(create_ra_entry("devname", "dev", data[dct]));
+			tr.appendChild(create_ra_entry("timedate", "", data[dct]));
+			tr.appendChild(create_ra_entry("data", "", data[dct]));
+			table.appendChild(tr);
+		}
+	});
+
+	function create_ra_entry(entry_name, link, data) {
+		var td = document.createElement("td");
+		if (link === "app") {
+			var a = document.createElement("a");
+			a.setAttribute("href", "/application/"+data["appkey"]);
+			a.innerHTML = data[entry_name];
+			td.appendChild(a);
+		} else if (link === "dev") {
+			var a = document.createElement("a");
+			a.setAttribute("href", "/application/"+data["appkey"]+"/"+data["devid"]);
+			a.innerHTML = data[entry_name];
+			td.appendChild(a);
+		} else {
+			if (typeof data[entry_name] == 'object') {
+				td.innerHTML = JSON.stringify(data[entry_name]);
+			} else {
+				td.innerHTML = data[entry_name];
+			}
+		}
+		return td;
+	}
+	*/
 	
   </script>
 {% endblock %}

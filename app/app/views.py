@@ -365,8 +365,21 @@ def recent_activity():
         hrefapp = '<th scope="row"><a href="application/{}">{}</a></th>'.format(r[5], r[1])
         hrefdev = '<th><a href="application/{}/device/{}">{}</a></th>'.format(r[5], r[6], r[2])
         ra += '<tr>'+hrefapp+hrefdev+'<th>'+r[0]+'</th><th>'+str(ddm.read_data(r[3].tobytes(), dev[3]))+'</th></tr>'
-
+    
     return ra, 200
+
+#@app.route('/recent-activity-json')
+#@decorators.restricted('interface')
+#def recent_activity_json():
+#    raj = md.get_recent_activity_json(session['name'])[1]
+#    rajl = []
+#
+#    for i in range(len(raj)):
+#        dev = dd.get(raj[i][0]['appkey'], raj[i][0]['devid'])[1]
+#        raj[i][0]['data'] = ddm.read_data(binascii.unhexlify(raj[i][0]["data"][2:]), dev[3])
+#        rajl.append(raj[i][0])
+#
+#    return str(rajl), 200
 
 
 @app.route('/application/<appkey>/device/<devid>/remove-configuration')
