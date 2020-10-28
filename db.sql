@@ -95,16 +95,15 @@ CREATE TABLE public.notifications (
 	action character varying (200) NOT NULL
 );
 
--- ALTER TABLE public.notifications_queue OWNER TO pi;
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: pi
---
-CREATE TABLE public.notifications_queue (
-	nf_id character varying(10) NOT NULL,
-	app_key character varying(30) NOT NULL,
-	dev_id numeric(3) NOT NULL,
-	fired_on timestamp(6) NOT NULL DEFAULT now()
+CREATE TABLE public.gateways (
+	name character varying(30) NOT NULL,
+	id character varying(20) NOT NULL,
+	protocol character varying(30) NOT NULL,
+	description character varying(300),
+	telemetry_send_freq numeric NOT NULL,
+	last_keep_alive numeric DEFAULT 0,
+	num_errors numeric DEFAULT 0,
+	last_report character varying(1000)
 );
 
 
@@ -155,6 +154,12 @@ ALTER TABLE ONLY public.notifications
 	ADD CONSTRAINT notifications_app_key_fkey FOREIGN KEY (app_key) REFERENCES public.applications(app_key);
 
 --
+-- Name: gateways gateways_id_pkey; Type: CONSTRAINT; Schema: public; Owner: pi
+--
+ALTER TABLE ONLY public.gateways
+	ADD CONSTRAINT gateways_id_pkey PRIMARY KEY (id);
+
+	--
 -- Name: notifications notifications_queue_pkey; Type: CONSTRAINT; Schema: public; Owner: pi
 --
 ALTER TABLE ONLY public.notifications_queue

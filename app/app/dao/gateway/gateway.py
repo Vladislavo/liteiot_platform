@@ -1,5 +1,4 @@
 from app.helpers.misc import with_psql
-from psycopg2 import Binary
 
 @with_psql
 def create(cur, name, gwid, protocol, desc, secure_key, telemetry_send_freq):
@@ -29,7 +28,7 @@ def get_all(cur):
 
 @with_psql
 def delete(cur, gwid):
-    cur.execute('DELETE FROM gateways WHERE id = %s', gwid)
+    cur.execute('DELETE FROM gateways WHERE id = %s', (gwid,))
 
     return (True,)
 

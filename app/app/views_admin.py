@@ -650,7 +650,7 @@ def administration_user_delete_account(name):
         return redirect(url_for('administration_user_settings', name=name))
 
 
-@app.route('/administration/gateways')
+@app.route('/administration/gateways', methods=["GET", "DELETE"])
 @restricted('admin')
 def administration_gateways():
     user_cnt = ud.get_count()[1][0]
@@ -663,7 +663,7 @@ def administration_gateways():
     return render_template('views/admin/gateways.html', utcnow=misc.get_utc(), info=info, gws=gws)
 
 
-@app.route('/administration/gateway/<gwid>')
+@app.route('/administration/gateway/<gwid>', methods=["GET", "POST", "DELETE"])
 @restricted('admin')
 def administration_gateway(gwid):
     user_cnt = ud.get_count()[1][0]
@@ -709,4 +709,15 @@ def administration_gateway_settings(gwid):
             flash('Error: {}'.format(res[1]), 'danger')
             return redirect(request.url)
     
+        return redirect(url_for('administration_gateway', gwid=gwid))
+
+@app.route('/administration/gateway/<gwid>/delete', methods=["DELETE"])
+@restricted('admin')
+def administration_gateway_delete(gwid):
+    res = gd.delete(gwid)
+    if res[0]:
+        flash("Gateway '{}' deleted.".format(gwid), 'success')
+        return redirect(url_for('administration_gateways'))
+    else:
+        flash('Error: {}'.format(res[1]), 'danger')
         return redirect(url_for('administration_gateway', gwid=gwid))
