@@ -92,7 +92,7 @@
 					{% for gw in gws %}
 					<tr onclick="window.location='/administration/gateway/{{ gw["id"] }}';">
 						<th> {{ gw['name'] }} </th>
-						<th> {{ gw['protocol'] }} </th>
+						<th> {{ protocols[gw['protocol']] }} </th>
 						<th> <span class="badge badge-dot">
 							{% if (utcnow - gw['last_keep_alive']) > gw['telemetry_send_freq'] %} 
 							<i class="bg-danger"></i> connection-lost

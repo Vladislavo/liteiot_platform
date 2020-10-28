@@ -660,7 +660,7 @@ def administration_gateways():
     
     gws = gd.get_all()[1]
 
-    return render_template('views/admin/gateways.html', utcnow=misc.get_utc(), info=info, gws=gws)
+    return render_template('views/admin/gateways.html', utcnow=misc.get_utc(), info=info, gws=gws, protocols=gwm.PROTOCOLS, gateways="active")
 
 
 @app.route('/administration/gateway/<gwid>', methods=["GET", "POST", "DELETE"])
@@ -674,14 +674,14 @@ def administration_gateway(gwid):
     gw = gd.get(gwid)[1]
     gw['secure_key'] = misc.skey_b64_to_hex(gw['secure_key']).decode('UTF-8')
 
-    return render_template('views/admin/gateway.html', utcnow=misc.get_utc(), info=info, gw=gw, protocols=gwm.PROTOCOLS)
+    return render_template('views/admin/gateway.html', utcnow=misc.get_utc(), info=info, gw=gw, protocols=gwm.PROTOCOLS, gateways="active")
 
 
 @app.route('/administration/new-gateway', methods=['GET', 'POST'])
 @restricted('admin')
 def administration_new_gateway():
     if request.method == 'GET':
-        return render_template('views/admin/new-gateway.html', administration="active", protocols=gwm.PROTOCOLS)
+        return render_template('views/admin/new-gateway.html', administration="active", protocols=gwm.PROTOCOLS, gateways="active")
     elif request.method == 'POST':
         secure_key = misc.gen_skey_b64(16)
 
@@ -701,7 +701,7 @@ def administration_gateway_settings(gwid):
         gw = gd.get(gwid)[1]
         gw['secure_key'] = misc.skey_b64_to_hex(gw['secure_key']).decode('UTF-8')
 
-        return render_template('views/admin/gateway-settings.html', utcnow=misc.get_utc(), gw=gw, protocols=gwm.PROTOCOLS)
+        return render_template('views/admin/gateway-settings.html', utcnow=misc.get_utc(), gw=gw, protocols=gwm.PROTOCOLS, gateways="active")
     elif request.method == "POST":
         res = gd.update(request.form['gwname'], request.form['gwid'], request.form['gwprotocol'], request.form['gwdesc'], request.form['gwtelemetry'])
         if not res[0]:
