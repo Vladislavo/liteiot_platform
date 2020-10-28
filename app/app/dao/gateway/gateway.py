@@ -43,7 +43,7 @@ def update(cur, name, gwid, protocol, desc, telemetry_send_freq):
             SET
                 name = %s,
                 protocol = %s,
-                desc = %s,
+                description = %s,
                 telemetry_send_freq = %s
             WHERE
                 id = %s

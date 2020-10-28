@@ -13,3 +13,7 @@
 [2020-10-07 22:22:21,007] INFO in views: Logged in superuser admin
 [2020-10-27 11:05:02,900] INFO in views: Logged in superuser admin
 [2020-10-27 11:05:37,214] INFO in views: Logged in superuser admin
+[2020-10-28 17:55:40,659] ERROR in views_admin: Administrator admin failed to create new gateway - syntax error at or near "desc"
+LINE 7:                 desc = 'sdasfasdf',
+                        ^
+

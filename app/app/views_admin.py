@@ -16,6 +16,7 @@ import app.dao.misc.misc as md
 from app.helpers.decorators import restricted
 import app.helpers.device_data_model as ddm
 import app.helpers.misc as misc
+import app.helpers.gateway_management as gwm
 
 import binascii
 import os
@@ -671,15 +672,16 @@ def administration_gateway(gwid):
     info = [user_cnt, apps_cnt, devs_cnt]
     
     gw = gd.get(gwid)[1]
+    gw['secure_key'] = misc.skey_b64_to_hex(gw['secure_key']).decode('UTF-8')
 
-    return render_template('views/admin/gateway.html', utcnow=misc.get_utc(), info=info, gw=gw)
+    return render_template('views/admin/gateway.html', utcnow=misc.get_utc(), info=info, gw=gw, protocols=gwm.PROTOCOLS)
 
 
 @app.route('/administration/new-gateway', methods=['GET', 'POST'])
 @restricted('admin')
 def administration_new_gateway():
     if request.method == 'GET':
-        return render_template('views/admin/new-gateway.html', administration="active")
+        return render_template('views/admin/new-gateway.html', administration="active", protocols=gwm.PROTOCOLS)
     elif request.method == 'POST':
         secure_key = misc.gen_skey_b64(16)
 
@@ -690,3 +692,21 @@ def administration_new_gateway():
             return redirect(request.url)
     
         return redirect(url_for('administration_gateways'))
+
+
+@app.route('/administration/gateway/<gwid>/settings', methods=["GET", "POST"])
+@restricted('admin')
+def administration_gateway_settings(gwid):
+    if request.method == "GET":
+        gw = gd.get(gwid)[1]
+        gw['secure_key'] = misc.skey_b64_to_hex(gw['secure_key']).decode('UTF-8')
+
+        return render_template('views/admin/gateway-settings.html', utcnow=misc.get_utc(), gw=gw, protocols=gwm.PROTOCOLS)
+    elif request.method == "POST":
+        res = gd.update(request.form['gwname'], request.form['gwid'], request.form['gwprotocol'], request.form['gwdesc'], request.form['gwtelemetry'])
+        if not res[0]:
+            app.logger.error('Administrator %s failed to update new gateway - %s', session['name'], res[1])
+            flash('Error: {}'.format(res[1]), 'danger')
+            return redirect(request.url)
+    
+        return redirect(url_for('administration_gateway', gwid=gwid))

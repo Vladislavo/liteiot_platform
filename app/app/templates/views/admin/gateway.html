@@ -37,7 +37,7 @@
                     <div class="card" style="margin-bottom : 15px;">
                       <div class="card-body">
                         <h5 class="card-title">Protocol</h5>
-			<p class="card-text">{{ gw['protocol'] }}</p>
+			<p class="card-text">{{ protocols[gw['protocol']] }}</p>
                       </div>
                     </div>
                     <div class="card" style="margin-bottom : 15px;">
@@ -98,7 +98,7 @@
 	var skey = document.getElementById("secure_key").innerHTML;
 	var fskey = "{ ";
 
-	for (var i = 2; i < skey.length-2; i+=2) {
+	for (var i = 0; i < skey.length-2; i+=2) {
 		fskey += "0x" + (skey[i] + skey[i+1]) + ", ";
 	}
 	fskey += "0x" + skey[skey.length-2]+skey[skey.length-1] + " }";
